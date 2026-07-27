@@ -1,0 +1,13 @@
+{
+  "name": "GATES Program 2nd Stakeholder Conference",
+  "short_name": "GATES 2026",
+  "description": "The 2nd GATES Program Stakeholder Conference — October 15–16, 2026, Metro Manila.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#08090b",
+  "theme_color": "#08090b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

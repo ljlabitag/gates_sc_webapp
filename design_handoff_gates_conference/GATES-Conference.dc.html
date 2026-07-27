@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#08090b;-webkit-font-smoothing:antialiased}</style>
+</helmet>
+<div style="{{pageStyle}}">
+  <dc-import name="GATES-Nav" current-page="conference" hint-size="100%,76px"></dc-import>
+
+  <section style="{{heroStyle}}">
+    <div style="{{eyebrowStyle}}">OCT 16, 2026 &middot; VENUE TBD</div>
+    <h1 style="{{h1Style}}">2026 GATES Stakeholder Conference</h1>
+    <a href="./GATES-Registration.dc.html" style="{{primaryBtnStyle}}">Register Now</a>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{sectionHeadStyle}}">
+      <div style="{{eyebrowStyle}}">AGENDA</div>
+      <h2 style="{{h2Style}}">On the day</h2>
+    </div>
+    <div style="{{timelineStyle}}">
+      <sc-for list="{{agendaItems}}" as="item" hint-placeholder-count="4">
+        <div style="{{timelineRowStyle}}">
+          <div style="{{timelineDotStyle}}"></div>
+          <div style="{{timelineContentStyle}}">
+            <div style="{{timelineTimeStyle}}">{{item.time}}</div>
+            <div style="{{timelineTitleStyle}}">{{item.title}}</div>
+            <div style="{{timelineDescStyle}}">{{item.desc}}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{glassCardStyle}}">
+      <div style="{{eyebrowStyle}}">VENUE</div>
+      <h3 style="{{cardTitleStyle}}">Location to be announced</h3>
+      <p style="{{cardBodyStyle}}">Venue details will be posted here as soon as they're confirmed &mdash; check back closer to the date.</p>
+    </div>
+  </section>
+
+  <section style="{{recapSectionStyle}}">
+    <div style="{{sectionHeadStyle}}">
+      <div style="{{eyebrowStyle}}">LOOKING BACK</div>
+      <h2 style="{{h2Style}}">2025 Conference Recap</h2>
+    </div>
+    <div style="{{recapGridStyle}}">
+      <div style="{{photoPlaceholderStyle}}">photo: 2025 keynote</div>
+      <div style="{{photoPlaceholderStyle}}">photo: exhibit floor</div>
+      <div style="{{photoPlaceholderStyle}}">photo: hackathon teams</div>
+      <div style="{{photoPlaceholderStyle}}">photo: awarding ceremony</div>
+    </div>
+    <p style="{{bodyTextStyle}}">Relive highlights from last year's conference, including the keynote sessions, exhibit floor, and hackathon awarding.</p>
+    <a href="https://www.facebook.com/share/p/1D6LxisvYK/" target="_blank" rel="noopener" style="{{textLinkOnDarkStyle}}">View 2025 recap on Facebook &rarr;</a>
+  </section>
+
+  <footer style="{{footerStyle}}">
+    <div style="{{footerTopStyle}}">GATES</div>
+    <div style="{{footerLinksStyle}}">
+      <a href="./GATES-Home.dc.html" style="{{footerLinkStyle}}">Home</a>
+      <a href="./GATES-Program.dc.html" style="{{footerLinkStyle}}">Program</a>
+      <a href="./GATES-Conference.dc.html" style="{{footerLinkStyle}}">Conference</a>
+      <a href="./GATES-Hackathon.dc.html" style="{{footerLinkStyle}}">Hackathon</a>
+      <a href="./GATES-Registration.dc.html" style="{{footerLinkStyle}}">Register</a>
+    </div>
+    <div style="{{footerBottomStyle}}">&copy; 2026 GATES Program &middot; contact@gates-program.org</div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const font = 'system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif';
+    const mono = 'ui-monospace,SFMono-Regular,Menlo,monospace';
+    const glass = {
+      background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+      borderRadius: '20px'
+    };
+    const agendaItems = [
+      { time: 'Morning', title: 'Keynotes', desc: 'Sector leaders on the future of geospatial data and technology.' },
+      { time: 'Midday', title: 'Exhibit', desc: 'Tools and platforms from partner agencies, live and hands-on.' },
+      { time: 'Afternoon', title: 'Hackathon Finals', desc: 'Teams present, following weeks of pre-event mentoring and activities.' },
+      { time: 'Late afternoon', title: 'Awarding', desc: "Recognizing this year's top hackathon teams and contributors." }
+    ];
+    return {
+      agendaItems,
+      pageStyle: { fontFamily: font, background: '#08090b', color: 'rgba(255,255,255,0.94)', minHeight: '100vh' },
+      heroStyle: { padding: '88px 32px 56px', maxWidth: '780px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center' },
+      eyebrowStyle: { fontFamily: mono, fontSize: '12px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)' },
+      h1Style: { fontFamily: '"Barlow Condensed",' + font, fontSize: 'clamp(36px,5.5vw,60px)', fontWeight: 800, margin: 0, letterSpacing: '0.01em', textTransform: 'uppercase', textShadow: '0 0 26px rgba(152,64,119,0.5), 0 0 50px rgba(26,26,234,0.45)' },
+      primaryBtnStyle: { padding: '14px 26px', borderRadius: '999px', background: 'linear-gradient(135deg, #1a1aea, #984077)', color: '#ffffff', fontWeight: 700, fontSize: '15px', textDecoration: 'none', boxShadow: '0 4px 20px rgba(152,64,119,0.45)' },
+      sectionStyle: { padding: '48px 32px', maxWidth: '900px', margin: '0 auto' },
+      recapSectionStyle: { padding: '48px 32px 96px', maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '16px' },
+      sectionHeadStyle: { textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginBottom: '32px' },
+      h2Style: { fontSize: 'clamp(24px,3vw,34px)', fontWeight: 700, margin: 0, letterSpacing: '-0.01em' },
+      timelineStyle: { display: 'flex', flexDirection: 'column', gap: '0' },
+      timelineRowStyle: { display: 'flex', gap: '20px', paddingBottom: '28px', borderLeft: '2px solid rgba(255,255,255,0.14)', marginLeft: '9px', paddingLeft: '28px', position: 'relative' },
+      timelineDotStyle: { position: 'absolute', left: '-11px', top: '2px', width: '18px', height: '18px', borderRadius: '50%', background: '#984077', border: '3px solid #08090b' },
+      timelineContentStyle: { ...glass, padding: '20px 24px', flex: 1 },
+      timelineTimeStyle: { fontFamily: mono, fontSize: '11px', color: 'rgba(255,255,255,0.5)', marginBottom: '6px', letterSpacing: '0.06em' },
+      timelineTitleStyle: { fontSize: '18px', fontWeight: 600, marginBottom: '4px' },
+      timelineDescStyle: { fontSize: '14px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 },
+      glassCardStyle: { ...glass, padding: '28px' },
+      cardTitleStyle: { fontSize: '19px', fontWeight: 600, margin: '10px 0 8px' },
+      cardBodyStyle: { fontSize: '14px', lineHeight: 1.5, color: 'rgba(255,255,255,0.6)', margin: 0 },
+      bodyTextStyle: { fontSize: '15px', lineHeight: 1.6, color: 'rgba(255,255,255,0.65)', margin: 0 },
+      recapGridStyle: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px' },
+      photoPlaceholderStyle: {
+        aspectRatio: '4/3', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.12)',
+        background: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 10px, rgba(255,255,255,0.01) 10px, rgba(255,255,255,0.01) 20px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: mono, fontSize: '10px', color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '6px'
+      },
+      textLinkOnDarkStyle: { color: '#6f74ff', textDecoration: 'none', fontSize: '14px', fontWeight: 600 },
+      footerStyle: { padding: '48px 32px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center', textAlign: 'center' },
+      footerTopStyle: { fontWeight: 700, fontSize: '18px' },
+      footerLinksStyle: { display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' },
+      footerLinkStyle: { color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '14px' },
+      footerBottomStyle: { color: 'rgba(255,255,255,0.35)', fontSize: '12px' }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

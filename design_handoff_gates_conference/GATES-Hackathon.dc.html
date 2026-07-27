@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#08090b;-webkit-font-smoothing:antialiased}</style>
+</helmet>
+<div style="{{pageStyle}}">
+  <dc-import name="GATES-Nav" current-page="hackathon" hint-size="100%,76px"></dc-import>
+
+  <section style="{{heroStyle}}">
+    <div style="{{eyebrowStyle}}">HACKATHON</div>
+    <h1 style="{{h1Style}}">Build with GATES</h1>
+    <p style="{{subtitleStyle}}">Pre-event activities lead into finals and awarding on Oct 16, 2026.</p>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{sectionHeadStyle}}">
+      <div style="{{eyebrowStyle}}">PRE-EVENT ACTIVITIES</div>
+      <h2 style="{{h2Style}}">Before the conference</h2>
+    </div>
+    <div style="{{timelineStyle}}">
+      <sc-for list="{{preEventItems}}" as="item" hint-placeholder-count="3">
+        <div style="{{timelineRowStyle}}">
+          <div style="{{timelineDotStyle}}"></div>
+          <div style="{{timelineContentStyle}}">
+            <div style="{{timelineTitleStyle}}">{{item.title}}</div>
+            <div style="{{timelineDescStyle}}">{{item.desc}}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{sectionHeadStyle}}">
+      <div style="{{eyebrowStyle}}">SUBMIT YOUR ENTRY</div>
+      <h2 style="{{h2Style}}">Proposal submission</h2>
+    </div>
+    <a href="#" style="{{templateBtnStyle}}">&#8595; Download Proposal Template</a>
+
+    <div style="{{formWrapStyle}}">
+      <sc-if value="{{submitted}}" hint-placeholder-val="{{false}}">
+        <div style="{{confirmCardStyle}}">
+          <div style="{{iconDotVioletStyle}}"></div>
+          <h3 style="{{cardTitleStyle}}">Entry received, {{form.team}}!</h3>
+          <p style="{{cardBodyStyle}}">"{{form.title}}" has been submitted. We'll be in touch with next steps.</p>
+          <a href="./GATES-Home.dc.html" style="{{textLinkOnDarkStyle}}">Back to Home &rarr;</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{notSubmitted}}" hint-placeholder-val="{{true}}">
+        <form style="{{formCardStyle}}" onSubmit="{{handleSubmit}}">
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Team name</label>
+            <input style="{{inputStyle}}" type="text" value="{{form.team}}" onChange="{{setTeam}}" placeholder="Team name" />
+          </div>
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Project title</label>
+            <input style="{{inputStyle}}" type="text" value="{{form.title}}" onChange="{{setTitle}}" placeholder="Project title" />
+          </div>
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Track / category (optional)</label>
+            <input style="{{inputStyle}}" type="text" value="{{form.track}}" onChange="{{setTrack}}" placeholder="e.g. Open Category" />
+          </div>
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Upload completed proposal template</label>
+            <input style="{{inputStyle}}" type="file" accept=".pdf,.doc,.docx" onChange="{{setFile}}" />
+          </div>
+          <sc-if value="{{error}}" hint-placeholder-val="{{false}}">
+            <div style="{{errorStyle}}">{{error}}</div>
+          </sc-if>
+          <button style="{{primaryBtnStyle}}" type="submit">Submit Entry</button>
+        </form>
+      </sc-if>
+    </div>
+  </section>
+
+  <footer style="{{footerStyle}}">
+    <div style="{{footerTopStyle}}">GATES</div>
+    <div style="{{footerLinksStyle}}">
+      <a href="./GATES-Home.dc.html" style="{{footerLinkStyle}}">Home</a>
+      <a href="./GATES-Program.dc.html" style="{{footerLinkStyle}}">Program</a>
+      <a href="./GATES-Conference.dc.html" style="{{footerLinkStyle}}">Conference</a>
+      <a href="./GATES-Hackathon.dc.html" style="{{footerLinkStyle}}">Hackathon</a>
+      <a href="./GATES-Registration.dc.html" style="{{footerLinkStyle}}">Register</a>
+    </div>
+    <div style="{{footerBottomStyle}}">&copy; 2026 GATES Program &middot; contact@gates-program.org</div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { form: { team: '', title: '', track: '', fileName: '' }, submitted: false, error: '' };
+
+  setField(key, value) {
+    this.setState(s => ({ form: { ...s.form, [key]: value } }));
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const { team, title } = this.state.form;
+    if (!team.trim() || !title.trim()) {
+      this.setState({ error: 'Please enter a team name and project title.' });
+      return;
+    }
+    try {
+      const existing = JSON.parse(localStorage.getItem('gates_hackathon_submissions') || '[]');
+      existing.push({ ...this.state.form, submittedAt: new Date().toISOString() });
+      localStorage.setItem('gates_hackathon_submissions', JSON.stringify(existing));
+    } catch (err) {}
+    this.setState({ submitted: true, error: '' });
+  }
+
+  renderVals() {
+    const font = 'system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif';
+    const mono = 'ui-monospace,SFMono-Regular,Menlo,monospace';
+    const glass = {
+      background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+      borderRadius: '20px'
+    };
+    const preEventItems = [
+      { title: 'Orientation webinar', desc: 'Kickoff session covering rules, timeline, and judging criteria.' },
+      { title: 'Mentoring sessions', desc: 'Office hours with GATES technical mentors.' },
+      { title: 'Proposal submission deadline', desc: 'Final date to submit your completed proposal template.' }
+    ];
+    return {
+      preEventItems,
+      form: this.state.form,
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      error: this.state.error,
+      setTeam: (e) => this.setField('team', e.target.value),
+      setTitle: (e) => this.setField('title', e.target.value),
+      setTrack: (e) => this.setField('track', e.target.value),
+      setFile: (e) => this.setField('fileName', e.target.files && e.target.files[0] ? e.target.files[0].name : ''),
+      handleSubmit: (e) => this.handleSubmit(e),
+      pageStyle: { fontFamily: font, background: '#08090b', color: 'rgba(255,255,255,0.94)', minHeight: '100vh' },
+      heroStyle: { padding: '88px 32px 56px', maxWidth: '780px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' },
+      eyebrowStyle: { fontFamily: mono, fontSize: '12px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)' },
+      h1Style: { fontFamily: '"Barlow Condensed",' + font, fontSize: 'clamp(36px,5.5vw,60px)', fontWeight: 800, margin: 0, letterSpacing: '0.01em', textTransform: 'uppercase', textShadow: '0 0 26px rgba(152,64,119,0.5), 0 0 50px rgba(253,148,4,0.4)' },
+      subtitleStyle: { fontSize: '16px', color: 'rgba(255,255,255,0.65)', margin: 0 },
+      sectionStyle: { padding: '48px 32px', maxWidth: '900px', margin: '0 auto' },
+      sectionHeadStyle: { textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginBottom: '32px' },
+      h2Style: { fontSize: 'clamp(24px,3vw,34px)', fontWeight: 700, margin: 0, letterSpacing: '-0.01em' },
+      timelineStyle: { display: 'flex', flexDirection: 'column', gap: '0' },
+      timelineRowStyle: { display: 'flex', gap: '20px', paddingBottom: '28px', borderLeft: '2px solid rgba(255,255,255,0.14)', marginLeft: '9px', paddingLeft: '28px', position: 'relative' },
+      timelineDotStyle: { position: 'absolute', left: '-11px', top: '2px', width: '18px', height: '18px', borderRadius: '50%', background: 'oklch(68% 0.17 300)', border: '3px solid #08090b' },
+      timelineContentStyle: { ...glass, padding: '20px 24px', flex: 1 },
+      timelineTitleStyle: { fontSize: '18px', fontWeight: 600, marginBottom: '4px' },
+      timelineDescStyle: { fontSize: '14px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 },
+      templateBtnStyle: { display: 'inline-flex', padding: '12px 22px', borderRadius: '999px', ...glass, color: 'rgba(255,255,255,0.9)', fontWeight: 600, fontSize: '14px', textDecoration: 'none', marginBottom: '28px' },
+      formWrapStyle: { marginTop: '8px' },
+      formCardStyle: { ...glass, padding: '32px', display: 'flex', flexDirection: 'column', gap: '18px' },
+      confirmCardStyle: { ...glass, padding: '40px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start' },
+      fieldStyle: { display: 'flex', flexDirection: 'column', gap: '8px' },
+      labelStyle: { fontSize: '13px', color: 'rgba(255,255,255,0.6)', fontWeight: 600 },
+      inputStyle: { padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.94)', fontSize: '15px', fontFamily: font },
+      errorStyle: { color: 'oklch(72% 0.19 25)', fontSize: '13px' },
+      primaryBtnStyle: { padding: '14px 26px', borderRadius: '999px', background: 'linear-gradient(135deg, #fd9404, #984077)', color: '#ffffff', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer', marginTop: '6px', boxShadow: '0 4px 20px rgba(152,64,119,0.45)' },
+      iconDotVioletStyle: { width: '34px', height: '34px', borderRadius: '10px', background: 'oklch(68% 0.17 300)', marginBottom: '4px' },
+      cardTitleStyle: { fontSize: '20px', fontWeight: 600, margin: 0 },
+      cardBodyStyle: { fontSize: '14px', lineHeight: 1.5, color: 'rgba(255,255,255,0.6)', margin: 0 },
+      textLinkOnDarkStyle: { color: '#6f74ff', textDecoration: 'none', fontSize: '14px', fontWeight: 600, marginTop: '6px' },
+      footerStyle: { padding: '48px 32px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center', textAlign: 'center' },
+      footerTopStyle: { fontWeight: 700, fontSize: '18px' },
+      footerLinksStyle: { display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' },
+      footerLinkStyle: { color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '14px' },
+      footerBottomStyle: { color: 'rgba(255,255,255,0.35)', fontSize: '12px' }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

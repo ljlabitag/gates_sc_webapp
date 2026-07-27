@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<nav style="{{navBarStyle}}">
+  <a href="./GATES-Home.dc.html" style="{{logoStyle}}">GATES</a>
+  <div style="{{linksRowStyle}}">
+    <sc-for list="{{navItems}}" as="item" hint-placeholder-count="4">
+      <a href="{{item.href}}" style="{{item.style}}">{{item.label}}</a>
+    </sc-for>
+  </div>
+  <a href="./GATES-Registration.dc.html" style="{{ctaStyle}}">Register</a>
+</nav>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:76},&quot;currentPage&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;program&quot;,&quot;conference&quot;,&quot;registration&quot;,&quot;hackathon&quot;]}}">
+class Component extends DCLogic {
+  renderVals() {
+    const current = this.props.currentPage || 'home';
+    const pages = [
+      { key: 'home', label: 'Home', href: './GATES-Home.dc.html' },
+      { key: 'program', label: 'Program', href: './GATES-Program.dc.html' },
+      { key: 'conference', label: 'Conference', href: './GATES-Conference.dc.html' },
+      { key: 'hackathon', label: 'Hackathon', href: './GATES-Hackathon.dc.html' },
+    ];
+    const activeStyle = {
+      padding: '8px 14px', borderRadius: '999px', fontSize: '14px',
+      fontFamily: 'system-ui,-apple-system,sans-serif', textDecoration: 'none',
+      color: 'rgba(255,255,255,0.96)', background: 'rgba(255,255,255,0.1)',
+      border: '1px solid rgba(255,255,255,0.16)'
+    };
+    const inactiveStyle = {
+      padding: '8px 14px', borderRadius: '999px', fontSize: '14px',
+      fontFamily: 'system-ui,-apple-system,sans-serif', textDecoration: 'none',
+      color: 'rgba(255,255,255,0.62)', background: 'transparent',
+      border: '1px solid transparent'
+    };
+    const navItems = pages.map(p => ({ ...p, style: p.key === current ? activeStyle : inactiveStyle }));
+    return {
+      navItems,
+      navBarStyle: {
+        position: 'sticky', top: 0, zIndex: 50, display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between', gap: '24px', padding: '14px 32px',
+        background: 'rgba(8,9,11,0.55)', backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)'
+      },
+      logoStyle: {
+        fontFamily: 'system-ui,-apple-system,sans-serif', fontWeight: 700, fontSize: '19px',
+        letterSpacing: '0.02em', color: 'rgba(255,255,255,0.96)', textDecoration: 'none'
+      },
+      linksRowStyle: { display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' },
+      ctaStyle: {
+        padding: '9px 18px', borderRadius: '999px', fontSize: '14px', fontWeight: 600,
+        fontFamily: 'system-ui,-apple-system,sans-serif', textDecoration: 'none', color: '#08090b',
+        background: '#1a1aea', boxShadow: '0 1px 0 rgba(255,255,255,0.4) inset'
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

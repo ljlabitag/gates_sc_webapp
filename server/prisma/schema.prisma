@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Registration {
+  id           String   @id @default(uuid())
+  name         String
+  email        String
+  organization String?
+  needs        String?
+  createdAt    DateTime @default(now())
+}
+
+/// Mirrors Annex A of the GATES Hackathon 2026 mechanics (v0.2).
+model HackathonSubmission {
+  id    String @id @default(uuid())
+  team  String
+  title String
+
+  /// One of the six GATES priority innovation domains.
+  domain String?
+
+  /// Team leader is the official point of contact for the team.
+  leaderName     String?
+  leaderPosition String?
+  leaderEmail    String?
+  leaderMobile   String?
+
+  /// Agency / regional office / PSTO the team is submitting from.
+  agency String?
+
+  /// Members 2-4: "Name — position — role in team", one per line.
+  members String?
+
+  /// Head/s of agency or office endorsing the team's participation.
+  endorsingHead String?
+
+  fileName  String?
+  filePath  String?
+  fileSize  Int?
+  mimeType  String?
+  createdAt DateTime @default(now())
+}

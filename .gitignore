@@ -1,0 +1,15 @@
+node_modules
+.DS_Store
+dist
+
+# Secrets — never commit. server/.env.example is the template.
+.env
+.env.*
+!.env.example
+
+# Uploaded hackathon proposals contain personal data (RA 10173).
+server/uploads
+
+# Build metadata
+*.tsbuildinfo
+.vite

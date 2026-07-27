@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f0eee9;font-family:'Kalam',cursive}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 14px/1.2 'Kalam',cursive;color:#1a1a1a}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 12px/1.3 'Kalam',cursive;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#fff;border:2px solid #1a1a1a;border-radius:2px;box-shadow:3px 3px 0 rgba(0,0,0,.15);overflow:hidden}
+.dv-opt:target .dv-oid{background:#e8532e;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 'Kalam',cursive;color:rgba(0,0,0,.55)}
+.wf-box{border:2px solid #1a1a1a}
+.wf-dash{border:2px dashed #1a1a1a}
+.wf-ph{background:repeating-linear-gradient(45deg,#fff,#fff 6px,#eee 6px,#eee 12px);border:2px solid #1a1a1a}
+.wf-accent{background:#e8532e;color:#fff;border:2px solid #1a1a1a}
+.wf-txt{color:#1a1a1a;font-family:'Kalam',cursive}
+.wf-label{font-family:'Patrick Hand',cursive;color:#555;font-size:11px}
+</style>
+</helmet>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Remaining pages, built on <a class="dv-oid" href="#1a">1a</a>'s dashboard style</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a> Program page</div>
+<div class="dv-card" style="width:520px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:20px;font-weight:700">GATES</div>
+    <div style="display:flex;gap:14px" class="wf-txt"><span>Program</span><span>Conference</span><span>Hackathon</span><span>Register</span></div>
+  </div>
+  <div style="padding:24px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:24px;font-weight:700">The GATES Program</div>
+    <div class="wf-dash" style="margin-top:10px;padding:10px">harmonizes geospatial data, tools + apps into one interoperable platform. Maximizes data/tech/people investments through co-creation.</div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">PILLARS</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <div class="wf-box" style="padding:12px;text-align:center"><div class="wf-ph" style="height:30px;margin-bottom:6px"></div>Data</div>
+      <div class="wf-box" style="padding:12px;text-align:center"><div class="wf-ph" style="height:30px;margin-bottom:6px"></div>Technology</div>
+      <div class="wf-box" style="padding:12px;text-align:center"><div class="wf-ph" style="height:30px;margin-bottom:6px"></div>People / Capacity</div>
+    </div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">PARTNER AGENCIES</div>
+    <div style="display:flex;gap:8px"><div class="wf-ph" style="flex:1;height:32px"></div><div class="wf-ph" style="flex:1;height:32px"></div><div class="wf-ph" style="flex:1;height:32px"></div><div class="wf-ph" style="flex:1;height:32px"></div></div>
+  </div>
+  <div style="padding:16px 20px"><div class="wf-accent" style="display:inline-block;padding:8px 16px">See this year's Conference \u2192</div></div>
+</div>
+</div>
+
+<div class="dv-opt" id="2b">
+<div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a> Conference & Past Event page</div>
+<div class="dv-card" style="width:520px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:20px;font-weight:700">GATES</div>
+    <div style="display:flex;gap:14px" class="wf-txt"><span>Program</span><span>Conference</span><span>Hackathon</span><span>Register</span></div>
+  </div>
+  <div style="padding:22px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:22px;font-weight:700">2026 Stakeholder Conference</div>
+    <div class="wf-label">Oct 16, 2026 \u00b7 venue TBD</div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">AGENDA</div>
+    <div style="display:flex;flex-direction:column;gap:8px" class="wf-txt">
+      <div class="wf-box" style="padding:8px 10px">\u25cf 9:00 Keynotes</div>
+      <div class="wf-box" style="padding:8px 10px">\u25cf 11:00 Exhibit</div>
+      <div class="wf-box" style="padding:8px 10px">\u25cf 1:00 Hackathon (pre-event activities linked)</div>
+      <div class="wf-box" style="padding:8px 10px">\u25cf 4:00 Awarding</div>
+    </div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">2025 CONFERENCE RECAP</div>
+    <div style="display:flex;gap:6px;margin:8px 0">
+      <div class="wf-ph" style="flex:1;height:50px"></div><div class="wf-ph" style="flex:1;height:50px"></div><div class="wf-ph" style="flex:1;height:50px"></div>
+    </div>
+    <div style="display:flex;gap:8px" class="wf-txt">
+      <div class="wf-box" style="padding:6px 10px">stat: attendees</div><div class="wf-box" style="padding:6px 10px">stat: sessions</div>
+    </div>
+    <div class="wf-dash" style="margin-top:8px;padding:8px">"quote / highlight from 2025 fb recap"</div>
+  </div>
+  <div style="padding:16px 20px"><div class="wf-accent" style="display:inline-block;padding:8px 16px">Register Now</div></div>
+</div>
+</div>
+
+<div class="dv-opt" id="2c">
+<div class="dv-olabel"><a class="dv-oid" href="#2c">2c</a> Registration page</div>
+<div class="dv-card" style="width:520px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:20px;font-weight:700">GATES</div>
+    <div style="display:flex;gap:14px" class="wf-txt"><span>Program</span><span>Conference</span><span>Hackathon</span><span>Register</span></div>
+  </div>
+  <div style="padding:22px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:22px;font-weight:700">Register to Attend</div>
+    <div class="wf-label">Oct 16, 2026</div>
+  </div>
+  <div style="display:flex;padding:20px;gap:16px">
+    <div style="flex:1.4;display:flex;flex-direction:column;gap:8px" class="wf-txt">
+      <div class="wf-box" style="padding:8px">Name</div>
+      <div class="wf-box" style="padding:8px">Email</div>
+      <div class="wf-box" style="padding:8px">Organization / Role</div>
+      <div class="wf-box" style="padding:8px">Dietary / accessibility needs</div>
+      <div class="wf-accent" style="padding:10px;text-align:center;margin-top:6px">Submit Registration</div>
+    </div>
+    <div style="flex:1" class="wf-dash">
+      <div style="padding:10px" class="wf-txt">
+        <div class="wf-label">EVENT INFO</div>
+        Oct 16, 2026<br>Venue TBD<br>Includes: keynotes, exhibit, awarding
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="2d">
+<div class="dv-olabel"><a class="dv-oid" href="#2d">2d</a> Hackathon page</div>
+<div class="dv-card" style="width:520px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:20px;font-weight:700">GATES</div>
+    <div style="display:flex;gap:14px" class="wf-txt"><span>Program</span><span>Conference</span><span>Hackathon</span><span>Register</span></div>
+  </div>
+  <div style="padding:22px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:22px;font-weight:700">Hackathon</div>
+    <div class="wf-label">Pre-event activities \u2192 Oct 16 finals & awarding</div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">PRE-EVENT ACTIVITIES</div>
+    <div style="display:flex;flex-direction:column;gap:8px" class="wf-txt">
+      <div class="wf-box" style="padding:8px 10px">\u25cf Orientation webinar</div>
+      <div class="wf-box" style="padding:8px 10px">\u25cf Mentoring sessions</div>
+      <div class="wf-box" style="padding:8px 10px">\u25cf Proposal submission deadline</div>
+    </div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">SUBMIT PROPOSAL</div>
+    <div class="wf-dash" style="padding:8px;margin-bottom:8px" class="wf-txt">\u2913 Download proposal template</div>
+    <div style="display:flex;flex-direction:column;gap:8px" class="wf-txt">
+      <div class="wf-box" style="padding:8px">Team name</div>
+      <div class="wf-box" style="padding:8px">Project title</div>
+      <div class="wf-box" style="padding:8px">Track / category</div>
+      <div class="wf-box" style="padding:8px">Upload filled proposal template</div>
+      <div class="wf-accent" style="padding:10px;text-align:center">Submit Entry</div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "tweak <a class="dv-oid" href="#2c">2c</a> form layout" \u00b7 "move to hi-fi dark/liquid design for all 5 pages"</p>
+</section>
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Home / Hub page \u2014 3 layout directions</span></div>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a> Dashboard hub \u2014 top nav + card grid</div>
+<div class="dv-card" style="width:760px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:20px;font-weight:700">GATES</div>
+    <div style="display:flex;gap:14px" class="wf-txt">
+      <span>Program</span><span>Conference</span><span>Hackathon</span><span>Register</span>
+    </div>
+  </div>
+  <div style="padding:26px 20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-txt" style="font-size:26px;font-weight:700">GATES Stakeholder Conference</div>
+    <div class="wf-label">Oct 16, 2026 \u00b7 venue TBD</div>
+    <div style="display:flex;gap:8px;margin:14px 0">
+      <div class="wf-box" style="padding:6px 10px" >84</div><div class="wf-box" style="padding:6px 10px">12</div><div class="wf-box" style="padding:6px 10px">05</div>
+      <div class="wf-label" style="align-self:center">days : hrs : min countdown</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <div class="wf-accent" style="padding:8px 16px">Register Now</div>
+      <div class="wf-box" style="padding:8px 16px">Submit Hackathon Entry</div>
+    </div>
+  </div>
+  <div style="padding:20px;border-bottom:2px solid #1a1a1a">
+    <div class="wf-label" style="margin-bottom:8px">EVENTS AT A GLANCE</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div class="wf-box" style="padding:14px 8px;text-align:center"><div class="wf-ph" style="height:36px;margin-bottom:8px"></div>Keynotes</div>
+      <div class="wf-box" style="padding:14px 8px;text-align:center"><div class="wf-ph" style="height:36px;margin-bottom:8px"></div>Exhibit</div>
+      <div class="wf-box" style="padding:14px 8px;text-align:center"><div class="wf-ph" style="height:36px;margin-bottom:8px"></div>Hackathon</div>
+      <div class="wf-box" style="padding:14px 8px;text-align:center"><div class="wf-ph" style="height:36px;margin-bottom:8px"></div>Awarding</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:0;border-bottom:2px solid #1a1a1a">
+    <div style="flex:1;padding:20px;border-right:2px solid #1a1a1a">
+      <div class="wf-label">ABOUT THE GATES PROGRAM</div>
+      <div class="wf-dash" style="height:70px;margin-top:8px;padding:8px" >harmonizes geospatial data + tools into one platform...</div>
+      <div class="wf-txt" style="margin-top:6px">Learn more \u2192</div>
+    </div>
+    <div style="flex:1;padding:20px">
+      <div class="wf-label">2025 CONFERENCE RECAP</div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <div class="wf-ph" style="width:60px;height:44px"></div><div class="wf-ph" style="width:60px;height:44px"></div><div class="wf-ph" style="width:60px;height:44px"></div>
+      </div>
+      <div class="wf-txt" style="margin-top:6px">See highlights \u2192</div>
+    </div>
+  </div>
+  <div style="padding:14px 20px;display:flex;justify-content:space-between" class="wf-label">
+    <span>footer: contact / socials</span><span>sitemap</span>
+  </div>
+</div>
+</div>
+
+<div class="dv-opt" id="1b">
+<div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a> Magazine long-scroll \u2014 alternating story blocks</div>
+<div class="dv-card" style="width:760px">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:2px solid #1a1a1a" class="wf-txt">
+    <span style="font-weight:700">GATES</span>
+    <div style="display:flex;gap:14px"><span>Program</span><span>Conference</span><span>Hackathon</span><span>Register</span></div>
+  </div>
+  <div class="wf-ph" style="height:180px;display:flex;align-items:center;justify-content:center;position:relative">
+    <div class="wf-txt" style="background:#fff;border:2px solid #1a1a1a;padding:10px 18px;font-size:22px;font-weight:700">GATES Stakeholder Conference 2026</div>
+  </div>
+  <div style="text-align:center;padding:10px" class="wf-label">Oct 16, 2026 \u2014 countdown ticker here</div>
+  <div style="display:flex;border-top:2px solid #1a1a1a">
+    <div class="wf-ph" style="width:220px;height:120px"></div>
+    <div style="flex:1;padding:16px">
+      <div class="wf-label">THE GATES PROGRAM</div>
+      <div class="wf-txt">Geospatial platform for co-creation \u00b7 shared data \u00b7 capacity building</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:row-reverse;border-top:2px solid #1a1a1a">
+    <div class="wf-ph" style="width:220px;height:120px"></div>
+    <div style="flex:1;padding:16px">
+      <div class="wf-label">AGENDA TIMELINE</div>
+      <div style="display:flex;gap:16px;margin-top:8px" class="wf-txt">
+        <div>\u25cf Keynotes</div><div>\u25cf Exhibit</div><div>\u25cf Hackathon</div><div>\u25cf Awarding</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:16px;border-top:2px solid #1a1a1a">
+    <div class="wf-label">2025 RECAP GALLERY</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div class="wf-ph" style="flex:1;height:70px"></div><div class="wf-ph" style="flex:1;height:70px"></div><div class="wf-ph" style="flex:1;height:70px"></div><div class="wf-ph" style="flex:1;height:70px"></div>
+    </div>
+  </div>
+  <div style="display:flex;border-top:2px solid #1a1a1a">
+    <div class="wf-accent" style="flex:1;padding:20px;text-align:center">Register Now</div>
+    <div class="wf-box" style="flex:1;padding:20px;text-align:center">Submit Hackathon Entry</div>
+  </div>
+  <div style="padding:12px 20px" class="wf-label">footer</div>
+</div>
+</div>
+
+<div class="dv-opt" id="1c">
+<div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a> App sidebar \u2014 persistent left nav</div>
+<div class="dv-card" style="width:760px;display:flex">
+  <div style="width:150px;border-right:2px solid #1a1a1a;padding:16px 10px;display:flex;flex-direction:column;gap:10px" class="wf-txt">
+    <div style="font-weight:700;font-size:18px;margin-bottom:8px">GATES</div>
+    <div class="wf-accent" style="padding:6px 8px">Home</div>
+    <div style="padding:6px 8px">Program</div>
+    <div style="padding:6px 8px">Conference</div>
+    <div style="padding:6px 8px">Hackathon</div>
+    <div style="padding:6px 8px">Register</div>
+  </div>
+  <div style="flex:1">
+    <div style="padding:16px 18px;border-bottom:2px solid #1a1a1a;display:flex;justify-content:space-between;align-items:center">
+      <div class="wf-txt" style="font-size:18px;font-weight:700">Oct 16, 2026</div>
+      <div class="wf-box wf-txt" style="padding:4px 10px">84d : 12h : 05m</div>
+    </div>
+    <div style="padding:18px;display:flex;gap:14px">
+      <div style="flex:2;display:flex;flex-direction:column;gap:10px">
+        <div class="wf-label">EVENT OVERVIEW</div>
+        <div class="wf-box" style="padding:10px;display:flex;gap:8px;align-items:center"><div class="wf-ph" style="width:34px;height:34px"></div>Keynotes</div>
+        <div class="wf-box" style="padding:10px;display:flex;gap:8px;align-items:center"><div class="wf-ph" style="width:34px;height:34px"></div>Exhibit</div>
+        <div class="wf-box" style="padding:10px;display:flex;gap:8px;align-items:center"><div class="wf-ph" style="width:34px;height:34px"></div>Hackathon (+ pre-event)</div>
+        <div class="wf-box" style="padding:10px;display:flex;gap:8px;align-items:center"><div class="wf-ph" style="width:34px;height:34px"></div>Awarding</div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:10px">
+        <div class="wf-label">QUICK ACTIONS</div>
+        <div class="wf-accent" style="padding:14px;text-align:center">Register</div>
+        <div class="wf-box" style="padding:14px;text-align:center">Submit Entry</div>
+        <div class="wf-dash" style="padding:10px">
+          <div class="wf-label">2025 RECAP</div>
+          <div class="wf-ph" style="height:40px;margin-top:6px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+<p class="dv-next">Try next: "go with <a class="dv-oid" href="#1a">1a</a> but sidebar nav from <a class="dv-oid" href="#1c">1c</a>" \u00b7 "sketch the Registration and Hackathon submission pages" \u00b7 "pick one and move to hi-fi dark/liquid design"</p>
+</section>
+
+</x-dc>
+</body>
+</html>

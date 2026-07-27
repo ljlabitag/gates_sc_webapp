@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#08090b;-webkit-font-smoothing:antialiased}</style>
+</helmet>
+<div style="{{pageStyle}}">
+  <dc-import name="GATES-Nav" current-page="registration" hint-size="100%,76px"></dc-import>
+
+  <section style="{{heroStyle}}">
+    <div style="{{eyebrowStyle}}">OCT 16, 2026</div>
+    <h1 style="{{h1Style}}">Register to Attend</h1>
+    <p style="{{subtitleStyle}}">Reserve your seat at the GATES Stakeholder Conference.</p>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{splitGridStyle}}">
+      <sc-if value="{{submitted}}" hint-placeholder-val="{{false}}">
+        <div style="{{confirmCardStyle}}">
+          <div style="{{iconDotBlueStyle}}"></div>
+          <h3 style="{{cardTitleStyle}}">You're registered, {{form.name}}!</h3>
+          <p style="{{cardBodyStyle}}">A confirmation has been saved for {{form.email}}. We'll follow up with venue and schedule details as they're confirmed.</p>
+          <a href="./GATES-Home.dc.html" style="{{textLinkOnDarkStyle}}">Back to Home &rarr;</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{notSubmitted}}" hint-placeholder-val="{{true}}">
+        <form style="{{formCardStyle}}" onSubmit="{{handleSubmit}}">
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Name</label>
+            <input style="{{inputStyle}}" type="text" value="{{form.name}}" onChange="{{setName}}" placeholder="Full name" />
+          </div>
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Email</label>
+            <input style="{{inputStyle}}" type="email" value="{{form.email}}" onChange="{{setEmail}}" placeholder="you@organization.org" />
+          </div>
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Organization / Role</label>
+            <input style="{{inputStyle}}" type="text" value="{{form.org}}" onChange="{{setOrg}}" placeholder="Organization and role" />
+          </div>
+          <div style="{{fieldStyle}}">
+            <label style="{{labelStyle}}">Dietary / accessibility needs</label>
+            <textarea style="{{textareaStyle}}" value="{{form.needs}}" onChange="{{setNeeds}}" placeholder="Optional"></textarea>
+          </div>
+          <sc-if value="{{error}}" hint-placeholder-val="{{false}}">
+            <div style="{{errorStyle}}">{{error}}</div>
+          </sc-if>
+          <button style="{{primaryBtnStyle}}" type="submit">Submit Registration</button>
+        </form>
+      </sc-if>
+
+      <div style="{{infoCardStyle}}">
+        <div style="{{eyebrowStyle}}">EVENT INFO</div>
+        <div style="{{infoRowStyle}}"><span style="{{infoLabelStyle}}">Date</span><span>Oct 16, 2026</span></div>
+        <div style="{{infoRowStyle}}"><span style="{{infoLabelStyle}}">Venue</span><span>TBD</span></div>
+        <div style="{{infoDividerStyle}}"></div>
+        <div style="{{eyebrowStyle}}">INCLUDES</div>
+        <p style="{{cardBodyStyle}}">Keynotes &middot; exhibit access &middot; awarding ceremony</p>
+      </div>
+    </div>
+  </section>
+
+  <footer style="{{footerStyle}}">
+    <div style="{{footerTopStyle}}">GATES</div>
+    <div style="{{footerLinksStyle}}">
+      <a href="./GATES-Home.dc.html" style="{{footerLinkStyle}}">Home</a>
+      <a href="./GATES-Program.dc.html" style="{{footerLinkStyle}}">Program</a>
+      <a href="./GATES-Conference.dc.html" style="{{footerLinkStyle}}">Conference</a>
+      <a href="./GATES-Hackathon.dc.html" style="{{footerLinkStyle}}">Hackathon</a>
+      <a href="./GATES-Registration.dc.html" style="{{footerLinkStyle}}">Register</a>
+    </div>
+    <div style="{{footerBottomStyle}}">&copy; 2026 GATES Program &middot; contact@gates-program.org</div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { form: { name: '', email: '', org: '', needs: '' }, submitted: false, error: '' };
+
+  setField(key, value) {
+    this.setState(s => ({ form: { ...s.form, [key]: value } }));
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const { name, email } = this.state.form;
+    if (!name.trim() || !email.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      this.setState({ error: 'Please enter your name and a valid email.' });
+      return;
+    }
+    try {
+      const existing = JSON.parse(localStorage.getItem('gates_registrations') || '[]');
+      existing.push({ ...this.state.form, submittedAt: new Date().toISOString() });
+      localStorage.setItem('gates_registrations', JSON.stringify(existing));
+    } catch (err) {}
+    this.setState({ submitted: true, error: '' });
+  }
+
+  renderVals() {
+    const font = 'system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif';
+    const mono = 'ui-monospace,SFMono-Regular,Menlo,monospace';
+    const glass = {
+      background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+      borderRadius: '20px'
+    };
+    return {
+      form: this.state.form,
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      error: this.state.error,
+      setName: (e) => this.setField('name', e.target.value),
+      setEmail: (e) => this.setField('email', e.target.value),
+      setOrg: (e) => this.setField('org', e.target.value),
+      setNeeds: (e) => this.setField('needs', e.target.value),
+      handleSubmit: (e) => this.handleSubmit(e),
+      pageStyle: { fontFamily: font, background: '#08090b', color: 'rgba(255,255,255,0.94)', minHeight: '100vh' },
+      heroStyle: { padding: '88px 32px 40px', maxWidth: '780px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' },
+      eyebrowStyle: { fontFamily: mono, fontSize: '12px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)' },
+      h1Style: { fontFamily: '"Barlow Condensed",' + font, fontSize: 'clamp(36px,5.5vw,60px)', fontWeight: 800, margin: 0, letterSpacing: '0.01em', textTransform: 'uppercase', textShadow: '0 0 26px rgba(152,64,119,0.5), 0 0 50px rgba(26,26,234,0.45)' },
+      subtitleStyle: { fontSize: '16px', color: 'rgba(255,255,255,0.65)', margin: 0 },
+      sectionStyle: { padding: '16px 32px 96px', maxWidth: '1000px', margin: '0 auto' },
+      splitGridStyle: { display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px', alignItems: 'start' },
+      formCardStyle: { ...glass, padding: '32px', display: 'flex', flexDirection: 'column', gap: '18px' },
+      confirmCardStyle: { ...glass, padding: '40px', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'flex-start' },
+      fieldStyle: { display: 'flex', flexDirection: 'column', gap: '8px' },
+      labelStyle: { fontSize: '13px', color: 'rgba(255,255,255,0.6)', fontWeight: 600 },
+      inputStyle: { padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.94)', fontSize: '15px', fontFamily: font },
+      textareaStyle: { padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.16)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.94)', fontSize: '15px', fontFamily: font, minHeight: '80px', resize: 'vertical' },
+      errorStyle: { color: 'oklch(72% 0.19 25)', fontSize: '13px' },
+      primaryBtnStyle: { padding: '14px 26px', borderRadius: '999px', background: 'linear-gradient(135deg, #1a1aea, #984077)', color: '#ffffff', fontWeight: 700, fontSize: '15px', border: 'none', cursor: 'pointer', marginTop: '6px', boxShadow: '0 4px 20px rgba(152,64,119,0.45)' },
+      iconDotBlueStyle: { width: '34px', height: '34px', borderRadius: '10px', background: '#1a1aea', marginBottom: '4px' },
+      cardTitleStyle: { fontSize: '20px', fontWeight: 600, margin: 0 },
+      cardBodyStyle: { fontSize: '14px', lineHeight: 1.5, color: 'rgba(255,255,255,0.6)', margin: 0 },
+      textLinkOnDarkStyle: { color: '#6f74ff', textDecoration: 'none', fontSize: '14px', fontWeight: 600, marginTop: '6px' },
+      infoCardStyle: { ...glass, padding: '28px', display: 'flex', flexDirection: 'column', gap: '10px', position: 'sticky', top: '96px' },
+      infoRowStyle: { display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: 'rgba(255,255,255,0.8)' },
+      infoLabelStyle: { color: 'rgba(255,255,255,0.5)' },
+      infoDividerStyle: { height: '1px', background: 'rgba(255,255,255,0.1)', margin: '6px 0' },
+      footerStyle: { padding: '48px 32px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center', textAlign: 'center' },
+      footerTopStyle: { fontWeight: 700, fontSize: '18px' },
+      footerLinksStyle: { display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' },
+      footerLinkStyle: { color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '14px' },
+      footerBottomStyle: { color: 'rgba(255,255,255,0.35)', fontSize: '12px' }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

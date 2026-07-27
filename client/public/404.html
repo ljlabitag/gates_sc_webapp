@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>GATES Program 2nd Stakeholder Conference</title>
+    <script>
+      // GitHub Pages has no rewrite rules, so a direct hit on /program returns
+      // this 404 page instead of the app. Encode the requested path into a query
+      // string and bounce to index.html, which decodes it back (see index.html).
+      // Single-page-app redirect, after rafgraph/spa-github-pages (MIT).
+      //
+      // 1 = the repository name is the first path segment (project site).
+      // Set to 0 if this is ever served from a <user>.github.io root site.
+      var pathSegmentsToKeep = 1;
+
+      var l = window.location;
+      l.replace(
+        l.protocol +
+          "//" +
+          l.hostname +
+          (l.port ? ":" + l.port : "") +
+          l.pathname
+            .split("/")
+            .slice(0, 1 + pathSegmentsToKeep)
+            .join("/") +
+          "/?/" +
+          l.pathname
+            .slice(1)
+            .split("/")
+            .slice(pathSegmentsToKeep)
+            .join("/")
+            .replace(/&/g, "~and~") +
+          (l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
+          l.hash,
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

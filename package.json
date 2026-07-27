@@ -1,0 +1,17 @@
+{
+  "name": "gates-conference",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,client -c magenta,blue \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client && npm run build -w server",
+    "db:migrate": "npm run prisma:migrate -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
+  }
+}

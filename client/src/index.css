@@ -1,0 +1,613 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@property --brand-border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@theme {
+  --color-gates-blue: #1a1aea;
+  --color-gates-teal: #118e8e;
+  --color-gates-orange: #fd9404;
+  --color-gates-plum: #984077;
+  --color-gates-bg: #08090b;
+  --color-gates-link: #6f74ff;
+  --color-gates-error: #e5484d;
+
+  --font-display: "Garet", "Montserrat", system-ui, sans-serif;
+  --font-heading: "Montserrat", system-ui, sans-serif;
+  --font-sans: "Proxima Nova", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    background: var(--color-gates-bg);
+    color: rgba(255, 255, 255, 0.94);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  /* "Liquid glass" panel used for cards, nav, sidebars, etc. */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-radius: 20px;
+  }
+
+  .glass-panel-strong {
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .glass-nav {
+    background:
+      radial-gradient(circle at 18% -80%, rgba(26, 26, 234, 0.2), transparent 34%),
+      radial-gradient(circle at 82% 180%, rgba(17, 142, 142, 0.14), transparent 38%),
+      linear-gradient(110deg, rgba(255, 255, 255, 0.09), rgba(8, 9, 11, 0.5) 42%, rgba(152, 64, 119, 0.08));
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      0 10px 32px rgba(0, 0, 0, 0.24);
+  }
+
+  .site-footer {
+    background:
+      radial-gradient(circle at 10% 0%, rgba(26, 26, 234, 0.08), transparent 34%),
+      radial-gradient(circle at 90% 100%, rgba(17, 142, 142, 0.06), transparent 32%),
+      linear-gradient(180deg, rgba(8, 9, 11, 0.4), rgba(5, 6, 8, 0.9));
+  }
+
+  .social-brand-icon {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    color: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    transition:
+      color 160ms ease,
+      background 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .social-brand-icon-facebook {
+    border-radius: 9999px;
+    font-family: Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1;
+    padding-top: 4px;
+  }
+
+  .social-brand-icon-instagram {
+    border-radius: 7px;
+  }
+
+  .social-brand-icon-instagram::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border: 1.5px solid currentColor;
+    border-radius: 5px;
+  }
+
+  .social-brand-icon-instagram::after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 1.5px solid currentColor;
+    border-radius: 9999px;
+    box-shadow: 5px -5px 0 -2px currentColor;
+  }
+
+  .site-footer a:hover .social-brand-icon-facebook,
+  .site-footer a:focus-visible .social-brand-icon-facebook,
+  .program-social-link:hover .social-brand-icon-facebook,
+  .program-social-link:focus-visible .social-brand-icon-facebook {
+    color: white;
+    background: #1877f2;
+    border-color: transparent;
+    box-shadow: 0 0 18px rgba(24, 119, 242, 0.28);
+  }
+
+  .site-footer a:hover .social-brand-icon-instagram,
+  .site-footer a:focus-visible .social-brand-icon-instagram,
+  .program-social-link:hover .social-brand-icon-instagram,
+  .program-social-link:focus-visible .social-brand-icon-instagram {
+    color: white;
+    background: radial-gradient(circle at 30% 110%, #feda75 0 18%, #fa7e1e 34%, #d62976 56%, #962fbf 76%, #4f5bd5 100%);
+    border-color: transparent;
+    box-shadow: 0 0 18px rgba(214, 41, 118, 0.25);
+  }
+
+  /* Neon headline glow — blue+plum combo used everywhere except Hackathon (orange+plum). */
+  .text-glow {
+    text-shadow:
+      0 0 26px rgba(152, 64, 119, 0.5),
+      0 0 50px rgba(26, 26, 234, 0.45);
+  }
+
+  .text-glow-orange {
+    text-shadow:
+      0 0 26px rgba(152, 64, 119, 0.5),
+      0 0 50px rgba(253, 148, 4, 0.4);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #1a1aea, #984077);
+    box-shadow: 0 4px 20px rgba(152, 64, 119, 0.45);
+  }
+
+  .nav-register-gradient {
+    background:
+      linear-gradient(rgba(8, 9, 11, 0.3), rgba(8, 9, 11, 0.3)),
+      linear-gradient(110deg, #1a1aea 0%, #984077 34%, #118e8e 67%, #fd9404 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 3px 14px rgba(26, 26, 234, 0.16);
+  }
+
+  .btn-hackathon {
+    background: linear-gradient(135deg, #fd9404, #984077);
+    box-shadow: 0 4px 20px rgba(152, 64, 119, 0.45);
+  }
+
+  /* Diagonal-stripe placeholder used for all "real photo" slots until real assets land. */
+  .photo-placeholder {
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.04),
+      rgba(255, 255, 255, 0.04) 10px,
+      rgba(255, 255, 255, 0.01) 10px,
+      rgba(255, 255, 255, 0.01) 20px
+    );
+  }
+
+  /* Blue-tinted perspective grid floor behind the Home hero. */
+  .grid-floor {
+    background-image:
+      linear-gradient(rgba(111, 116, 255, 0.28) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(111, 116, 255, 0.28) 1px, transparent 1px);
+    background-size: 44px 44px;
+    transform: perspective(420px) rotateX(58deg);
+    transform-origin: bottom;
+    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+  }
+
+  .hero-brand-gradient {
+    background:
+      radial-gradient(circle at 8% 8%, rgba(26, 26, 234, 0.42), transparent 38%),
+      radial-gradient(circle at 92% 16%, rgba(152, 64, 119, 0.38), transparent 36%),
+      radial-gradient(circle at 82% 92%, rgba(253, 148, 4, 0.22), transparent 34%),
+      radial-gradient(circle at 18% 88%, rgba(17, 142, 142, 0.32), transparent 38%),
+      linear-gradient(155deg, #05060c 0%, #0b0c15 52%, #050608 100%);
+  }
+
+  .program-hero::after,
+  .conference-hero::after,
+  .hackathon-hero::after,
+  .home-hero::after,
+  .registration-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 20%, rgba(255, 255, 255, 0.045) 48%, transparent 72%);
+  }
+
+  .program-overview-lead {
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 18px 0 42px rgba(26, 26, 234, 0.06),
+      0 18px 54px rgba(0, 0, 0, 0.16);
+  }
+
+  .program-overview-lead::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--color-gates-blue),
+      var(--color-gates-plum) 34%,
+      var(--color-gates-teal) 68%,
+      var(--color-gates-orange)
+    );
+    box-shadow: 0 0 18px rgba(152, 64, 119, 0.5);
+  }
+
+  .program-accent-blue {
+    --program-accent: var(--color-gates-blue);
+  }
+
+  .program-accent-orange {
+    --program-accent: var(--color-gates-orange);
+  }
+
+  .program-accent-plum {
+    --program-accent: var(--color-gates-plum);
+  }
+
+  .program-accent-teal {
+    --program-accent: var(--color-gates-teal);
+  }
+
+  .program-goal-card,
+  .program-domain-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .program-goal-card::after,
+  .program-domain-card::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--program-accent);
+    opacity: 0.75;
+  }
+
+  .program-domain-card {
+    min-height: 148px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 38px 70px color-mix(in srgb, var(--program-accent) 8%, transparent);
+  }
+
+  .program-icon-placeholder {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    border: 1px dashed color-mix(in srgb, var(--program-accent) 65%, white 10%);
+    border-radius: 10px;
+    color: color-mix(in srgb, var(--program-accent) 65%, white 35%);
+    background: color-mix(in srgb, var(--program-accent) 10%, transparent);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .program-icon-placeholder-large {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .conference-about-lead {
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 18px 0 42px rgba(152, 64, 119, 0.06),
+      0 18px 54px rgba(0, 0, 0, 0.16);
+  }
+
+  .conference-about-lead::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--color-gates-blue),
+      var(--color-gates-plum) 34%,
+      var(--color-gates-teal) 68%,
+      var(--color-gates-orange)
+    );
+    box-shadow: 0 0 18px rgba(152, 64, 119, 0.5);
+  }
+
+  .hackathon-objective-lead {
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset 18px 0 42px rgba(253, 148, 4, 0.06),
+      0 18px 54px rgba(0, 0, 0, 0.16);
+  }
+
+  .hackathon-objective-lead::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--color-gates-blue),
+      var(--color-gates-plum) 34%,
+      var(--color-gates-teal) 68%,
+      var(--color-gates-orange)
+    );
+    box-shadow: 0 0 18px rgba(253, 148, 4, 0.45);
+  }
+
+  .hackathon-hero-fact {
+    min-height: 78px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .hackathon-rule-card[open] {
+    border-color: rgba(255, 255, 255, 0.17);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .home-next-date {
+    box-shadow:
+      inset 0 0 48px rgba(253, 148, 4, 0.06),
+      0 18px 52px rgba(0, 0, 0, 0.18);
+  }
+
+  .home-program-mark {
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(152, 64, 119, 0.16), transparent 45%),
+      rgba(255, 255, 255, 0.045);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 22px 70px rgba(26, 26, 234, 0.12);
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  /*
+   * Animated brand border: a comet of brand colour orbiting the card edge.
+   *
+   * Two layers share one keyframe, one duration and one custom property, so the
+   * bright head and its bloom are synchronised by construction rather than by
+   * hand-tuned timings. (An earlier version blinked two dots pinned to opposite
+   * corners; those fired ~95 degrees away from wherever the comet actually was,
+   * which read as random flicker.)
+   *
+   * inset:0 + border-radius:inherit keeps the ring exactly on the card's edge —
+   * a negative inset would need a larger radius to match the outer curve.
+   */
+  .home-program-mark::before,
+  .home-program-mark::after {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    /* Ring thickness — the mask keeps only this padding band. */
+    padding: 3px;
+    pointer-events: none;
+    border-radius: inherit;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: brandBorderOrbit 4.8s linear infinite;
+  }
+
+  /* Trail — a long, gradual build through the brand ramp into a white-hot head. */
+  .home-program-mark::before {
+    background: conic-gradient(
+      from var(--brand-border-angle),
+      transparent 0deg 248deg,
+      rgba(26, 26, 234, 0.08) 268deg,
+      rgba(26, 26, 234, 0.5) 292deg,
+      #984077 312deg,
+      #118e8e 330deg,
+      #fd9404 346deg,
+      rgba(255, 255, 255, 0.92) 353deg,
+      transparent 360deg
+    );
+  }
+
+  /*
+   * Head bloom. Kept on its own layer so the expensive blur/drop-shadow applies
+   * to a narrow arc instead of the whole trail, which halves the repaint cost of
+   * every frame.
+   */
+  .home-program-mark::after {
+    z-index: 3;
+    background: conic-gradient(
+      from var(--brand-border-angle),
+      transparent 0deg 341deg,
+      rgba(255, 255, 255, 0.45) 348deg,
+      #ffffff 353deg,
+      rgba(255, 255, 255, 0.45) 357deg,
+      transparent 360deg
+    );
+    filter: blur(1.5px) drop-shadow(0 0 8px rgba(253, 148, 4, 0.9))
+      drop-shadow(0 0 18px rgba(152, 64, 119, 0.5));
+  }
+
+  .home-program-mark:hover {
+    transform: translateY(-3px) scale(1.01);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 26px 80px rgba(152, 64, 119, 0.2);
+  }
+
+  .home-recap-feature::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(to top, rgba(5, 6, 12, 0.5), transparent 60%),
+      linear-gradient(120deg, transparent 28%, rgba(255, 255, 255, 0.05) 50%, transparent 72%);
+  }
+
+  .conference-venue {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 32px 0 70px rgba(17, 142, 142, 0.07);
+  }
+
+  .conference-programme-row {
+    transition: background-color 160ms ease;
+  }
+
+  .conference-programme-row:hover {
+    background-color: rgba(255, 255, 255, 0.045);
+  }
+
+  .section-nav-scroll {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .section-nav-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .program-card {
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .program-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.075);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 18px 46px rgba(0, 0, 0, 0.2);
+  }
+
+  .program-card summary::-webkit-details-marker {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .program-card {
+      transition: none;
+    }
+
+    .program-card:hover {
+      transform: none;
+    }
+
+    .orb {
+      animation: none;
+    }
+
+    .home-program-mark {
+      transition: none;
+    }
+
+    /* Hold the comet at a fixed angle so the border still reads as brand-coloured. */
+    .home-program-mark::before {
+      --brand-border-angle: 300deg;
+      animation: none;
+    }
+
+    /* The head bloom only means anything while it travels. */
+    .home-program-mark::after {
+      display: none;
+    }
+
+    .home-program-mark:hover {
+      transform: none;
+    }
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 9999px;
+  }
+  .orb-1 {
+    top: -160px;
+    left: -100px;
+    width: 520px;
+    height: 520px;
+    background: var(--color-gates-blue);
+    filter: blur(110px);
+    opacity: 0.6;
+    animation: orbFloat 16s ease-in-out infinite;
+  }
+  .orb-2 {
+    bottom: -160px;
+    right: -140px;
+    width: 560px;
+    height: 560px;
+    background: var(--color-gates-plum);
+    filter: blur(120px);
+    opacity: 0.5;
+    animation: orbFloat2 18s ease-in-out infinite;
+  }
+  .orb-3 {
+    bottom: -120px;
+    left: 30%;
+    width: 380px;
+    height: 380px;
+    background: var(--color-gates-orange);
+    filter: blur(130px);
+    opacity: 0.28;
+    animation: orbFloat 20s ease-in-out infinite;
+  }
+}
+
+@keyframes orbFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, -24px) scale(1.06);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes brandBorderOrbit {
+  to {
+    --brand-border-angle: 360deg;
+  }
+}
+
+@keyframes orbFloat2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-24px, 20px) scale(1.08);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}

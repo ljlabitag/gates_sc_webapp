@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#08090b;-webkit-font-smoothing:antialiased}</style>
+</helmet>
+<div style="{{pageStyle}}">
+  <dc-import name="GATES-Nav" current-page="program" hint-size="100%,76px"></dc-import>
+
+  <section style="{{heroStyle}}">
+    <div style="{{eyebrowStyle}}">THE PROGRAM</div>
+    <h1 style="{{h1Style}}">The GATES Program</h1>
+    <p style="{{subtitleStyle}}">The Geospatial Analytics and Technology Solutions Program harmonizes geospatial information, tools, and applications into one integrated, interoperable platform.</p>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <p style="{{bodyTextStyle}}">GATES maximizes resources &mdash; data, technology, and people &mdash; and adds value to these investments by creating an environment for co-creation and collaboration: an environment where data is shared, multi-sectoral use cases and applications are developed, capacities are strengthened, and efforts are sustained.</p>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{sectionHeadStyle}}">
+      <div style="{{eyebrowStyle}}">PILLARS</div>
+      <h2 style="{{h2Style}}">What GATES brings together</h2>
+    </div>
+    <div style="{{pillarGridStyle}}">
+      <div style="{{glassCardStyle}}">
+        <div style="{{iconDotBlueStyle}}"></div>
+        <h3 style="{{cardTitleStyle}}">Data</h3>
+        <p style="{{cardBodyStyle}}">A shared geospatial data environment across agencies and sectors.</p>
+      </div>
+      <div style="{{glassCardStyle}}">
+        <div style="{{iconDotOrangeStyle}}"></div>
+        <h3 style="{{cardTitleStyle}}">Technology</h3>
+        <p style="{{cardBodyStyle}}">Interoperable tools and platforms built for reuse, not reinvention.</p>
+      </div>
+      <div style="{{glassCardStyle}}">
+        <div style="{{iconDotVioletStyle}}"></div>
+        <h3 style="{{cardTitleStyle}}">People</h3>
+        <p style="{{cardBodyStyle}}">Capacity strengthened across the community that builds and uses it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="{{sectionStyle}}">
+    <div style="{{sectionHeadStyle}}">
+      <div style="{{eyebrowStyle}}">HOW IT WORKS</div>
+      <h2 style="{{h2Style}}">Co-creation, in practice</h2>
+    </div>
+    <div style="{{howGridStyle}}">
+      <div style="{{glassCardStyle}}">
+        <h3 style="{{cardTitleStyle}}">Co-creation &amp; collaboration</h3>
+        <p style="{{cardBodyStyle}}">Partners build alongside each other, not in isolation.</p>
+      </div>
+      <div style="{{glassCardStyle}}">
+        <h3 style="{{cardTitleStyle}}">Shared data environment</h3>
+        <p style="{{cardBodyStyle}}">One interoperable platform, many contributors.</p>
+      </div>
+      <div style="{{glassCardStyle}}">
+        <h3 style="{{cardTitleStyle}}">Capacity strengthening</h3>
+        <p style="{{cardBodyStyle}}">Skills and tools that stay with the people who use them.</p>
+      </div>
+      <div style="{{glassCardStyle}}">
+        <h3 style="{{cardTitleStyle}}">Sustained efforts</h3>
+        <p style="{{cardBodyStyle}}">Built to outlast any single project or funding cycle.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="{{ctaSectionStyle}}">
+    <h2 style="{{h2Style}}">See it in action at the 2026 Conference</h2>
+    <a href="./GATES-Conference.dc.html" style="{{primaryBtnStyle}}">View Conference Details</a>
+  </section>
+
+  <footer style="{{footerStyle}}">
+    <div style="{{footerTopStyle}}">GATES</div>
+    <div style="{{footerLinksStyle}}">
+      <a href="./GATES-Home.dc.html" style="{{footerLinkStyle}}">Home</a>
+      <a href="./GATES-Program.dc.html" style="{{footerLinkStyle}}">Program</a>
+      <a href="./GATES-Conference.dc.html" style="{{footerLinkStyle}}">Conference</a>
+      <a href="./GATES-Hackathon.dc.html" style="{{footerLinkStyle}}">Hackathon</a>
+      <a href="./GATES-Registration.dc.html" style="{{footerLinkStyle}}">Register</a>
+    </div>
+    <div style="{{footerBottomStyle}}">&copy; 2026 GATES Program &middot; contact@gates-program.org</div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const font = 'system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif';
+    const glass = {
+      background: 'rgba(255,255,255,0.055)', border: '1px solid rgba(255,255,255,0.12)',
+      backdropFilter: 'blur(20px) saturate(160%)', WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+      borderRadius: '20px'
+    };
+    return {
+      pageStyle: { fontFamily: font, background: '#08090b', color: 'rgba(255,255,255,0.94)', minHeight: '100vh' },
+      heroStyle: { padding: '88px 32px 56px', maxWidth: '780px', margin: '0 auto', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center' },
+      eyebrowStyle: { fontFamily: 'ui-monospace,SFMono-Regular,Menlo,monospace', fontSize: '12px', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.55)' },
+      h1Style: { fontFamily: '"Barlow Condensed",' + font, fontSize: 'clamp(38px,6vw,64px)', fontWeight: 800, margin: 0, letterSpacing: '0.01em', textTransform: 'uppercase', textShadow: '0 0 26px rgba(152,64,119,0.5), 0 0 50px rgba(26,26,234,0.45)' },
+      subtitleStyle: { fontSize: '17px', lineHeight: 1.5, color: 'rgba(255,255,255,0.65)', margin: 0 },
+      sectionStyle: { padding: '48px 32px', maxWidth: '1000px', margin: '0 auto' },
+      bodyTextStyle: { fontSize: '17px', lineHeight: 1.7, color: 'rgba(255,255,255,0.68)', maxWidth: '760px', margin: '0 auto' },
+      sectionHeadStyle: { textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center', marginBottom: '32px' },
+      h2Style: { fontSize: 'clamp(24px,3vw,34px)', fontWeight: 700, margin: 0, letterSpacing: '-0.01em' },
+      pillarGridStyle: { display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '16px' },
+      howGridStyle: { display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '16px' },
+      glassCardStyle: { ...glass, padding: '28px' },
+      iconDotBlueStyle: { width: '34px', height: '34px', borderRadius: '10px', background: '#1a1aea', marginBottom: '14px' },
+      iconDotVioletStyle: { width: '34px', height: '34px', borderRadius: '10px', background: '#984077', marginBottom: '14px' },
+      iconDotOrangeStyle: { width: '34px', height: '34px', borderRadius: '10px', background: '#fd9404', marginBottom: '14px' },
+      cardTitleStyle: { fontSize: '19px', fontWeight: 600, margin: '0 0 8px' },
+      cardBodyStyle: { fontSize: '14px', lineHeight: 1.5, color: 'rgba(255,255,255,0.6)', margin: 0 },
+      ctaSectionStyle: { padding: '64px 32px 96px', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '22px', alignItems: 'center' },
+      primaryBtnStyle: { padding: '14px 26px', borderRadius: '999px', background: 'linear-gradient(135deg, #1a1aea, #984077)', color: '#ffffff', fontWeight: 700, fontSize: '15px', textDecoration: 'none', boxShadow: '0 4px 20px rgba(152,64,119,0.45)' },
+      footerStyle: { padding: '48px 32px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', flexDirection: 'column', gap: '18px', alignItems: 'center', textAlign: 'center' },
+      footerTopStyle: { fontWeight: 700, fontSize: '18px' },
+      footerLinksStyle: { display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' },
+      footerLinkStyle: { color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '14px' },
+      footerBottomStyle: { color: 'rgba(255,255,255,0.35)', fontSize: '12px' }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

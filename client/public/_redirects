@@ -1,0 +1,5 @@
+# SPA fallback. React Router owns the routing, so every path must serve
+# index.html with a 200 (not a redirect) or /program, /hackathon etc. will
+# 404 on refresh and on direct links.
+# Read by Cloudflare Pages and Netlify.
+/*    /index.html   200
