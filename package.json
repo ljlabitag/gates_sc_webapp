@@ -4,14 +4,21 @@
   "version": "1.0.0",
   "workspaces": [
     "client",
-    "server"
+    "worker"
   ],
   "scripts": {
-    "dev": "concurrently -n server,client -c magenta,blue \"npm run dev -w server\" \"npm run dev -w client\"",
-    "build": "npm run build -w client && npm run build -w server",
-    "db:migrate": "npm run prisma:migrate -w server"
+    "dev": "concurrently -n worker,client -c magenta,blue \"npm run dev -w worker\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "worker:dev": "npm run build -w client && wrangler dev",
+    "worker:deploy": "npm run build -w client && wrangler deploy"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260811.1": true,
+    "esbuild@0.18.20": true,
+    "esbuild@0.19.12": true
   }
 }

@@ -1,5 +1,5 @@
-# SPA fallback. React Router owns the routing, so every path must serve
-# index.html with a 200 (not a redirect) or /program, /hackathon etc. will
-# 404 on refresh and on direct links.
-# Read by Cloudflare Pages and Netlify.
-/*    /index.html   200
+# SPA fallback is handled by wrangler.toml's `not_found_handling =
+# "single-page-application"` under [assets] — that's the native mechanism for
+# Cloudflare Workers static assets. A catch-all rule here (`/*  /index.html  200`)
+# is redundant with it and Wrangler flags it as an infinite redirect loop, so it
+# has been removed. Keep this file for any future explicit, non-SPA redirects.

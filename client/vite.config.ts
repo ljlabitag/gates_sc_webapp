@@ -8,7 +8,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        // wrangler dev's default port — run `npm run dev` from the repo root
+        // to start both this and the Worker together.
+        target: 'http://localhost:8787',
         changeOrigin: true,
       },
     },

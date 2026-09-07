@@ -1,0 +1,53 @@
+name = "gates-sc-webapp"
+main = "worker/src/index.ts"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "client/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gates-sc-webapp"
+database_id = "61092e00-c9b5-4b62-8683-efd19e4d9c1f"
+migrations_dir = "drizzle/migrations"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "gates-sc-webapp"
+
+# S3-compatible endpoint for the presign adapter (ops plan: build once against
+# the plain S3 API so R2 now and MinIO later are a config swap, not a rewrite).
+# The native BUCKET binding above stays in use for server-side operations
+# (existence checks) — only presigning needs the S3 credentials, since
+# generating a presigned URL is inherently an S3-protocol signing operation
+# the native binding doesn't expose.
+[vars]
+R2_ENDPOINT = "https://c5f38af076958ae8289a040392373bec.r2.cloudflarestorage.com"
+R2_BUCKET_NAME = "gates-sc-webapp"
+# Placeholder version stamp — the actual /privacy page (order-of-work item 8)
+# doesn't exist yet and its content is still pending DOST privacy office
+# review. Bump this whenever the real notice is drafted or revised; every
+# consent record stores the version it was given under so what a person
+# agreed to stays provable later.
+PRIVACY_NOTICE_VERSION = "2026-08-13"
+# INTERIM sender — dost.gov.ph's DNS is managed solely by DOST IT (no self-
+# service access), so authenticating dostgates@notify.dost.gov.ph in Brevo is
+# blocked on that request going through them. This Gmail address is verified
+# in Brevo as a single sender (no domain auth needed) purely to prove the
+# integration works end to end. Swap to dostgates@notify.dost.gov.ph — the
+# real target, see brief §7 — the moment IT completes the DNS records; no
+# other code changes needed when that happens.
+MAIL_FROM = "ljlabitag.dostgates@gmail.com"
+
+# Secrets (R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, BREVO_API_KEY,
+# SECRETARIAT_EMAIL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET) are set via
+# `wrangler secret put` — never committed here.
+
+# Cost/abuse safeguard on POST /uploads/presign, POST /hackathon-submissions,
+# and admin login: rate limiting implemented directly against D1 (see
+# worker/src/lib/rateLimit.ts). The native `[[ratelimits]]` Workers binding
+# was tried first but didn't enforce anything in testing — 30 rapid requests
+# against a configured limit of 20 all succeeded, with no error to explain
+# why — so this doesn't rely on it.

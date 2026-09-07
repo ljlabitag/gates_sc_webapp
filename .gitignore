@@ -2,14 +2,13 @@ node_modules
 .DS_Store
 dist
 
-# Secrets — never commit. server/.env.example is the template.
+# Secrets — never commit. Set via `wrangler secret put` instead.
 .env
 .env.*
-!.env.example
-
-# Uploaded hackathon proposals contain personal data (RA 10173).
-server/uploads
 
 # Build metadata
 *.tsbuildinfo
 .vite
+
+# Wrangler local dev state (simulated D1/R2 data, telemetry)
+.wrangler
