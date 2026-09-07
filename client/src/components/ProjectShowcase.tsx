@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
-import logomark from "../assets/logos/gates-logomark.png";
+import logomark from "../assets/logos/gates-logomark.webp";
 import { PROJECTS, type Quadrant } from "../data/projects";
 import { ProjectCard } from "./ui";
 

@@ -1,0 +1,13 @@
+# Crawling is allowed here so crawlers can actually see the noindex directive
+# below and on every page (index.html's <meta name="robots"> and the
+# X-Robots-Tag header in _headers) — blocking crawling outright can cause a
+# bare, snippet-less URL to still appear in search results instead. Once the
+# content items in the implementation brief's §0 are confirmed and _headers'
+# noindex rule is removed, this file needs no changes — it's already the
+# "ready to be public" config.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://gates-sc-webapp.dost-gates.workers.dev/sitemap.xml

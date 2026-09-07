@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://gates-sc-webapp.dost-gates.workers.dev/</loc>
+  </url>
+  <url>
+    <loc>https://gates-sc-webapp.dost-gates.workers.dev/program</loc>
+  </url>
+  <url>
+    <loc>https://gates-sc-webapp.dost-gates.workers.dev/conference</loc>
+  </url>
+  <url>
+    <loc>https://gates-sc-webapp.dost-gates.workers.dev/hackathon</loc>
+  </url>
+  <url>
+    <loc>https://gates-sc-webapp.dost-gates.workers.dev/registration</loc>
+  </url>
+  <url>
+    <loc>https://gates-sc-webapp.dost-gates.workers.dev/privacy</loc>
+  </url>
+</urlset>

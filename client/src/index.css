@@ -1,5 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
+
+/* Self-hosted: faster first paint than Google Fonts, and stops sending every
+   visitor's IP to a third party the privacy notice would otherwise have to
+   name. Google actually serves one variable font file across weights 500-800
+   (all four @font-face blocks for this family point at the same URL), so
+   there's one file here too, declared with a weight range rather than four
+   separate files. Latin subset only — this site is English-only. */
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("./assets/fonts/montserrat-latin-500-800.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 @property --brand-border-angle {
   syntax: "<angle>";

@@ -16,34 +16,34 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#08090b" />
 
-    <title>GATES Program 2nd Stakeholder Conference — October 15–16, 2026</title>
+    <title>GATES Program 2nd Stakeholder Conference — November 10, 2026</title>
     <meta
       name="description"
-      content="The 2nd GATES Program Stakeholder Conference — October 15–16, 2026, Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES Hackathon."
+      content="The 2nd GATES Program Stakeholder Conference — November 10, 2026, Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026."
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet" />
+
+    <!-- Static/site-wide — usePageMeta only updates title + description per
+         route. Update the URLs below once this is on its real dost.gov.ph
+         domain; they currently point at the interim workers.dev deployment. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GATES Program" />
+    <meta property="og:title" content="GATES Program 2nd Stakeholder Conference — November 10, 2026" />
+    <meta
+      property="og:description"
+      content="The 2nd GATES Program Stakeholder Conference — November 10, 2026, Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026."
+    />
+    <meta property="og:url" content="https://gates-sc-webapp.dost-gates.workers.dev/" />
+    <meta property="og:image" content="https://gates-sc-webapp.dost-gates.workers.dev/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GATES Program 2nd Stakeholder Conference — November 10, 2026" />
+    <meta
+      name="twitter:description"
+      content="The 2nd GATES Program Stakeholder Conference — November 10, 2026, Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026."
+    />
+    <meta name="twitter:image" content="https://gates-sc-webapp.dost-gates.workers.dev/og-image.png" />
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      // Decodes the path that public/404.html encoded, so GitHub Pages deep links
-      // (/program, /hackathon) land on the right route. Must run before the app
-      // mounts. No-op on hosts that support rewrites.
-      (function () {
-        var l = window.location;
-        if (l.search[1] !== "/") return;
-        var decoded = l.search
-          .slice(1)
-          .split("&")
-          .map(function (s) {
-            return s.replace(/~and~/g, "&");
-          })
-          .join("?");
-        window.history.replaceState(null, "", l.pathname.slice(0, -1) + decoded + l.hash);
-      })();
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

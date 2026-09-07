@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import gatesLogo from "../assets/logos/gates-lockup-horizontal.png";
+import gatesLogo from "../assets/logos/gates-lockup-horizontal.webp";
 
 const pages = [
   { to: "/", label: "Home" },
