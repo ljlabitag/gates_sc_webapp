@@ -6,8 +6,8 @@ interface Registration {
   name: string;
   email: string;
   organization: string | null;
-  needs: string | null;
-  createdAt: string;
+  dietaryAccessibility: string | null;
+  createdAt: number;
 }
 
 interface HackathonSubmission {
@@ -19,31 +19,20 @@ interface HackathonSubmission {
   leaderName: string | null;
   leaderEmail: string | null;
   fileName: string | null;
-  createdAt: string;
+  createdAt: number;
 }
 
-const AUTH_STORAGE_KEY = "gates_admin_auth";
 const adminInputClass =
   "w-full px-3.5 py-3 rounded-xl border border-white/16 bg-white/5 text-white/94 text-[15px] font-sans focus:outline-none focus:ring-2 focus:ring-gates-blue focus:border-gates-blue";
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleString();
+function formatDate(ms: number) {
+  return new Date(ms).toLocaleString();
 }
 
-async function downloadWithAuth(url: string, filename: string, authHeader: string) {
-  const res = await fetch(url, { headers: { Authorization: authHeader } });
-  if (!res.ok) throw new Error("Download failed.");
-  const blob = await res.blob();
-  const objectUrl = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = objectUrl;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(objectUrl);
-}
+type Status = "checking" | "loginRequired" | "authenticated";
 
 export default function Admin() {
-  const [authHeader, setAuthHeader] = useState<string | null>(() => sessionStorage.getItem(AUTH_STORAGE_KEY));
+  const [status, setStatus] = useState<Status>("checking");
   const [loginUser, setLoginUser] = useState("");
   const [loginPass, setLoginPass] = useState("");
   const [loginError, setLoginError] = useState("");
@@ -53,43 +42,51 @@ export default function Admin() {
   const [submissions, setSubmissions] = useState<HackathonSubmission[] | null>(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!authHeader) return;
-    async function load(header: string) {
-      try {
-        const [regRes, subRes] = await Promise.all([
-          fetch("/api/admin/registrations", { headers: { Authorization: header } }),
-          fetch("/api/admin/hackathon-submissions", { headers: { Authorization: header } }),
-        ]);
-        if (regRes.status === 401 || subRes.status === 401) {
-          sessionStorage.removeItem(AUTH_STORAGE_KEY);
-          setAuthHeader(null);
-          setLoginError("Invalid credentials.");
-          return;
-        }
-        if (!regRes.ok || !subRes.ok) throw new Error("Failed to load admin data.");
-        setRegistrations(await regRes.json());
-        setSubmissions(await subRes.json());
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load admin data.");
+  async function loadData() {
+    try {
+      const [regRes, subRes] = await Promise.all([
+        fetch("/api/admin/registrations", { credentials: "include" }),
+        fetch("/api/admin/hackathon-submissions", { credentials: "include" }),
+      ]);
+      if (regRes.status === 401 || subRes.status === 401) {
+        setStatus("loginRequired");
+        return;
       }
+      if (!regRes.ok || !subRes.ok) throw new Error("Failed to load admin data.");
+      setRegistrations(await regRes.json());
+      setSubmissions(await subRes.json());
+      setStatus("authenticated");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load admin data.");
+      setStatus("loginRequired");
     }
-    load(authHeader);
-  }, [authHeader]);
+  }
+
+  // The session lives in an httpOnly cookie the browser controls, not
+  // anything readable from JS — so "are we logged in" is only knowable by
+  // asking a protected endpoint, not by checking local state on mount.
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setSigningIn(true);
     setLoginError("");
-    const header = `Basic ${btoa(`${loginUser}:${loginPass}`)}`;
     try {
-      const res = await fetch("/api/admin/registrations", { headers: { Authorization: header } });
-      if (res.status === 401) {
-        setLoginError("Invalid credentials.");
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: loginUser, password: loginPass }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setLoginError(body.error ?? "Invalid credentials.");
         return;
       }
-      sessionStorage.setItem(AUTH_STORAGE_KEY, header);
-      setAuthHeader(header);
+      await loadData();
     } catch {
       setLoginError("Could not reach the server.");
     } finally {
@@ -97,7 +94,18 @@ export default function Admin() {
     }
   };
 
-  if (!authHeader) {
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST", credentials: "include" });
+    setRegistrations(null);
+    setSubmissions(null);
+    setStatus("loginRequired");
+  };
+
+  if (status === "checking") {
+    return <div className="min-h-screen flex items-center justify-center text-white/50">Loading…</div>;
+  }
+
+  if (status === "loginRequired") {
     return (
       <div className="min-h-screen flex items-center justify-center px-5 sm:px-8 py-8">
         <form className="glass-panel p-6 sm:p-8 w-full max-w-[360px] flex flex-col gap-4" onSubmit={handleLogin}>
@@ -138,9 +146,18 @@ export default function Admin() {
     <div className="min-h-screen px-5 sm:px-8 py-8 sm:py-10 max-w-[1200px] mx-auto flex flex-col gap-8 sm:gap-10">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h1 className="font-display text-3xl font-extrabold uppercase tracking-[0.01em] m-0">GATES Admin</h1>
-        <Link to="/" className="text-gates-link no-underline text-sm font-semibold">
-          &larr; Back to site
-        </Link>
+        <div className="flex items-center gap-5">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="text-gates-link no-underline text-sm font-semibold bg-transparent border-none cursor-pointer p-0"
+          >
+            Log out
+          </button>
+          <Link to="/" className="text-gates-link no-underline text-sm font-semibold">
+            &larr; Back to site
+          </Link>
+        </div>
       </div>
 
       {error && <div className="text-gates-error text-sm">{error}</div>}
@@ -148,13 +165,12 @@ export default function Admin() {
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <h2 className="text-xl font-semibold m-0">Registrations {registrations ? `(${registrations.length})` : ""}</h2>
-          <button
-            type="button"
-            onClick={() => downloadWithAuth("/api/admin/registrations/export", "gates-registrations.csv", authHeader)}
-            className="glass-panel px-4 py-2 rounded-full text-sm text-white/90 cursor-pointer border-none"
+          <a
+            href="/api/admin/registrations/export"
+            className="glass-panel px-4 py-2 rounded-full text-sm text-white/90 no-underline"
           >
             Export CSV
-          </button>
+          </a>
         </div>
         <div className="glass-panel overflow-x-auto">
           <table className="w-full min-w-[760px] text-sm text-left border-collapse">
@@ -163,7 +179,7 @@ export default function Admin() {
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
                 <th className="px-4 py-3 font-medium">Organization / Role</th>
-                <th className="px-4 py-3 font-medium">Needs</th>
+                <th className="px-4 py-3 font-medium">Dietary / Accessibility</th>
                 <th className="px-4 py-3 font-medium">Submitted</th>
               </tr>
             </thead>
@@ -180,7 +196,7 @@ export default function Admin() {
                   <td className="px-4 py-3">{r.name}</td>
                   <td className="px-4 py-3">{r.email}</td>
                   <td className="px-4 py-3">{r.organization || "—"}</td>
-                  <td className="px-4 py-3">{r.needs || "—"}</td>
+                  <td className="px-4 py-3">{r.dietaryAccessibility || "—"}</td>
                   <td className="px-4 py-3 text-white/60">{formatDate(r.createdAt)}</td>
                 </tr>
               ))}
@@ -201,19 +217,12 @@ export default function Admin() {
           <h2 className="text-xl font-semibold m-0">
             Hackathon Submissions {submissions ? `(${submissions.length})` : ""}
           </h2>
-          <button
-            type="button"
-            onClick={() =>
-              downloadWithAuth(
-                "/api/admin/hackathon-submissions/export",
-                "gates-hackathon-submissions.csv",
-                authHeader,
-              )
-            }
-            className="glass-panel px-4 py-2 rounded-full text-sm text-white/90 cursor-pointer border-none"
+          <a
+            href="/api/admin/hackathon-submissions/export"
+            className="glass-panel px-4 py-2 rounded-full text-sm text-white/90 no-underline"
           >
             Export CSV
-          </button>
+          </a>
         </div>
         <div className="glass-panel overflow-x-auto">
           <table className="w-full min-w-[920px] text-sm text-left border-collapse">
@@ -252,19 +261,12 @@ export default function Admin() {
                   </td>
                   <td className="px-4 py-3">
                     {s.fileName ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          downloadWithAuth(
-                            `/api/admin/hackathon-submissions/${s.id}/file`,
-                            s.fileName ?? "proposal",
-                            authHeader,
-                          )
-                        }
-                        className="text-gates-link no-underline cursor-pointer bg-transparent border-none p-0 font-sans text-sm"
+                      <a
+                        href={`/api/admin/hackathon-submissions/${s.id}/file`}
+                        className="text-gates-link no-underline text-sm"
                       >
                         {s.fileName}
-                      </button>
+                      </a>
                     ) : (
                       "—"
                     )}
