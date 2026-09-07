@@ -82,19 +82,22 @@ orb + perspective-grid-floor hero treatment on the Home page. Not required — t
 treatment is a valid final look on its own.
 
 ## Proposal template
-`client/public/templates/gates-proposal-template.pdf` — currently a real, valid but
-placeholder-content PDF (clearly labeled as such inside the file). Linked directly from the
-Hackathon page's "Download Proposal Template" button. Replace by overwriting the same file
-with the final document (same filename, so the link keeps working).
+`client/public/templates/GATESGeoHack2026_Proposal_Template.docx` — the real Annex A template
+(currently `Annex_A_Proposal_Submission_Template_v3.docx`, supplied 2026-08-27; supersedes v2,
+supplied 2026-08-19 — v3 added the step-by-step submission walkthrough, the eligibility
+self-check, and the scoring table, but kept the same page/word/size limits and filename pattern
+as v2, so nothing in `data/hackathon.ts` needed to change with this swap), linked directly from
+the Hackathon page's "Download proposal template" button. Deliberately kept as `.docx`, not
+converted to PDF — teams fill it in as a Word document, then export their own completed copy to
+PDF for submission (that's what the site's upload actually requires). To update, overwrite this
+file (same filename, so the link keeps working) — the site's page/word/size limits in
+`data/hackathon.ts` (`proposalMaxPages`, `proposalMaxSizeMB`) and the filename pattern
+(`proposalFilenamePattern`) should stay in sync with whatever a new version of this template
+states.
 
-## Not yet wired (needs a decision, not just a file)
-- `client/public/templates/gates-proposal-template.pdf` must be replaced with the real Annex A
-  template from the hackathon mechanics (max 5 pages, PDF, filename
-  `GATESHack2026_Proposal_[TeamName].pdf`). The page already states those requirements.
-- The hackathon name is still a placeholder. `data/hackathon.ts` uses "GATES Hackathon 2026";
-  the mechanics shortlist "GATES GeoHack 2026" and "GATES Geo-vation Challenge 2026" with the
-  final choice pending. One constant to change.
-
-**Resolved:** the submission form now collects the team leader's email, so hackathon
-confirmation emails send properly once `SMTP_*` is configured — the old limitation noted in
-`server/src/lib/mailer.ts` is gone.
+**Resolved:** the hackathon name is confirmed as "GATES GeoHack 2026" (`data/hackathon.ts`), per
+the mechanics v0.2 document supplied 2026-08-15. The submission form now collects the team
+leader's email, so hackathon confirmation emails send properly via the Brevo API
+(`worker/src/lib/mailer.ts`). The proposal template is now the real document (above), which also
+revealed the actual page/word/size limits and filename pattern were wrong on the site until this
+update — see `data/hackathon.ts`'s header comment.

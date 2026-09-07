@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
-import gatesVerticalLogo from "../assets/logos/gates-lockup-vertical.png";
+import gatesVerticalLogo from "../assets/logos/gates-lockup-vertical.webp";
 import {
   Eyebrow,
   IconDot,
@@ -29,7 +29,7 @@ const accentByColor = {
 const KEY_DATES = [
   {
     color: "orange",
-    date: "August 18, 2026",
+    date: "September 15, 2026",
     detail: "11:59 PM",
     title: "Hackathon proposals due",
     to: "/hackathon",
@@ -37,7 +37,7 @@ const KEY_DATES = [
   },
   {
     color: "teal",
-    date: "October 15, 2026",
+    date: "November 9, 2026",
     detail: "Finalists only",
     title: "Hackathon final coaching and technical judging",
     to: "/hackathon",
@@ -45,7 +45,7 @@ const KEY_DATES = [
   },
   {
     color: "blue",
-    date: "October 16, 2026",
+    date: "November 10, 2026",
     detail: "8:00 AM onwards",
     title: "Stakeholder conference proper",
     to: "/conference",
@@ -55,8 +55,8 @@ const KEY_DATES = [
 
 export default function Home() {
   usePageMeta(
-    `${CONFERENCE.edition} — October 16, 2026`,
-    "The 2nd GATES Program Stakeholder Conference, October 16, 2026 in Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES Hackathon.",
+    `${CONFERENCE.edition} — November 10, 2026`,
+    "The 2nd GATES Program Stakeholder Conference, November 10, 2026 in Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.",
   );
 
   const { d, h, m, s } = useCountdown(CONFERENCE_DATE);
@@ -82,7 +82,7 @@ export default function Home() {
 
         <div className="relative z-10 max-w-[800px] text-center flex flex-col items-center gap-[18px]">
           <Eyebrow>
-            October 16, 2026 &middot; {CONFERENCE.venueLabel}
+            November 10, 2026 &middot; {CONFERENCE.venueLabel}
           </Eyebrow>
           <h1 className="font-display text-[clamp(30px,6.6vw,78px)] font-extrabold leading-[0.98] m-0 tracking-[0.01em] uppercase text-glow">
             GATES Program <span className="whitespace-nowrap">2nd Stakeholder</span> Conference
@@ -91,7 +91,7 @@ export default function Home() {
             {CONFERENCE.theme}
           </p>
           <p className="text-[17px] sm:text-lg leading-[1.55] text-white/68 max-w-[620px] m-0">
-            Keynotes, use case showcases, and the first GATES Hackathon &mdash; bringing the geospatial data community
+            Keynotes, use case showcases, and the first GATES GeoHack 2026 &mdash; bringing the geospatial data community
             together to co-develop what comes next.
           </p>
 
@@ -111,7 +111,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col min-[420px]:flex-row gap-3 mt-2.5 w-full min-[420px]:w-auto">
-            <PrimaryButton to="/registration">Register Now</PrimaryButton>
+            <PrimaryButton to="/registration">Registration Info</PrimaryButton>
             <SecondaryButton to="/hackathon">Join the Hackathon</SecondaryButton>
           </div>
         </div>
@@ -274,12 +274,12 @@ export default function Home() {
 
       {/* CTA */}
       <section className="hero-brand-gradient glass-panel relative overflow-hidden max-w-[1000px] mx-5 sm:mx-8 lg:mx-auto my-10 sm:my-16 px-6 sm:px-10 py-10 sm:py-14 text-center flex flex-col gap-[18px] items-center">
-        <Eyebrow>REGISTRATION IS OPEN</Eyebrow>
+        <Eyebrow>SAVE THE DATE</Eyebrow>
         <h2 className="text-[clamp(24px,3vw,34px)] font-bold m-0 tracking-tight">
-          See you on {CONFERENCE.conferenceProperLabel.replace("Friday, ", "")}
+          See you on {CONFERENCE.conferenceProperLabel.replace(/^\w+, /, "")}
         </h2>
         <div className="flex flex-col min-[420px]:flex-row gap-3">
-          <PrimaryButton to="/registration">Register Now</PrimaryButton>
+          <PrimaryButton to="/registration">Registration Info</PrimaryButton>
           <SecondaryButton to="/hackathon">Proposals close {HACKATHON.submissionDeadlineShort}</SecondaryButton>
         </div>
       </section>

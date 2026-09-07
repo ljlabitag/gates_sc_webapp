@@ -1,43 +1,58 @@
 /**
- * GATES Hackathon 2026 — public-facing mechanics.
+ * GATES GeoHack 2026 — public-facing mechanics.
  *
- * Source: "P4_GATES-Hackathon_Internal_General_Mechanics_v0.2_20260709".
- * This supersedes the earlier stakeholder-conference concept note, which said
- * "5 teams max" and dated the finalist announcement to Aug 19; v0.2 sets 6 teams
- * and Aug 25. Keep this file in sync with the mechanics document, not the concept note.
+ * Source: "Official Mechanics for the GATES Program Hackathon 2026_v2.0_20260819"
+ * (external copy supplied 2026-08-19). This is a full timeline revision, not a
+ * typo fix, superseding the v0.2 dates previously in this file (Aug 18 call /
+ * Sep 3 deadline / Oct 25-26 finals+conference) — do not revert to those.
+ * v2.0 pushes the whole schedule back roughly a month and, unlike v0.2, is
+ * internally consistent (no stale-date mismatches between its timeline table
+ * and its prose) — nothing needed the same kind of judgment call this time.
+ *
+ * Call-for-participants opening slipped again after v2.0: August 24 → August
+ * 27, 2026 (confirmed verbally 2026-08-26, not yet in a revised mechanics
+ * doc). Only that one date moved — the submission window's start shifted with
+ * it, but the September 15 deadline and everything after are unchanged.
+ *
+ * v2.0 also references this site directly as the submission channel
+ * ("...via https://gates-sc-webapp.dost-gates.workers.dev/hackathon"), so the
+ * domain in that document needs updating too if this site's domain changes
+ * again before launch.
  */
 
 export const HACKATHON = {
-  /*
-   * The mechanics shortlist two names ("GATES GeoHack 2026" and
-   * "GATES Geo-vation Challenge 2026") with final selection pending, and uses
-   * this placeholder throughout.
-   * TODO: replace once the name is chosen.
-   */
-  name: "GATES Hackathon 2026",
-  /** Anchored on the stakeholder conference theme. */
+  name: "GATES GeoHack 2026",
+  /** Confirmed — matches the mechanics document's own title. */
   theme: "Charting Spatial Futures",
-  submissionDeadlineLabel: "11:59 PM on August 18, 2026",
+  submissionDeadlineLabel: "11:59 PM on September 15, 2026",
   /** For buttons and tight spaces where the full label won't fit. */
-  submissionDeadlineShort: "August 18",
-  callForParticipantsLabel: "August 7, 2026",
-  finalistsAnnouncedLabel: "August 25, 2026",
+  submissionDeadlineShort: "September 15",
+  callForParticipantsLabel: "August 27, 2026",
+  finalistsAnnouncedLabel: "September 22, 2026",
   maxFinalistTeams: 6,
   reserveTeams: 2,
   teamSize: 4,
-  developmentPeriodLabel: "September 18 – October 14, 2026",
-  proposalMaxPages: 5,
-  proposalFilenamePattern: "GATESHack2026_Proposal_[TeamName].pdf",
+  developmentPeriodLabel: "October 8 – November 8, 2026",
+  // Sourced from the real Annex A template (originally Annex_A_Proposal_Submission_Template_v2.docx,
+  // supplied 2026-08-19; superseded by v3.0, supplied 2026-08-27 — v3 kept
+  // these same limits, so nothing below changed with the v3 swap). The v2
+  // template itself superseded 5 pages / no stated size limit /
+  // "GATESHack2026_..." that were on the site before either version existed.
+  // The 8-page limit covers Sections 1–7 only; the declarations page doesn't
+  // count toward it.
+  proposalMaxPages: 8,
+  proposalMaxSizeMB: 100,
+  proposalFilenamePattern: "GATESGeoHack2026_Proposal_[TeamName].pdf",
 };
 
 export const OBJECTIVE =
-  "Develop innovative geospatial technology solutions using the GATES Lakehouse, datasets, and tools to address operational challenges and pain points across the DOST system.";
+  "Develop innovative geospatial technology solutions using the GATES Lakehouse, datasets, and tools to address operational challenges and pain points or explore an uncharted territory across the DOST system.";
 
 export const SUB_OBJECTIVES = [
-  "Surface real operational pain points within DOST agencies, regional offices, and PSTOs that geospatial technology can address.",
+  "Encourage the development of geospatial solutions and innovations within the DOST system.",
+  "Build internal capacity and a pipeline of geospatial champions across the Department.",
   "Demonstrate the value of the GATES Lakehouse, datasets, and tools through working solutions built by the DOST community itself.",
-  "Build internal capacity and a pipeline of geospatial champions across the DOST system.",
-  "Feed promising solutions into the GATES use case pipeline for possible further development after the hackathon.",
+  "Identify promising solutions for inclusion into the GATES use case pipeline for possible further development after the hackathon.",
 ];
 
 /** A proposal must address a pain point in at least one of these. */
@@ -51,9 +66,9 @@ export const DOMAINS = [
 ];
 
 export const ELIGIBLE = [
-  "Technical staff of DOST attached agencies",
-  "Technical staff of DOST regional offices",
-  "Technical staff of Provincial Science and Technology Offices (PSTOs)",
+  "DOST attached agencies staff",
+  "DOST regional offices staff",
+  "Provincial Science and Technology Offices (PSTOs) staff",
   "DOST-SEI scholars, who must be in their senior year of college at the time of the hackathon",
 ];
 
@@ -76,44 +91,44 @@ export const PHASES = [
     number: 1,
     color: "orange",
     title: "Idea submission and screening",
-    window: "August 7 – September 2, 2026",
+    window: "August 27 – September 30, 2026",
     steps: [
-      "Call for participants — GATES publishes the mechanics, proposal template, and submission instructions (August 7).",
-      "Submission — one proposal per team using the official template, covering the domain and pain point, the proposed geospatial solution, GATES resources to be used, feasibility, and expected impact. Deadline August 18, 11:59 PM.",
-      "Screening — subject matter experts and organizers review submissions against the screening rubric (August 19–24).",
-      "Announcement — up to 6 finalist teams plus 2 ranked reserve teams announced August 25.",
-      "Confirmation — finalists confirm participation, including agency endorsement, by September 1. Any team that backs out is replaced by the next-ranked reserve. The final list locks September 2.",
+      "Call for participants — GATES publishes the mechanics, proposal template, and submission instructions (August 27).",
+      "Submission — one proposal per team using the official template, covering the domain and pain point, the proposed geospatial solution, GATES resources to be used, feasibility, and expected impact. Deadline September 15, 11:59 PM.",
+      "Screening — subject matter experts and organizers review submissions against the screening rubric (September 16–21).",
+      "Announcement — up to 6 finalist teams plus 2 ranked reserve teams announced September 22.",
+      "Confirmation — finalists confirm participation, including agency endorsement, by September 29. Any team that backs out is replaced by the next-ranked reserve. The final list locks September 30.",
     ],
   },
   {
     number: 2,
     color: "teal",
     title: "Build, coach, pitch",
-    window: "September 17 – October 16, 2026",
+    window: "October 7 – November 10, 2026",
     steps: [
-      "Orientation and capacity building (face-to-face, September 17) — onboarding to the GATES Lakehouse sandbox, datasets, and tools; briefing on rules, deliverables, scoring, and data governance; matching with assigned GATES mentors.",
-      "Development period (September 18 – October 14) — teams build at their own offices with mentor support.",
-      "Virtual check-ins — two mandatory online checkpoints with GATES specialists on September 30 and October 7, plus on-demand consultations with mentors.",
-      "Final coaching and technical judging (face-to-face, October 15) — a walkthrough of pitching rules and a coaching session, then each team presents to the technical panel: 10 minutes to pitch, 5 minutes Q&A, 5 minutes of feedback. Worth 70% of the final score.",
-      "Final pitch and executive judging (October 16) — teams deliver an improved 5-minute pitch to the executive panel and the conference audience. Worth 30% of the final score.",
+      "Orientation and capacity building (online, October 7) — onboarding to the GATES Lakehouse sandbox, datasets, and tools; briefing on rules, deliverables, scoring, and data governance; matching with assigned GATES mentors.",
+      "Development period (October 8 – November 8) — teams build at their own offices with mentor support.",
+      "Virtual check-ins — two mandatory online checkpoints with GATES specialists on October 20 and November 3, plus on-demand consultations with mentors.",
+      "Final coaching and technical judging (face-to-face, November 9) — a walkthrough of pitching rules and a coaching session, then each team presents to the technical panel: 10 minutes to pitch, 5 minutes Q&A, 5 minutes of feedback. Worth 70% of the final score.",
+      "Final pitch and executive judging (November 10) — teams deliver an improved 5-minute pitch to the executive panel and the conference audience. Worth 30% of the final score.",
       "Awarding — winners announced during the conference.",
     ],
   },
 ] as const;
 
 export const TIMELINE = [
-  { date: "August 7, 2026", milestone: "Call for participants opens" },
-  { date: "August 7 – 18", milestone: "Submission window" },
-  { date: "August 18, 11:59 PM", milestone: "Deadline for proposal submissions" },
-  { date: "August 19 – 24", milestone: "Screening by subject matter experts and organizers" },
-  { date: "August 25", milestone: "Announcement of finalists and 2 reserve teams" },
-  { date: "August 26 – September 1", milestone: "Confirmation and back-out period" },
-  { date: "September 2", milestone: "Final list of finalist teams locked" },
-  { date: "September 17", milestone: "Orientation and capacity building (face-to-face)" },
-  { date: "September 18 – October 14", milestone: "Development period with mentorship" },
-  { date: "September 30 and October 7", milestone: "Mandatory virtual check-ins" },
-  { date: "October 15", milestone: "Final coaching and technical judging (70%)" },
-  { date: "October 16", milestone: "Final pitch, executive judging (30%), and awarding" },
+  { date: "August 27, 2026", milestone: "Call for participants opens" },
+  { date: "August 27 – September 15", milestone: "Submission window" },
+  { date: "September 15, 11:59 PM", milestone: "Deadline for proposal submissions" },
+  { date: "September 16 – 21", milestone: "Screening by subject matter experts and organizers" },
+  { date: "September 22", milestone: "Announcement of finalists and 2 reserve teams" },
+  { date: "September 23 – 29", milestone: "Confirmation and back-out period" },
+  { date: "September 30", milestone: "Final list of finalist teams locked" },
+  { date: "October 7", milestone: "Orientation and capacity building (online)" },
+  { date: "October 8 – November 8", milestone: "Development period with mentorship" },
+  { date: "October 20 and November 3", milestone: "Mandatory virtual check-ins" },
+  { date: "November 9", milestone: "Final coaching and technical judging (70%)" },
+  { date: "November 10", milestone: "Final pitch, executive judging (30%), and awarding" },
 ];
 
 export const RESOURCES = [
@@ -168,28 +183,37 @@ export const RUBRICS: Rubric[] = [
   },
 ];
 
+// Orientation is online now (see PHASES), so there's no separate covered
+// hotel night for it — only Finals gets one, per the mechanics' §X.
 export const COVERED_COSTS = [
-  "Orientation (September 17) — one night of hotel accommodation, with meals during the activity.",
-  "Finals (October 15–16) — one night of hotel accommodation on October 15, with meals during the activity.",
+  "Finals (November 9–10) — one night of hotel accommodation, with meals during the activity.",
 ];
 
 export const PARTICIPANT_COSTS = [
-  "Airfare and land travel to and from Metro Manila for both face-to-face activities.",
-  "Accommodation and meals beyond the covered nights and activity meals.",
+  "Airfare and land travel to and from Metro Manila for face-to-face activities.",
+  "Accommodation and meals beyond the covered night and activity meals.",
+];
+
+// Per the mechanics §VIII. Cash amounts are deliberately not stated here —
+// they're to be announced closer to the finals — so keep that as a quiet
+// trailing note in the UI rather than its own callout.
+export const PRIZES = [
+  "The top 3 teams each receive a cash prize, a plaque, and medals for their members.",
+  "Remaining finalist teams receive a certificate of recognition and a consolation prize.",
 ];
 
 export const PROPOSAL_SECTIONS = [
   { title: "Team information", detail: "Team name, agency or office per member, team leader contact, members and roles, and endorsing head/s." },
-  { title: "Problem statement / pain point", detail: "Max 300 words. Which domain, who experiences the problem, how often, and what it costs today in time, money, or service quality." },
-  { title: "Proposed solution", detail: "Max 500 words. How it works, and what will exist at the end of the hackathon as a demo-able prototype." },
+  { title: "Problem statement / pain point", detail: "Max 400 words. Which domain, who experiences the problem, how often, and what it costs today in time, money, or service quality." },
+  { title: "Proposed solution", detail: "Max 700 words. How it works, and what will exist at the end of the hackathon as a demo-able prototype." },
   { title: "Geospatial component and GATES resources", detail: "What makes the solution geospatial, and which datasets and development tools you need." },
   { title: "Business model canvas", detail: "Condensed: target users, value proposition, key activities, resources and data, channels, cost to sustain, and success indicators." },
-  { title: "Feasibility and workplan", detail: "High-level plan for the September 18 – October 14 development period, including who does what." },
+  { title: "Feasibility and workplan", detail: "High-level plan for the October 8 – November 8 development period, including who does what." },
   { title: "Expected impact", detail: "Who benefits, at what scale, and how DOST would adopt this beyond the hackathon." },
 ];
 
 export const GENERAL_RULES = [
-  "Solutions must be substantially developed during the development period (September 18 – October 14). Pre-existing open-source libraries, frameworks, and public components may be used with proper attribution; a pre-existing complete system merely rebranded is not eligible.",
+  "Solutions must be substantially developed during the development period (October 8 – November 8). Pre-existing open-source libraries, frameworks, and public components may be used with proper attribution; a pre-existing complete system merely rebranded is not eligible.",
   "Teams must use the GATES Lakehouse sandbox, authorized datasets, and/or GATES tools as a core component of the solution.",
   "Any plagiarism, misrepresentation, or unauthorized use of another team's work is ground for disqualification.",
   "The organizing committee may disqualify teams for violations of these mechanics, the data governance rules, or the code of conduct, at any stage.",

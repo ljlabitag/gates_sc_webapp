@@ -4,32 +4,35 @@
  * Sources: "2nd Stakeholder Conference Concept" (draft) and "Conference
  * Documentation Oct 15 - 17" (the 2025 event report).
  *
- * The 2026 concept note is an early draft and was internally inconsistent on
- * dates. The reading used here, confirmed with the team:
- *   - Oct 15 (Thu) — hackathon final coaching and technical judging, participants only
- *   - Oct 16 (Fri) — the stakeholder conference proper, plus final pitches and awarding
+ * The conference date and hackathon-day pairing come from the hackathon
+ * mechanics v2.0 (external copy supplied 2026-08-19), which pushed the whole
+ * hackathon timeline back roughly a month from the v0.2 reading this file
+ * previously used (Oct 25/26) — do not revert to those dates:
+ *   - Nov 9 (Mon) — hackathon final coaching and technical judging, participants only
+ *   - Nov 10 (Tue) — the stakeholder conference proper, plus final pitches and awarding
+ * The mechanics cover one hotel night for this pairing (see COVERED_COSTS in
+ * data/hackathon.ts) — and unlike the Oct 25/26 reading, Nov 9/10 is a clean
+ * weekday pair (Mon/Tue), not weekend judging.
  *
- * Hackathon specifics come from the hackathon mechanics v0.2, which supersedes the
- * concept note (6 finalist teams, not 5; finalists announced Aug 25, not Aug 19).
- * See data/hackathon.ts — do not duplicate those figures here.
+ * Hackathon specifics come from the hackathon mechanics v2.0. See
+ * data/hackathon.ts — do not duplicate those figures here.
  *
  * Nothing internal belongs in this file: no budgets, billeting or pax counts,
  * purchase-request details, PCIEERD monitoring figures, or staff initials.
  */
 
+// Anchored to +08:00 explicitly — an earlier version of this constructed in
+// browser-local time, so the countdown differed per viewer timezone.
 /** Conference proper, used for the countdown. */
-export const CONFERENCE_DATE = new Date(2026, 9, 16, 9, 0, 0);
+export const CONFERENCE_DATE = new Date("2026-11-10T09:00:00+08:00");
 
 export const CONFERENCE = {
   edition: "2nd GATES Program Stakeholder Conference",
-  dateLabel: "October 16, 2026",
-  conferenceProperLabel: "Friday, October 16, 2026",
-  hackathonDayLabel: "Thursday, October 15, 2026",
+  dateLabel: "November 10, 2026",
+  conferenceProperLabel: "Tuesday, November 10, 2026",
+  hackathonDayLabel: "Monday, November 9, 2026",
   venueLabel: "Metro Manila — venue to be announced",
-  /*
-   * Working theme, chosen from the four options in the draft concept note.
-   * TODO: confirm before any printed or broadcast material goes out.
-   */
+  /** Confirmed — matches the hackathon mechanics document's own title. */
   theme: "Charting Spatial Futures",
   previousTheme: "#SpatialTogether",
 };
@@ -67,9 +70,9 @@ export const COMPONENTS = [
   },
   {
     color: "plum",
-    title: "GATES Hackathon",
+    title: "GATES GeoHack 2026",
     short: "Six finalist teams build on the GATES Lakehouse, then pitch live at the conference.",
-    desc: "The first GATES Hackathon. Up to six finalist teams build geospatial solutions on the GATES Lakehouse sandbox, then deliver a five-minute pitch to the executive panel and the conference audience before awarding.",
+    desc: "The first GATES GeoHack. Up to six finalist teams build geospatial solutions on the GATES Lakehouse sandbox, then deliver a five-minute pitch to the executive panel and the conference audience before awarding.",
     to: "/hackathon",
     linkLabel: "See the full mechanics",
   },

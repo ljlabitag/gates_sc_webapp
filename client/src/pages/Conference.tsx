@@ -59,7 +59,7 @@ const AGENDA_GROUPS = [
 export default function Conference() {
   usePageMeta(
     `${CONFERENCE.edition} — ${CONFERENCE.dateLabel}`,
-    `The 2nd GATES Program Stakeholder Conference, ${CONFERENCE.dateLabel} in Metro Manila. Program updates, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES Hackathon.`,
+    `The 2nd GATES Program Stakeholder Conference, ${CONFERENCE.dateLabel} in Metro Manila. Program updates, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.`,
   );
 
   const { d, h, m, s } = useCountdown(CONFERENCE_DATE);
@@ -107,7 +107,7 @@ export default function Conference() {
           </div>
 
           <div className="flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
-            <PrimaryButton to="/registration">Register Now</PrimaryButton>
+            <PrimaryButton to="/registration">Registration Info</PrimaryButton>
             <a
               href="#programme"
               className="glass-panel px-[26px] py-3.5 rounded-full text-white/90 font-semibold text-[15px] no-underline text-center"
@@ -132,7 +132,7 @@ export default function Conference() {
             puts emerging use cases, collaborative initiatives, and strategic partnerships at the center.
           </p>
           <p className="m-0">
-            Through Program updates, use case presentations, the first GATES Hackathon, and discussions with
+            Through Program updates, use case presentations, the first GATES GeoHack 2026, and discussions with
             development partners, the conference is a venue to strengthen partnerships, surface new ideas, and chart the
             next phase of the Program together.
           </p>
@@ -145,7 +145,7 @@ export default function Conference() {
           eyebrow="HACKATHON PRE-EVENT"
           title="Building toward the conference"
           titleId="schedule-title"
-          intro="The Hackathon begins before the main event, preparing finalist teams to bring their strongest ideas to the stakeholder conference on October 16."
+          intro="The Hackathon begins before the main event, preparing finalist teams to bring their strongest ideas to the stakeholder conference on November 10."
         />
         <div className="glass-panel glass-panel-strong max-w-[860px] mx-auto p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-5 sm:gap-7 sm:items-center">
           <div>
@@ -357,9 +357,9 @@ export default function Conference() {
         className="hero-brand-gradient glass-panel relative overflow-hidden max-w-[1000px] mx-5 sm:mx-8 lg:mx-auto my-10 sm:my-16 px-6 sm:px-10 py-10 sm:py-14 text-center flex flex-col gap-[18px] items-center"
       >
         <Eyebrow>BE PART OF WHAT COMES NEXT</Eyebrow>
-        <h2 className="text-[clamp(24px,3vw,34px)] font-bold m-0 tracking-tight">Join us on October 16</h2>
+        <h2 className="text-[clamp(24px,3vw,34px)] font-bold m-0 tracking-tight">Join us on November 10</h2>
         <div className="flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
-          <PrimaryButton to="/registration">Register Now</PrimaryButton>
+          <PrimaryButton to="/registration">Registration Info</PrimaryButton>
           <SecondaryButton to="/hackathon">Explore the Hackathon</SecondaryButton>
         </div>
       </section>
