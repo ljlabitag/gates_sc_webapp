@@ -54,14 +54,27 @@ Participant confirmations and the secretariat notification (on every hackathon s
 through the Brevo HTTP API — see [`worker/src/lib/mailer.ts`](worker/src/lib/mailer.ts). Sends
 are logged; a failure is logged and alerted on but never blocks a submission response.
 
+## Branching and environments
+`main` is production; day-to-day work happens on `dev` (or short-lived feature branches off it),
+merged into `main` via PR only after being verified on staging. Staging is a fully separate
+Cloudflare Worker/D1/R2 — not a copy of production's data — configured under `[env.staging]` in
+`wrangler.toml`.
+
 ## Deploying
 ```bash
-npm run worker:deploy        # builds the client, then deploys the Worker (static assets + API)
+npm run worker:deploy            # production: builds the client, deploys the Worker
+npm run worker:deploy:staging    # staging: same, but to the separate staging environment
 ```
-This is the same command whether you're deploying for the first time or redeploying — Cloudflare
-Workers static assets serve `client/dist` directly, and `wrangler.toml`'s
+Cloudflare Workers static assets serve `client/dist` directly, and `wrangler.toml`'s
 `not_found_handling = "single-page-application"` handles React Router deep links (`/program`,
-`/hackathon`, etc.) without needing a separate rewrite rule.
+`/hackathon`, etc.) without needing a separate rewrite rule. Staging's URL is
+https://gates-sc-webapp-staging.dost-gates.workers.dev — check it works there before merging
+`dev` into `main`.
+
+Staging needs its own secrets (`wrangler secret put <NAME> --env staging`, same names as
+production above) — they are not shared with production and haven't been set yet, so
+presign/submission/admin flows will error on staging until that's done. D1 migrations go through
+`npm run db:migrate:staging -w worker` (mirrors `db:migrate:remote` but targets the staging DB).
 
 ## Notes
 - The hackathon submission form mirrors Annex A of the GATES GeoHack 2026 mechanics (team

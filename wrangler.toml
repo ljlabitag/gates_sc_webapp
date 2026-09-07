@@ -51,3 +51,35 @@ MAIL_FROM = "ljlabitag.dostgates@gmail.com"
 # was tried first but didn't enforce anything in testing — 30 rapid requests
 # against a configured limit of 20 all succeeded, with no error to explain
 # why — so this doesn't rely on it.
+
+# Staging environment — a fully separate Worker/D1/R2 so `dev`-branch work can
+# be deployed and tested (`wrangler deploy --env staging`) without touching
+# production data or the live URL. Named-environment bindings do NOT inherit
+# from the top-level config above, so every binding/var production has is
+# re-declared here rather than assumed. Secrets are also per-environment
+# (`wrangler secret put NAME --env staging`) and have not been set yet.
+[env.staging]
+name = "gates-sc-webapp-staging"
+
+[env.staging.assets]
+directory = "client/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "gates-sc-webapp-staging"
+database_id = "fc2f89c8-f7f1-441d-bb8a-ed91bc537587"
+migrations_dir = "drizzle/migrations"
+
+[[env.staging.r2_buckets]]
+binding = "BUCKET"
+bucket_name = "gates-sc-webapp-staging"
+
+[env.staging.vars]
+R2_ENDPOINT = "https://c5f38af076958ae8289a040392373bec.r2.cloudflarestorage.com"
+R2_BUCKET_NAME = "gates-sc-webapp-staging"
+PRIVACY_NOTICE_VERSION = "2026-08-13"
+# Same interim Gmail sender as production — fine to share for staging since
+# it's just proving the integration works, not sending anything real.
+MAIL_FROM = "ljlabitag.dostgates@gmail.com"

@@ -12,10 +12,10 @@ each API feature, client wiring, security/performance pass, content updates, the
 gate, this doc) — `git log --oneline` on `main` tells the real story, don't assume it's still
 one undifferentiated blob of uncommitted changes.
 
-A `dev` branch exists off `main` for ongoing work — check `git log`/`git branch` for whether it
-has a staging Cloudflare environment set up yet (separate Worker/D1/R2 so future changes get
-tested before touching the live site). `main` is production: only merge into it once a change
-has been verified there.
+A `dev` branch exists off `main` for ongoing work, with its own Cloudflare environment (see
+**Environments** below) so future changes get tested on a separate URL/database/bucket before
+touching the live site. `main` is production: only merge into it once a change has been verified
+on staging.
 
 ## What this project is
 
@@ -44,6 +44,25 @@ describe in places (e.g. the content dates below supersede the brief's placehold
   overage billing risk); **R2 is genuinely metered and could bill** — see the cost-safeguard
   memory files (below) before provisioning anything new.
 - `wrangler login` is already authenticated on this machine.
+
+## Environments — production vs. staging
+
+Added 2026-09-07. Staging is a **fully separate** Worker/D1/R2, not a copy of production data —
+configured under `[env.staging]` in `wrangler.toml`, deployed with
+`npm run worker:deploy:staging`.
+
+- **Staging URL**: https://gates-sc-webapp-staging.dost-gates.workers.dev (health-checked working)
+- **Staging D1**: `gates-sc-webapp-staging`, ID `fc2f89c8-f7f1-441d-bb8a-ed91bc537587` — migrations
+  applied (`npm run db:migrate:staging -w worker`)
+- **Staging R2**: `gates-sc-webapp-staging` — same `abort-multipart-days: 1` lifecycle safeguard
+  as production, applied directly with `wrangler r2 bucket lifecycle add`
+- **Staging secrets: not set yet.** `wrangler secret list --env staging` returns `[]`. Presign,
+  submission, and admin-login will error until someone runs `wrangler secret put <NAME> --env
+  staging` for each of the seven secrets listed below — same names, same "run it yourself"
+  pattern, just with `--env staging` appended.
+- Workflow going forward: branch off `dev` → `npm run worker:deploy:staging` to verify on the
+  staging URL → merge to `main` via PR → `npm run worker:deploy` for production. `main` should
+  only ever contain what's actually live.
 
 ### Deploy / dev commands
 ```
@@ -204,6 +223,8 @@ risk; Workers/D1 are hard-capped, not billed).
 For any change touching the submission flow, the standard regression test is: presign → PUT a
 real small PDF (`%PDF-1.4` header is enough to pass the magic-byte check) → submit metadata →
 confirm `201` → clean up the test row/object via `wrangler d1 execute ... DELETE` and
-`wrangler r2 object delete`. Used dozens of times this session against the **real** deployed
-Worker and D1/R2 (not local dev) — there's no separate staging environment, so any live test is
-a live-data test; always clean up afterward.
+`wrangler r2 object delete`. Used dozens of times through 2026-09-06 against the **real**
+production Worker and D1/R2 (not local dev), since there was no separate staging environment yet
+— every one of those was a live-data test, always cleaned up afterward. As of 2026-09-07, prefer
+running this same test against staging (`gates-sc-webapp-staging`) instead, once its secrets are
+set — no need to touch production data or clean up after production anymore for routine testing.

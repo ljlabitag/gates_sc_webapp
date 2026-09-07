@@ -10,7 +10,8 @@
     "dev": "concurrently -n worker,client -c magenta,blue \"npm run dev -w worker\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
     "worker:dev": "npm run build -w client && wrangler dev",
-    "worker:deploy": "npm run build -w client && wrangler deploy"
+    "worker:deploy": "npm run build -w client && wrangler deploy",
+    "worker:deploy:staging": "npm run build -w client && wrangler deploy --env staging"
   },
   "devDependencies": {
     "concurrently": "^10.0.3"
