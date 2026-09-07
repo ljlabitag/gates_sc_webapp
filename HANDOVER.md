@@ -1,0 +1,209 @@
+# Handover — GATES SC Webapp
+
+Written 2026-08-19, end of the session that did the full Cloudflare rewrite; updated through
+2026-09-07. Read this before doing anything else in this repo — it'll save re-deriving context
+that's already settled.
+
+## Git history and branching
+
+The entire Express→Cloudflare rewrite plus every content update through 2026-09-07 is now
+committed to `main` as a sequence of logical commits (backend replacement, worker foundation,
+each API feature, client wiring, security/performance pass, content updates, the early-access
+gate, this doc) — `git log --oneline` on `main` tells the real story, don't assume it's still
+one undifferentiated blob of uncommitted changes.
+
+A `dev` branch exists off `main` for ongoing work — check `git log`/`git branch` for whether it
+has a staging Cloudflare environment set up yet (separate Worker/D1/R2 so future changes get
+tested before touching the live site). `main` is production: only merge into it once a change
+has been verified there.
+
+## What this project is
+
+Public site + hackathon submission portal for the GATES Program 2nd Stakeholder Conference.
+Was Express + Prisma + Postgres; is now **entirely Cloudflare**: Workers (Hono) + D1 (Drizzle) +
+R2, one Worker serving both the static SPA and the API. `server/` (the old Express app) has been
+deleted — everything it did now lives in `worker/`.
+
+Two documents this whole build was driven by, in the parent folder (`../`, i.e.
+`GATES SC Website/`, one level up from this repo):
+- `GATES-implementation-brief.md` — the spec. §0 lists what was blocked pending human decisions;
+  everything there except venue and cash-prize amounts is now resolved (see below).
+- `GATES-operationalization-plan.md` — the reasoning behind the architecture choices (why
+  Cloudflare, why Hono/Drizzle over Express/Prisma, the Phase 1/Phase 2 COARE migration plan).
+
+Both are historical context now — the actual implementation (this repo) is ahead of what they
+describe in places (e.g. the content dates below supersede the brief's placeholders).
+
+## Live deployment
+
+- **URL**: https://gates-sc-webapp.dost-gates.workers.dev (health-checked working as of writing)
+- **Cloudflare account**: `ljlabitagdev@gmail.com`, account ID `c5f38af076958ae8289a040392373bec`
+- **D1 database**: `gates-sc-webapp`, ID `61092e00-c9b5-4b62-8683-efd19e4d9c1f`
+- **R2 bucket**: `gates-sc-webapp`
+- The account has a **payment card on file**. Workers/D1 are hard-capped on the free tier (no
+  overage billing risk); **R2 is genuinely metered and could bill** — see the cost-safeguard
+  memory files (below) before provisioning anything new.
+- `wrangler login` is already authenticated on this machine.
+
+### Deploy / dev commands
+```
+npm run dev              # worker (wrangler dev, :8787) + client (Vite, :5173) concurrently
+npm run worker:deploy    # builds client, deploys the Worker (static assets + API)
+npm run db:generate -w worker        # after changing worker/src/db/schema.ts
+npm run db:migrate:local -w worker
+npm run db:migrate:remote -w worker  # applies to the REAL deployed D1 — no undo but Time Travel
+```
+
+### Secrets already set (names only — values were never typed into this conversation)
+`R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `BREVO_API_KEY`, `SECRETARIAT_EMAIL`, `ADMIN_USER`,
+`ADMIN_PASSWORD`, `SESSION_SECRET`. All via `wrangler secret put <NAME>` — the user ran these
+themselves in their own terminal each time, by design, so secret values never passed through
+the chat. Keep doing it that way for any new secret.
+
+## What's built — brief's "Order of work" (§11), all 12 items done
+
+1. Worker skeleton (Hono + static assets, `_redirects`/`not_found_handling` for SPA deep links)
+2. D1 + R2 bindings proven end to end
+3. Drizzle schema + migrations — `registrations`, `hackathon_submissions`, `audit_log`,
+   `rate_limit_hits` (see below) tables
+4. `POST /uploads/presign` — S3-compatible adapter (`@aws-sdk/client-s3` + presigner), works
+   against R2 now, MinIO later per the ops plan, just an env var swap
+5. `POST /hackathon-submissions` — validation, consent, magic-byte PDF check (not just
+   extension), try/catch around the DB write (the old Express bug this was meant to fix: a DB
+   error used to hang the browser with no response)
+6. Brevo email (confirmation + secretariat notification) — **interim sender**, see below
+7. Admin auth — signed httpOnly cookie session (not the old sessionStorage Basic-auth), fails
+   closed when unset (the old bug: unset `ADMIN_USER`/`PASSWORD` defaulted to `""` and matched
+   a blank `Authorization: Basic` header), constant-time credential compare, CSV export,
+   short-TTL signed R2 download links, full audit logging
+8. `/privacy` page + three real consent checkboxes on the hackathon form (processing consent
+   required, member/endorsing-head attestation required, documentation consent optional —
+   deliberately not forced, since coerced consent isn't legally valid consent)
+9. Registration page replaced with a static "by invitation" notice (voucher/registration module
+   is explicitly out of scope until after the proposal deadline — see brief §13)
+10. Security headers + CSP — `_headers` for static assets, **plus a separate Worker middleware
+    for `/api/*`** since `_headers` doesn't cover Worker-generated responses at all (a real gap
+    that would've left every `/api/admin/*` PII response with zero security headers)
+11. Performance pass — code-split `/admin`, self-hosted fonts (found Barlow Condensed was loaded
+    but never actually used anywhere — dropped it instead of self-hosting dead weight), WebP
+    images, OG/Twitter tags, robots.txt + sitemap.xml, deleted all GitHub-Pages-era dead code
+12. Content dates — see below, this has been updated **twice** as newer mechanics documents
+    arrived; check for a v2.1+ before trusting anything date-related without re-verifying
+
+## Two bugs found by testing, not by inspection — worth knowing the pattern held
+
+- **Cloudflare's native Workers `[[ratelimits]]` binding does not work.** Verified directly: 30
+  rapid requests against a configured limit of 20 all returned `success: true`, no error. Rate
+  limiting on `/uploads/presign`, `/hackathon-submissions`, and admin login is now a hand-rolled
+  D1-backed implementation (`worker/src/lib/rateLimit.ts`) — confirmed actually enforcing via the
+  same kind of burst test. If you're ever tempted to "simplify" this back to the native binding,
+  re-test it first; it may still be broken.
+- **Fire-and-forget email sends need `executionCtx.waitUntil()`.** Without it, Cloudflare can
+  (and did, in testing) kill the in-flight `fetch()` to Brevo the instant the response returns —
+  "don't await" alone isn't enough on Workers. Both email calls in
+  `worker/src/routes/hackathonSubmissions.ts` are wrapped in `waitUntil`.
+
+General lesson from both: this session's default has been to **verify claims against the live
+system**, not trust that config/code "should" work. Keep doing that — it caught two things that
+would otherwise have silently failed in production.
+
+## Content status — hackathon name, dates, template
+
+Per brief §0, these were blocked pending confirmation. All resolved now, sourced from real
+documents supplied mid-session (not in this repo — they were read from the user's Downloads
+folder and are not committed anywhere; if a newer version shows up, re-extract and re-apply
+rather than assuming these are final):
+
+- **Name**: "GATES GeoHack 2026" (confirmed, was a placeholder)
+- **Theme**: "Charting Spatial Futures" (was already correct)
+- **Timeline** (currently in `client/src/data/hackathon.ts` / `conference.ts`) — from
+  *"Official Mechanics for the GATES Program Hackathon 2026_v2.0_20260819"*:
+  - Call opens Aug 27 → deadline Sep 15, 11:59 PM → screening Sep 16–21 → finalists announced
+    Sep 22 → confirm by Sep 29 / locked Sep 30 → orientation (online) Oct 7 → development
+    Oct 8–Nov 8 → check-ins Oct 20 & Nov 3 → technical judging **Nov 9 (Mon)** → conference,
+    final pitch, awarding **Nov 10 (Tue)**
+  - This is the **second** timeline revision this session (the first, from a v0.2 doc, put
+    everything in Aug–Oct with Sun/Mon judging+conference; v2.0 pushed a month later and
+    landed on a clean Mon/Tue pair instead — genuinely better, not just different)
+- **Proposal template**: the real Annex A doc is live at
+  `client/public/templates/GATESGeoHack2026_Proposal_Template.docx` (kept as `.docx`, not
+  converted to PDF — teams fill it in and export their own PDF for submission), now on **v3.0**
+  (supplied 2026-08-27, superseding v2). Reading v2 caught real bugs, not just stale copy: page
+  limit was 5, should be **8**; problem-statement word limit was 300, should be **400**; solution
+  word limit was 500, should be **700**; and critically, **the Worker was hard-capping uploads at
+  10MB while the template says 100MB** — legitimate proposals with real diagrams would have been
+  silently rejected. All fixed in `client/src/data/hackathon.ts` (`proposalMaxPages`,
+  `proposalMaxSizeMB`, `proposalFilenamePattern`) and `worker/src/index.ts` (`MAX_FILE_SIZE`). v3
+  kept the same limits and filename pattern as v2 — it only added a step-by-step submission
+  walkthrough, an eligibility self-check, and a scoring table — so the swap to v3 was a straight
+  file overwrite with no code changes.
+- **Call-for-participants date**: slipped from August 24 to **August 27, 2026** (confirmed
+  verbally 2026-08-26, ahead of any revised mechanics doc). The submission window's start moved
+  with it; the September 15 deadline and everything after did not.
+- **Eligibility wording**: reworded to be explicitly inclusive of non-technical DOST staff —
+  "Technical staff of DOST attached agencies" → "DOST attached agencies staff" (and the same
+  pattern for regional offices / PSTOs). Was an explicit correction; don't reintroduce "Technical".
+- **Objective copy**: now says solutions may "address operational challenges and pain points or
+  explore an uncharted territory" (no quotes around "territory" — quotes were tried once and
+  explicitly removed). The four sub-objectives were also replaced wholesale per the mechanics —
+  don't assume the old "surface real pain points" phrasing is still accurate.
+- **Prizes**: added (brief's mechanics §VIII was new content, not in earlier versions) — top 3
+  teams get cash + plaque + medals, other finalists get a certificate + consolation prize. Cash
+  amounts are deliberately not stated; the "announced closer to the finals" line is styled as a
+  quiet footnote, not a callout, per explicit instruction.
+- **Still open**: venue (still "Metro Manila — venue to be announced" everywhere), specific
+  prize cash amounts.
+
+## Early-access gate — most of the site is temporarily unreachable
+
+As of 2026-08-27, `client/src/App.tsx` routes everything except `/hackathon`, `/privacy`, and
+`/admin` through a catch-all `<Navigate to="/hackathon" replace />` — Home, Program, Conference,
+and Registration are **not deleted**, just unrouted, because those pages aren't final yet and the
+brief wanted early access limited to the hackathon call while the rest is still being reviewed.
+Nav links and the Register button still render (they point at the old paths) but resolve to
+`/hackathon` the instant they're clicked, by design. **Revert by restoring their `<Route>` entries
+in `App.tsx`** once those pages are approved to go live — don't "fix" this by editing Nav.tsx,
+the gate is intentionally at the router level so it covers direct URLs and bookmarks too.
+
+## Domain situation
+
+- `workers.dev` subdomain was renamed from the account-default `ljlabitagdev` to `dost-gates`
+  (an account-wide dashboard change the user made, not something scriptable via wrangler) — the
+  live URL is `gates-sc-webapp.dost-gates.workers.dev`. No further action needed there.
+- **No custom domain yet.** The real target is a `dost.gov.ph` subdomain, but `dost.gov.ph`'s
+  DNS is managed solely by DOST IT — the user has no self-service access (confirmed directly,
+  don't assume otherwise). Same blocker as the email domain below.
+- **Email**: `MAIL_FROM` is currently the interim `ljlabitag.dostgates@gmail.com`, verified in
+  Brevo as a single sender. The real target `dostgates@notify.dost.gov.ph` is blocked on DOST IT
+  adding DNS records — the exact record list (with a deliberately-corrected DMARC entry scoped
+  to `_dmarc.notify` rather than the root, so it can't collide with DOST's live
+  `_dmarc.dost.gov.ph` policy) was given to the user to send to IT. When those records land:
+  update `MAIL_FROM` in `wrangler.toml` to the real address — nothing else needs to change.
+- If/when a custom domain does get set up, there's a full checklist of every place the current
+  domain is hardcoded (OG tags in `index.html`, `sitemap.xml`, `robots.txt`'s `Sitemap:` line,
+  README) — grep for `dost-gates.workers.dev` and update every hit, then redeploy. Already done
+  once this session (when the subdomain was renamed), so the pattern is proven.
+
+## Not done / explicitly out of scope
+
+- Registration/voucher module (brief §13 — deferred until after the proposal deadline)
+- Phase 2 COARE migration (ops plan — a September+ item, not started)
+- Cloudflare Web Analytics, UptimeRobot — both need the user's own dashboard/account action,
+  not something scriptable from here
+- CPU-time instrumentation baseline (brief §12 acceptance checklist) — not measured yet
+
+## Persistent memory
+
+Two auto-memory files exist from this session (load automatically in future sessions, no action
+needed): a standing instruction to always build in spend safeguards when provisioning billable
+cloud resources, and the specifics of this account's Cloudflare billing exposure (R2 is the real
+risk; Workers/D1 are hard-capped, not billed).
+
+## Testing pattern used throughout
+
+For any change touching the submission flow, the standard regression test is: presign → PUT a
+real small PDF (`%PDF-1.4` header is enough to pass the magic-byte check) → submit metadata →
+confirm `201` → clean up the test row/object via `wrangler d1 execute ... DELETE` and
+`wrangler r2 object delete`. Used dozens of times this session against the **real** deployed
+Worker and D1/R2 (not local dev) — there's no separate staging environment, so any live test is
+a live-data test; always clean up afterward.
