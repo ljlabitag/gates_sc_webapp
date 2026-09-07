@@ -1,11 +1,4 @@
-export interface RegistrationInput {
-  name: string;
-  email: string;
-  org: string;
-  needs: string;
-}
-
-/** Mirrors Annex A of the GATES Hackathon 2026 mechanics. */
+/** Mirrors Annex A of the GATES GeoHack 2026 mechanics. */
 export interface HackathonInput {
   team: string;
   title: string;
@@ -16,8 +9,10 @@ export interface HackathonInput {
   leaderEmail: string;
   leaderMobile: string;
   members: string;
-  endorsingHead: string;
   file: File | null;
+  consent: boolean;
+  documentationConsent: boolean;
+  memberConsentAttested: boolean;
 }
 
 class ApiError extends Error {}
@@ -32,26 +27,48 @@ async function parseErrorMessage(res: Response, fallback: string): Promise<strin
   return fallback;
 }
 
-export async function submitRegistration(input: RegistrationInput): Promise<void> {
-  const res = await fetch("/api/registrations", {
+// Browser gets a presigned URL, PUTs the file straight to R2, then submits
+// the form metadata with the resulting objectKey — in that order, so an
+// abandoned submission leaves an orphaned file rather than a database row
+// that looks like a real submission with no proposal attached. It also keeps
+// the file off this Worker request's body entirely.
+export async function submitHackathonEntry(input: HackathonInput): Promise<void> {
+  const { file, ...fields } = input;
+  if (!file) {
+    throw new ApiError("Please attach your completed proposal PDF.");
+  }
+
+  const contentType = file.type || "application/pdf";
+
+  const presignRes = await fetch("/api/uploads/presign", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(input),
+    body: JSON.stringify({ fileName: file.name, contentType, fileSize: file.size }),
   });
-  if (!res.ok) {
-    throw new ApiError(await parseErrorMessage(res, "Please enter your name and a valid email."));
+  if (!presignRes.ok) {
+    throw new ApiError(await parseErrorMessage(presignRes, "Could not prepare the upload. Please try again."));
   }
-}
+  const { objectKey, uploadUrl } = await presignRes.json();
 
-export async function submitHackathonEntry(input: HackathonInput): Promise<void> {
-  const formData = new FormData();
-  const { file, ...fields } = input;
-  for (const [key, value] of Object.entries(fields)) formData.append(key, value);
-  if (file) formData.append("proposal", file);
+  const putRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": contentType },
+    body: file,
+  });
+  if (!putRes.ok) {
+    throw new ApiError("Could not upload the proposal file. Please try again.");
+  }
 
   const res = await fetch("/api/hackathon-submissions", {
     method: "POST",
-    body: formData,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...fields,
+      objectKey,
+      fileName: file.name,
+      fileSize: file.size,
+      mimeType: contentType,
+    }),
   });
   if (!res.ok) {
     throw new ApiError(await parseErrorMessage(res, "Please check the required fields and try again."));

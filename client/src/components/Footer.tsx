@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import gatesLogo from "../assets/logos/gates-lockup-horizontal.png";
-import dostLogo from "../assets/logos/dost-logo-horizontal.png";
+import gatesLogo from "../assets/logos/gates-lockup-horizontal.webp";
+import dostLogo from "../assets/logos/dost-logo-horizontal.webp";
 import { DOST, GATES, SOCIALS } from "../data/org";
 
 const links = [
@@ -126,8 +126,16 @@ export default function Footer() {
 
         {/* Legal */}
         <div className="pt-6 border-t border-white/8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-white/50 text-xs">
-          <span>
-            &copy; 2026 {DOST.abbreviation} {GATES.shortName}. All rights reserved.
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <span>
+              &copy; 2026 {DOST.abbreviation} {GATES.shortName}. All rights reserved.
+            </span>
+            <Link
+              to="/privacy"
+              className="text-white/55 no-underline hover:text-white/90 transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+            >
+              Privacy Notice
+            </Link>
           </span>
           <a
             href="#top"

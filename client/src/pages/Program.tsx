@@ -391,7 +391,7 @@ export default function Program() {
         </h2>
         <div className="flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
           <PrimaryButton to="/conference">View Conference Details</PrimaryButton>
-          <SecondaryButton to="/registration">Register Now</SecondaryButton>
+          <SecondaryButton to="/registration">Registration Info</SecondaryButton>
         </div>
       </section>
 

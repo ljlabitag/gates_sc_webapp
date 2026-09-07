@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import {
@@ -24,6 +25,7 @@ import {
   OBJECTIVE,
   PARTICIPANT_COSTS,
   PHASES,
+  PRIZES,
   PROPOSAL_SECTIONS,
   RESOURCES,
   RUBRICS,
@@ -33,7 +35,6 @@ import {
 } from "../data/hackathon";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { submitHackathonEntry } from "../lib/api";
-import { IS_PREVIEW, PREVIEW_FORM_MESSAGE } from "../lib/preview";
 
 const SECTIONS = [
   { id: "objective", label: "Objective" },
@@ -62,21 +63,21 @@ const TIMELINE_GROUPS = [
   {
     number: "01",
     title: "Apply",
-    window: "August 7 – September 2",
+    window: "August 27 – September 30",
     color: "orange",
     entries: TIMELINE.slice(0, 7),
   },
   {
     number: "02",
     title: "Build",
-    window: "September 17 – October 14",
+    window: "October 7 – November 8",
     color: "teal",
     entries: TIMELINE.slice(7, 10),
   },
   {
     number: "03",
     title: "Finals",
-    window: "October 15–16",
+    window: "November 9–10",
     color: "plum",
     entries: TIMELINE.slice(10),
   },
@@ -116,7 +117,6 @@ const EMPTY_FORM = {
   leaderEmail: "",
   leaderMobile: "",
   members: "",
-  endorsingHead: "",
 };
 
 export default function Hackathon() {
@@ -130,6 +130,9 @@ export default function Hackathon() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [consent, setConsent] = useState(false);
+  const [documentationConsent, setDocumentationConsent] = useState(false);
+  const [memberConsentAttested, setMemberConsentAttested] = useState(false);
 
   const setField =
     (key: keyof typeof form) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -167,14 +170,18 @@ export default function Hackathon() {
       setError("Please attach your completed proposal PDF.");
       return;
     }
-    if (IS_PREVIEW) {
-      setError(PREVIEW_FORM_MESSAGE);
+    if (!consent) {
+      setError("You must consent to data processing to submit a proposal — see the privacy notice.");
+      return;
+    }
+    if (!memberConsentAttested) {
+      setError("Please confirm that each named member has been informed their details are being submitted.");
       return;
     }
     setSubmitting(true);
     setError("");
     try {
-      await submitHackathonEntry({ ...form, file });
+      await submitHackathonEntry({ ...form, file, consent, documentationConsent, memberConsentAttested });
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -190,7 +197,7 @@ export default function Hackathon() {
       {/* Hero */}
       <header className="hackathon-hero hero-brand-gradient relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
         <div className="relative z-10 max-w-[880px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
-          <Eyebrow>AUGUST 7&ndash;OCTOBER 16, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
+          <Eyebrow>AUGUST 24&ndash;NOVEMBER 10, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
           <h1 className="font-display text-[clamp(34px,5.6vw,62px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow-orange">
             {HACKATHON.name}
           </h1>
@@ -208,7 +215,7 @@ export default function Hackathon() {
                 value: HACKATHON.callForParticipantsLabel.replace("August", "Aug").replace(", 2026", ""),
                 label: "Call opens",
               },
-              { value: "Aug 18", label: "Proposals due · 11:59 PM" },
+              { value: HACKATHON.submissionDeadlineShort.replace("September", "Sep"), label: "Proposals due · 11:59 PM" },
               { value: `${HACKATHON.maxFinalistTeams}`, label: "Finalist teams" },
               { value: `${HACKATHON.teamSize}`, label: "Members per team" },
             ].map((fact) => (
@@ -442,7 +449,7 @@ export default function Hackathon() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 sm:p-5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-teal">October 15</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-teal">November 9</span>
                 <h4 className="text-[15px] font-semibold mt-2 mb-1.5">Technical judging</h4>
                 <p className="text-[13px] leading-[1.6] text-white/58 m-0">
                   Teams demonstrate their working solution, explain its technical implementation, and respond to the
@@ -450,7 +457,7 @@ export default function Hackathon() {
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 sm:p-5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-plum">October 16</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-plum">November 10</span>
                 <h4 className="text-[15px] font-semibold mt-2 mb-1.5">Final conference pitch</h4>
                 <p className="text-[13px] leading-[1.6] text-white/58 m-0">
                   Teams present an improved pitch to the executive panel and stakeholder conference audience before
@@ -505,6 +512,22 @@ export default function Hackathon() {
               Process travel authority and agency endorsements early, using the milestone dates above.
             </p>
           </div>
+        </div>
+
+        <div className="glass-panel program-card p-6 sm:p-7 mt-4">
+          <IconDot color="plum" />
+          <h3 className="text-[18px] font-semibold mb-3">What awaits the winners</h3>
+          <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
+            {PRIZES.map((item) => (
+              <li key={item} className="flex gap-2.5 text-[13px] leading-[1.55] text-white/65">
+                <span aria-hidden="true" className="shrink-0 mt-[6px] w-1.5 h-1.5 rounded-full bg-gates-plum" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-[12px] leading-[1.6] text-white/45 mt-4 mb-0">
+            Specific prize amounts will be announced closer to the finals.
+          </p>
         </div>
       </PageSection>
 
@@ -564,7 +587,7 @@ export default function Hackathon() {
           eyebrow="SUBMIT YOUR PROPOSAL"
           title="One proposal per team"
           titleId="submit-title"
-          intro={`Submit by ${HACKATHON.submissionDeadlineLabel}. Proposals must be PDF files of no more than ${HACKATHON.proposalMaxPages} pages.`}
+          intro={`Submit by ${HACKATHON.submissionDeadlineLabel}. Proposals must be PDF files of no more than ${HACKATHON.proposalMaxPages} pages and under ${HACKATHON.proposalMaxSizeMB}MB.`}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
@@ -588,11 +611,11 @@ export default function Hackathon() {
               ))}
             </ol>
             <a
-              href="/templates/gates-proposal-template.pdf"
+              href="/templates/GATESGeoHack2026_Proposal_Template.docx"
               download
-              className="glass-panel inline-flex w-full sm:w-auto justify-center px-[22px] py-3 rounded-full text-white/90 font-semibold text-sm text-center no-underline mt-6"
+              className="btn-hackathon inline-flex w-full sm:w-auto justify-center px-[22px] py-3 rounded-full text-white font-semibold text-sm text-center no-underline mt-6"
             >
-              &#8595; Download proposal template
+              &#8595; Download proposal template (.docx)
             </a>
           </div>
 
@@ -604,11 +627,11 @@ export default function Hackathon() {
                 <h3 className="text-xl font-semibold m-0">Proposal received, {form.team}.</h3>
                 <p className="text-sm leading-[1.6] text-white/62 m-0">
                   &ldquo;{form.title}&rdquo; is in. We&apos;ve sent a confirmation to {form.leaderEmail}. Screening runs
-                  August 19&ndash;24, and finalists are announced {HACKATHON.finalistsAnnouncedLabel}.
+                  September 16&ndash;21, and finalists are announced {HACKATHON.finalistsAnnouncedLabel}.
                 </p>
                 <p className="text-[13px] leading-[1.6] text-white/50 m-0 mt-1">
                   If your agency endorsement isn&apos;t in progress yet, start it now &mdash; finalists need it to
-                  confirm by September 1.
+                  confirm by September 29.
                 </p>
                 <div className="mt-1.5">
                   <TextLink to="/conference">See the conference programme &rarr;</TextLink>
@@ -732,18 +755,6 @@ export default function Hackathon() {
                       specialist, and a presenter or analyst.
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className={labelClass} htmlFor="endorsingHead">
-                      Endorsing head/s of agency or office
-                    </label>
-                    <input
-                      id="endorsingHead"
-                      className={inputClass}
-                      type="text"
-                      value={form.endorsingHead}
-                      onChange={setField("endorsingHead")}
-                    />
-                  </div>
                 </fieldset>
 
                 <fieldset className="border-0 m-0 p-0 flex flex-col gap-4 border-t border-white/8 pt-5">
@@ -771,8 +782,8 @@ export default function Hackathon() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <label className={labelClass} htmlFor="proposal">
-                      Completed proposal &mdash; PDF, max {HACKATHON.proposalMaxPages} pages{" "}
-                      <span className="text-gates-orange">*</span>
+                      Completed proposal &mdash; PDF, max {HACKATHON.proposalMaxPages} pages, under{" "}
+                      {HACKATHON.proposalMaxSizeMB}MB <span className="text-gates-orange">*</span>
                     </label>
                     <input
                       id="proposal"
@@ -787,6 +798,61 @@ export default function Hackathon() {
                       {file ? `Selected: ${file.name}` : `Filename: ${HACKATHON.proposalFilenamePattern}`}
                     </p>
                   </div>
+                </fieldset>
+
+                <fieldset className="border-0 m-0 p-0 flex flex-col gap-3.5 border-t border-white/8 pt-5">
+                  <legend className="font-heading text-[11px] font-semibold uppercase tracking-[0.12em] text-white/48 mb-1">
+                    <span className="text-gates-orange mr-2">04</span>Consent
+                  </legend>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={consent}
+                      onChange={(e) => {
+                        setConsent(e.target.checked);
+                        if (error) setError("");
+                      }}
+                      required
+                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-white/25 bg-white/5 accent-gates-orange"
+                    />
+                    <span className="text-[13px] leading-[1.55] text-white/70">
+                      I consent to GATES collecting and processing the information in this form to administer the
+                      hackathon, per the{" "}
+                      <Link to="/privacy" className="text-gates-link underline">
+                        privacy notice
+                      </Link>
+                      . <span className="text-gates-orange">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={memberConsentAttested}
+                      onChange={(e) => {
+                        setMemberConsentAttested(e.target.checked);
+                        if (error) setError("");
+                      }}
+                      required
+                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-white/25 bg-white/5 accent-gates-orange"
+                    />
+                    <span className="text-[13px] leading-[1.55] text-white/70">
+                      I confirm each named team member and endorsing head has been informed that their details are
+                      being submitted, and how they will be used &mdash; they will not visit this site themselves.{" "}
+                      <span className="text-gates-orange">*</span>
+                    </span>
+                  </label>
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={documentationConsent}
+                      onChange={(e) => setDocumentationConsent(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 shrink-0 rounded border-white/25 bg-white/5 accent-gates-orange"
+                    />
+                    <span className="text-[13px] leading-[1.55] text-white/70">
+                      Separately, our team consents to documentation &mdash; photos, video, and publication of team
+                      names and solution summaries &mdash; for GATES information and advocacy purposes.
+                    </span>
+                  </label>
                 </fieldset>
 
                 {error && (
@@ -805,10 +871,6 @@ export default function Hackathon() {
                 >
                   {submitting ? "Submitting…" : "Submit proposal"}
                 </button>
-                <p className="text-[12px] leading-[1.55] text-white/42 m-0">
-                  By submitting, your team consents to documentation &mdash; photos, video, and publication of team
-                  names and solution summaries &mdash; for GATES information and advocacy purposes.
-                </p>
               </form>
             )}
           </div>
