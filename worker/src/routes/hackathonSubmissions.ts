@@ -153,8 +153,8 @@ hackathonSubmissionsRoute.post("/", async (c) => {
   // is keeping the isolate alive for it. waitUntil tells the runtime "let
   // this finish anyway," without making the request wait on it.
   c.executionCtx.waitUntil(
-    sendHackathonConfirmation(c.env, leaderEmail, team, title).catch((err) =>
-      console.error("Failed to send hackathon confirmation email:", err),
+    sendHackathonConfirmation(c.env, leaderEmail, { id, team, title, leaderName, domain }).catch(
+      (err) => console.error("Failed to send hackathon confirmation email:", err),
     ),
   );
   c.executionCtx.waitUntil(

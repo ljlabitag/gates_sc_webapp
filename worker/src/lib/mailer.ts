@@ -47,29 +47,58 @@ async function sendMail(env: Env, { to, subject, text }: MailInput): Promise<voi
   console.log(`[mailer] sent to=${to} subject="${subject}" messageId=${result.messageId ?? "?"}`);
 }
 
+export interface HackathonConfirmationDetails {
+  id: string;
+  team: string;
+  title: string;
+  leaderName: string;
+  domain: string | null;
+}
+
 // Sent to the team leader, who is the official point of contact per Section 4 of the mechanics.
+// Structured like an ordinary email (salutation, context, a scannable summary
+// block, next steps, a way to reach a human) rather than a bare notification —
+// this is the one message every participant is guaranteed to read closely,
+// since it's their only receipt that the submission went through.
 export function sendHackathonConfirmation(
   env: Env,
   to: string,
-  team: string,
-  title: string,
+  details: HackathonConfirmationDetails,
 ): Promise<void> {
   return sendMail(env, {
     to,
     subject: "Your GATES GeoHack 2026 proposal was received",
     text: [
-      `Hi team ${team},`,
+      `Dear ${details.leaderName},`,
       "",
-      `We've received your proposal "${title}" for GATES GeoHack 2026.`,
+      "Thank you for submitting a proposal to GATES GeoHack 2026. This email confirms that " +
+        "your submission has been received on behalf of your team.",
       "",
-      "What happens next:",
-      "  • Screening by subject matter experts and organizers runs September 16-21.",
-      "  • Up to 6 finalist teams and 2 reserve teams are announced on September 22.",
-      "  • Finalists confirm participation, including agency endorsement, by September 29.",
+      "SUBMISSION SUMMARY",
+      `  Team: ${details.team}`,
+      `  Project Title: ${details.title}`,
+      ...(details.domain ? [`  Priority Innovation Domain: ${details.domain}`] : []),
+      `  Reference ID: ${details.id}`,
       "",
-      "Make sure your agency or office endorsement is in progress — finalists need it to confirm.",
+      "WHAT HAPPENS NEXT",
+      "  • Screening by subject matter experts and organizers will take place from " +
+        "September 16 to 21.",
+      "  • Up to six finalist teams and two reserve teams will be announced on September 22.",
+      "  • Finalists must confirm their participation, including agency endorsement, by " +
+        "September 29.",
       "",
-      "— GATES Program",
+      "Please note: should your team be selected as a finalist, you will be required to " +
+        "secure your agency or office head's endorsement to confirm participation. This is " +
+        "not required at this stage; however, initial preparations may begin at your " +
+        "convenience, as formal endorsement will only be necessary upon the announcement of " +
+        "finalists.",
+      "",
+      "Should you have any questions or concerns, please contact the secretariat directly " +
+        "at dostgates@dost.gov.ph.",
+      "",
+      "Sincerely,",
+      "GATES Program Secretariat",
+      "Department of Science and Technology",
     ].join("\n"),
   });
 }
