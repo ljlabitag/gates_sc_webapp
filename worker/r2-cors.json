@@ -1,0 +1,16 @@
+{
+  "rules": [
+    {
+      "id": "presigned-upload",
+      "allowed": {
+        "origins": [
+          "https://gates-sc-webapp.dost-gates.workers.dev",
+          "https://gates-sc-webapp-staging.dost-gates.workers.dev"
+        ],
+        "methods": ["PUT"],
+        "headers": ["content-type"]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}

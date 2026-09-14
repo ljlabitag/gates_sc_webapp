@@ -109,7 +109,7 @@ the chat. Keep doing it that way for any new secret.
 12. Content dates — see below, this has been updated **twice** as newer mechanics documents
     arrived; check for a v2.1+ before trusting anything date-related without re-verifying
 
-## Two bugs found by testing, not by inspection — worth knowing the pattern held
+## Bugs found by testing, not by inspection — worth knowing the pattern held
 
 - **Cloudflare's native Workers `[[ratelimits]]` binding does not work.** Verified directly: 30
   rapid requests against a configured limit of 20 all returned `success: true`, no error. Rate
@@ -121,10 +121,26 @@ the chat. Keep doing it that way for any new secret.
   (and did, in testing) kill the in-flight `fetch()` to Brevo the instant the response returns —
   "don't await" alone isn't enough on Workers. Both email calls in
   `worker/src/routes/hackathonSubmissions.ts` are wrapped in `waitUntil`.
+- **R2 buckets need an explicit CORS policy for the direct-to-R2 upload to work at all**, and this
+  was missed for months of this project's life — a real participant hit it on 2026-09-14, one day
+  before the deadline (screenshot showed "Failed to fetch" right at the Submit step, after
+  filling the whole form). Root cause: the browser's PUT to the presigned R2 URL is cross-origin
+  (site origin → `*.r2.cloudflarestorage.com`), and with no CORS rule configured, the browser's
+  preflight `OPTIONS` request gets no `Access-Control-Allow-*` headers back and silently blocks
+  the actual PUT — `fetch()` throws with no useful detail, R2 itself never even logs a rejected
+  request, so nothing about it is visible from the Worker or `wrangler tail`. Fixed by applying
+  `worker/r2-cors.json` to both the production and staging buckets via
+  `wrangler r2 bucket cors set <bucket> --file worker/r2-cors.json`. **This config lives outside
+  `wrangler.toml`** (R2 CORS isn't a `wrangler.toml`-managed setting) — if either bucket is ever
+  recreated, or a new environment/bucket is added, this must be reapplied by hand; nothing
+  automatically keeps it in sync. Verified the fix with a raw `OPTIONS` preflight (`curl -X
+  OPTIONS` with `Origin`/`Access-Control-Request-Method` headers) before trusting it, not just a
+  same-origin curl PUT — a plain `curl PUT` without an `Origin` header would have looked fine even
+  with CORS still broken, since curl doesn't enforce CORS the way a browser does.
 
-General lesson from both: this session's default has been to **verify claims against the live
-system**, not trust that config/code "should" work. Keep doing that — it caught two things that
-would otherwise have silently failed in production.
+General lesson from all of these: this session's default has been to **verify claims against the
+live system**, not trust that config/code "should" work. Keep doing that — it's caught real,
+otherwise-invisible production failures every time.
 
 ## Content status — hackathon name, dates, template
 
