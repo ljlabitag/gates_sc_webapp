@@ -1,19 +1,42 @@
 import type { Env } from "../index";
 
+export interface MailAttachment {
+  name: string;
+  content: ArrayBuffer;
+}
+
 interface MailInput {
   to: string;
   subject: string;
   text: string;
+  attachment?: MailAttachment;
 }
 
 const BREVO_SEND_URL = "https://api.brevo.com/v3/smtp/email";
+
+// Brevo caps attachments at 4MB per file / 20MB per email (confirmed against
+// Brevo's own docs, not assumed) — see ATTACHMENT_MAX_BYTES below, used to
+// decide whether to even attempt an attachment.
+
+// Chunked to avoid blowing the call stack on `String.fromCharCode(...bytes)`
+// for large files — spreading a big typed array as arguments can exceed the
+// engine's argument-count limit.
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
 
 // Workers has no process.env — env only exists per-request (c.env), unlike
 // the old Express code where the mailer read it as a module-level global. So
 // unlike the brief's "keep signatures unchanged" for the nodemailer→Brevo
 // swap itself, this one platform difference does thread `env` through the
 // public functions below; every other call shape is untouched.
-async function sendMail(env: Env, { to, subject, text }: MailInput): Promise<void> {
+async function sendMail(env: Env, { to, subject, text, attachment }: MailInput): Promise<void> {
   const res = await fetch(BREVO_SEND_URL, {
     method: "POST",
     headers: {
@@ -26,6 +49,9 @@ async function sendMail(env: Env, { to, subject, text }: MailInput): Promise<voi
       to: [{ email: to }],
       subject,
       textContent: text,
+      ...(attachment
+        ? { attachment: [{ name: attachment.name, content: arrayBufferToBase64(attachment.content) }] }
+        : {}),
     }),
   });
 
@@ -120,12 +146,22 @@ export interface SecretariatSubmissionMetadata {
 }
 
 // New per brief §7: the secretariat mailbox watches submissions arrive in real
-// time without needing an admin login. Metadata only, no attachment — links to
-// the admin record rather than a signed file URL, since a bearer link in a
-// shared inbox would bypass access logging. The link is relative and won't
-// resolve until the admin panel exists (order-of-work item 7); that's
-// intentional, not a placeholder standing in for something else.
-export function sendSecretariatNotification(env: Env, s: SecretariatSubmissionMetadata): Promise<void> {
+// time without needing an admin login. Links to the admin record rather than
+// a signed file URL, since a bearer link in a shared inbox would bypass
+// access logging. The link is relative and won't resolve until the admin
+// panel exists (order-of-work item 7); that's intentional, not a placeholder
+// standing in for something else.
+//
+// `attachment` is the actual proposal file, included when it's small enough
+// for Brevo's limits (see ATTACHMENT_MAX_BYTES in hackathonSubmissions.ts) —
+// an email backup of the file itself, not just a pointer to R2/D1. When it's
+// omitted (file too large, or fetching it from R2 failed), the notification
+// still sends with metadata only, same as before this existed.
+export function sendSecretariatNotification(
+  env: Env,
+  s: SecretariatSubmissionMetadata,
+  attachment: MailAttachment | null,
+): Promise<void> {
   const to = env.SECRETARIAT_EMAIL;
   if (!to) {
     console.log("[mailer] SECRETARIAT_EMAIL not set — skipping secretariat notification");
@@ -144,9 +180,11 @@ export function sendSecretariatNotification(env: Env, s: SecretariatSubmissionMe
       `Members: ${s.members ?? "—"}`,
       `Endorsing head: ${s.endorsingHead ?? "—"}`,
       `File: ${s.fileName ?? "—"}${s.fileSize ? ` (${s.fileSize} bytes)` : ""}`,
+      attachment ? "  (attached to this email)" : "  (not attached — see the admin record below)",
       `Submitted: ${new Date(s.createdAt).toISOString()}`,
       "",
       `Admin record (relative — resolves once /admin exists): /admin/hackathon-submissions/${s.id}`,
     ].join("\n"),
+    attachment: attachment ?? undefined,
   });
 }

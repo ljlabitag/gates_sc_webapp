@@ -56,10 +56,13 @@ configured under `[env.staging]` in `wrangler.toml`, deployed with
   applied (`npm run db:migrate:staging -w worker`)
 - **Staging R2**: `gates-sc-webapp-staging` — same `abort-multipart-days: 1` lifecycle safeguard
   as production, applied directly with `wrangler r2 bucket lifecycle add`
-- **Staging secrets: not set yet.** `wrangler secret list --env staging` returns `[]`. Presign,
-  submission, and admin-login will error until someone runs `wrangler secret put <NAME> --env
-  staging` for each of the seven secrets listed below — same names, same "run it yourself"
-  pattern, just with `--env staging` appended.
+- **Staging secrets: all set**, including `MINIO_ACCESS_KEY_ID`/`MINIO_SECRET_ACCESS_KEY` (see
+  **Proposal file backups** below) — confirmed via `wrangler secret list --env staging`.
+  **Production is missing the two MinIO secrets** as of this writing; everything else was already
+  set from the original Cloudflare setup. The MinIO backup silently no-ops (logs, doesn't throw)
+  until they're added, so this isn't blocking, but the backup won't actually run in production
+  until `wrangler secret put MINIO_ACCESS_KEY_ID` / `MINIO_SECRET_ACCESS_KEY` (no `--env` flag)
+  are run.
 - Workflow going forward: branch off `dev` → `npm run worker:deploy:staging` to verify on the
   staging URL → merge to `main` via PR → `npm run worker:deploy` for production. `main` should
   only ever contain what's actually live.
@@ -75,9 +78,42 @@ npm run db:migrate:remote -w worker  # applies to the REAL deployed D1 — no un
 
 ### Secrets already set (names only — values were never typed into this conversation)
 `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `BREVO_API_KEY`, `SECRETARIAT_EMAIL`, `ADMIN_USER`,
-`ADMIN_PASSWORD`, `SESSION_SECRET`. All via `wrangler secret put <NAME>` — the user ran these
-themselves in their own terminal each time, by design, so secret values never passed through
-the chat. Keep doing it that way for any new secret.
+`ADMIN_PASSWORD`, `SESSION_SECRET`, `MINIO_ACCESS_KEY_ID`, `MINIO_SECRET_ACCESS_KEY` (staging
+only — see above). All via `wrangler secret put <NAME>` — the user ran these themselves in their
+own terminal each time, by design, so secret values never passed through the chat. Keep doing it
+that way for any new secret.
+
+## Proposal file backups — R2, email attachment, MinIO
+
+Added 2026-09-14. A submitted proposal now lands in up to three places, only one of which is the
+real source of truth:
+
+1. **R2** (`worker/src/routes/hackathonSubmissions.ts`, `objectKey` column) — the actual store.
+   Collision-safe (UUID-based key), referenced by every admin download link. If you need to trust
+   exactly one copy, this is it.
+2. **Email attachment** on the secretariat notification (`worker/src/lib/mailer.ts`,
+   `sendSecretariatNotification`) — only when the file is ≤3MB (`ATTACHMENT_MAX_BYTES` in
+   `hackathonSubmissions.ts`). Brevo hard-caps attachments at 4MB/file, 20MB/email total
+   (confirmed against Brevo's own docs, not assumed) — 3MB leaves headroom for base64's ~33%
+   size inflation. Above that threshold, the email just sends without an attachment, same as
+   before this existed — never blocks or fails the submission.
+3. **MinIO** (`worker/src/storage/s3.ts`, `backupToMinio`) — a publicly reachable instance on
+   P4's shared internal infrastructure (`https://infra-s3-api.gates-staging.work`, bucket
+   `p4-internal`), gets the **full file regardless of size** (no Brevo-style cap). Lands directly
+   under `MINIO_KEY_PREFIX` using the participant's own filename — `GATES GeoHack 2026/` in
+   production, `GATES GeoHack 2026/staging/` in staging (so test backups don't mix with real
+   ones in that shared bucket) — **by explicit request, not a placeholder**: no subfolder, no
+   UUID. Trade-off that was raised and accepted: this has no built-in uniqueness, so two teams
+   submitting the same filename (or one resubmitting under the same name) will silently overwrite
+   each other in MinIO. R2 and D1 remain the collision-safe source of truth regardless — this is
+   purely a convenience backup layer, not the record of what was actually submitted.
+   `forcePathStyle: true` was a guess about this MinIO deployment's addressing style, confirmed
+   correct by an actual test write (not assumed) — worth re-checking only if PUTs to MinIO start
+   failing after some future MinIO-side change.
+
+All three attempts (confirmation email, secretariat email, MinIO backup) are independent
+fire-and-forget tasks wrapped in `waitUntil` — a failure in any one is logged and never blocks
+the submission response or affects the other two.
 
 ## What's built — brief's "Order of work" (§11), all 12 items done
 
@@ -182,12 +218,15 @@ rather than assuming these are final):
   explore an uncharted territory" (no quotes around "territory" — quotes were tried once and
   explicitly removed). The four sub-objectives were also replaced wholesale per the mechanics —
   don't assume the old "surface real pain points" phrasing is still accurate.
-- **Prizes**: added (brief's mechanics §VIII was new content, not in earlier versions) — top 3
-  teams get cash + plaque + medals, other finalists get a certificate + consolation prize. Cash
-  amounts are deliberately not stated; the "announced closer to the finals" line is styled as a
-  quiet footnote, not a callout, per explicit instruction.
-- **Still open**: venue (still "Metro Manila — venue to be announced" everywhere), specific
-  prize cash amounts.
+- **Prizes**: cash amounts confirmed 2026-09-14 via the official "Map. Innovate. Win." prize
+  announcement graphic (DOST GATES social channels) — 1st ₱30,000, 2nd ₱20,000, 3rd ₱10,000, each
+  plus a trophy, medals, and certificates for every team member. `PRIZE_TIERS` in
+  `client/src/data/hackathon.ts` holds the structured amounts; `PRIZES` now holds just the
+  "remaining finalist teams get a certificate + consolation prize" line. Rendered on the
+  Hackathon page as three colored tier cards (blue/orange/teal, matching the graphic and the
+  site's existing accent palette) instead of the old plain bullet list — the previous "specific
+  amounts will be announced closer to the finals" footnote is gone, since it's no longer true.
+- **Still open**: venue (still "Metro Manila — venue to be announced" everywhere).
 
 ## Early-access gate — most of the site is temporarily unreachable
 

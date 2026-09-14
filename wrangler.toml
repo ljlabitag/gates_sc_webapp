@@ -40,9 +40,19 @@ PRIVACY_NOTICE_VERSION = "2026-08-13"
 # real target, see brief §7 — the moment IT completes the DNS records; no
 # other code changes needed when that happens.
 MAIL_FROM = "ljlabitag.dostgates@gmail.com"
+# Third backup location for proposal files (alongside R2 and the emailed
+# attachment) — a publicly reachable MinIO instance on P4's shared internal
+# infrastructure. Bucket is shared across P4 projects, hence the key prefix
+# to namespace this hackathon's files within it. MINIO_ACCESS_KEY_ID/
+# MINIO_SECRET_ACCESS_KEY are set as secrets once created — the backup
+# skips itself (logs, doesn't throw) until then.
+MINIO_ENDPOINT = "https://infra-s3-api.gates-staging.work"
+MINIO_BUCKET_NAME = "p4-internal"
+MINIO_KEY_PREFIX = "GATES GeoHack 2026/"
 
 # Secrets (R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, BREVO_API_KEY,
-# SECRETARIAT_EMAIL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET) are set via
+# SECRETARIAT_EMAIL, ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET,
+# MINIO_ACCESS_KEY_ID, MINIO_SECRET_ACCESS_KEY) are set via
 # `wrangler secret put` — never committed here.
 
 # Cost/abuse safeguard on POST /uploads/presign, POST /hackathon-submissions,
@@ -83,3 +93,9 @@ PRIVACY_NOTICE_VERSION = "2026-08-13"
 # Same interim Gmail sender as production — fine to share for staging since
 # it's just proving the integration works, not sending anything real.
 MAIL_FROM = "ljlabitag.dostgates@gmail.com"
+# Same shared MinIO instance and bucket as production, but its own
+# sub-prefix — staging test backups land in a clearly separate folder
+# instead of mixing with real submission backups.
+MINIO_ENDPOINT = "https://infra-s3-api.gates-staging.work"
+MINIO_BUCKET_NAME = "p4-internal"
+MINIO_KEY_PREFIX = "GATES GeoHack 2026/staging/"

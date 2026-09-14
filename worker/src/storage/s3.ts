@@ -43,3 +43,59 @@ export async function presignDownload(env: Env, params: { objectKey: string; fil
   });
   return getSignedUrl(client, command, { expiresIn: DOWNLOAD_PRESIGN_TTL_SECONDS });
 }
+
+// MinIO's own S3-compatible endpoint. A separate client (not getS3Client
+// above) since this is a different service with its own credentials — R2
+// stays the primary store either way, this is purely an extra backup copy.
+// forcePathStyle is the practical difference from R2: R2's client relies on
+// virtual-hosted-style addressing (bucket as a subdomain of R2_ENDPOINT),
+// but infra-s3-api.gates-staging.work has no per-bucket subdomain, so the
+// bucket has to go in the path instead — the standard MinIO deployment
+// shape. Verify this against the real instance once credentials exist; if
+// path-style turns out to be wrong, this is the flag to flip.
+function getMinioClient(env: Env) {
+  return new S3Client({
+    region: "auto",
+    endpoint: env.MINIO_ENDPOINT,
+    forcePathStyle: true,
+    credentials: {
+      accessKeyId: env.MINIO_ACCESS_KEY_ID!,
+      secretAccessKey: env.MINIO_SECRET_ACCESS_KEY!,
+    },
+  });
+}
+
+// Best-effort backup copy to MinIO, called from the same fire-and-forget
+// path as the email attachment (see hackathonSubmissions.ts) — never awaited
+// by the request handler, and a failure here must never surface to the
+// participant or block their submission. Skips (and logs) rather than
+// throwing when the access key hasn't been created yet, same pattern as
+// SECRETARIAT_EMAIL being unset.
+//
+// Lands directly under MINIO_KEY_PREFIX using the participant's own
+// filename — no "hackathon-submissions/"-style subfolder and no R2 UUID, by
+// request. Trade-off worth knowing: unlike the UUID-based R2 key, this has
+// no built-in uniqueness — two teams submitting the same filename (or one
+// team resubmitting under the same name) will silently overwrite each other
+// in MinIO. R2 and D1 stay the real, collision-safe source of truth either
+// way; this is purely a convenience backup layer.
+export async function backupToMinio(
+  env: Env,
+  params: { fileName: string; contentType: string; body: ArrayBuffer },
+): Promise<void> {
+  if (!env.MINIO_ACCESS_KEY_ID || !env.MINIO_SECRET_ACCESS_KEY) {
+    console.log("[minio] access key not set — skipping backup");
+    return;
+  }
+  const client = getMinioClient(env);
+  const key = `${env.MINIO_KEY_PREFIX}${params.fileName}`;
+  await client.send(
+    new PutObjectCommand({
+      Bucket: env.MINIO_BUCKET_NAME,
+      Key: key,
+      Body: new Uint8Array(params.body),
+      ContentType: params.contentType,
+    }),
+  );
+  console.log(`[minio] backed up ${params.fileName} to ${env.MINIO_BUCKET_NAME}/${key}`);
+}

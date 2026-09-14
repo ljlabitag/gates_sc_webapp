@@ -21,6 +21,18 @@ export type Env = {
   ADMIN_USER: string;
   ADMIN_PASSWORD: string;
   SESSION_SECRET: string;
+  // Third backup location for proposal files (alongside R2 and the emailed
+  // attachment) — a publicly reachable MinIO instance on P4's shared
+  // internal infrastructure, not the "in-network replica" the original ops
+  // plan envisioned replacing R2 with; this one runs alongside it instead.
+  // Endpoint/bucket/prefix aren't secret, but the access key is — optional
+  // because it isn't created yet, and the backup skips (and logs) rather
+  // than throwing until it's set, same pattern as SECRETARIAT_EMAIL above.
+  MINIO_ENDPOINT: string;
+  MINIO_BUCKET_NAME: string;
+  MINIO_KEY_PREFIX: string;
+  MINIO_ACCESS_KEY_ID?: string;
+  MINIO_SECRET_ACCESS_KEY?: string;
 };
 
 // Shared with the admin routes/middleware, which also need to read/write the

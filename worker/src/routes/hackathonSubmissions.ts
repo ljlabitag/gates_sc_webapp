@@ -2,8 +2,9 @@ import { Hono } from "hono";
 import type { Env } from "../index";
 import { getDb } from "../db/client";
 import { hackathonSubmissions } from "../db/schema";
-import { sendHackathonConfirmation, sendSecretariatNotification } from "../lib/mailer";
+import { sendHackathonConfirmation, sendSecretariatNotification, type MailAttachment } from "../lib/mailer";
 import { checkRateLimit } from "../lib/rateLimit";
+import { backupToMinio } from "../storage/s3";
 
 export const hackathonSubmissionsRoute = new Hono<{ Bindings: Env }>();
 
@@ -25,6 +26,35 @@ const EMAIL_RE = /^[^@\s]+@[^@\s.]+(\.[^@\s.]+)+$/;
 // but both are client-supplied and spoofable — this is the real check
 // (brief §5 security must-fix: validate by magic bytes, not extension alone).
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46];
+
+// Brevo caps attachments at 4MB per file (confirmed against Brevo's docs).
+// Base64 inflates the encoded size by roughly a third, so this stays well
+// under that even after encoding. Most proposals are nowhere near the 100MB
+// upload cap in practice, but when one is, the secretariat email just falls
+// back to metadata + the admin-record link, same as before attachments
+// existed — it never blocks or fails the submission itself.
+const ATTACHMENT_MAX_BYTES = 3 * 1024 * 1024;
+
+// Re-fetches the full file from R2 for the secretariat email attachment.
+// Deliberately not the same read as the magic-byte check above (that one is
+// range-limited to 4 bytes) — this happens inside the fire-and-forget email
+// task below, so it never delays the submission response.
+async function buildAttachment(
+  env: Env,
+  objectKey: string,
+  fileName: string | null,
+  fileSize: number | null,
+): Promise<MailAttachment | null> {
+  if (!fileSize || fileSize > ATTACHMENT_MAX_BYTES) return null;
+  try {
+    const object = await env.BUCKET.get(objectKey);
+    if (!object) return null;
+    return { name: fileName ?? "proposal.pdf", content: await object.arrayBuffer() };
+  } catch (err) {
+    console.error("Failed to fetch proposal file for email attachment:", err);
+    return null;
+  }
+}
 
 function text(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value.trim() : null;
@@ -157,22 +187,52 @@ hackathonSubmissionsRoute.post("/", async (c) => {
       (err) => console.error("Failed to send hackathon confirmation email:", err),
     ),
   );
+  const submittedFileName = text(body.fileName);
+  const submittedFileSize = typeof body.fileSize === "number" ? body.fileSize : null;
   c.executionCtx.waitUntil(
-    sendSecretariatNotification(c.env, {
-      id,
-      team,
-      title,
-      domain,
-      agency: text(body.agency),
-      leaderName,
-      leaderEmail,
-      leaderMobile: text(body.leaderMobile),
-      members: text(body.members),
-      endorsingHead: text(body.endorsingHead),
-      fileName: text(body.fileName),
-      fileSize: typeof body.fileSize === "number" ? body.fileSize : null,
-      createdAt: now,
-    }).catch((err) => console.error("Failed to send secretariat notification:", err)),
+    buildAttachment(c.env, objectKey, submittedFileName, submittedFileSize)
+      .then((attachment) =>
+        sendSecretariatNotification(
+          c.env,
+          {
+            id,
+            team,
+            title,
+            domain,
+            agency: text(body.agency),
+            leaderName,
+            leaderEmail,
+            leaderMobile: text(body.leaderMobile),
+            members: text(body.members),
+            endorsingHead: text(body.endorsingHead),
+            fileName: submittedFileName,
+            fileSize: submittedFileSize,
+            createdAt: now,
+          },
+          attachment,
+        ),
+      )
+      .catch((err) => console.error("Failed to send secretariat notification:", err)),
+  );
+
+  // Independent of the email attachment above — MinIO gets the full file
+  // regardless of size (no Brevo-style cap applies to it), so this always
+  // does its own fetch from R2 rather than reusing buildAttachment's
+  // size-limited one.
+  const submittedMimeType = typeof body.mimeType === "string" ? body.mimeType : "application/pdf";
+  // Falls back to the R2 object's own basename in the rare case a direct API
+  // call omits fileName — the actual site always sends it (client/src/lib/api.ts
+  // sets it from the browser File object), so this fallback shouldn't fire
+  // in practice.
+  const minioFileName = submittedFileName ?? objectKey.split("/").pop() ?? `${id}.pdf`;
+  c.executionCtx.waitUntil(
+    c.env.BUCKET.get(objectKey)
+      .then((r2Object) => {
+        if (!r2Object) throw new Error(`objectKey not found in R2: ${objectKey}`);
+        return r2Object.arrayBuffer();
+      })
+      .then((fileBody) => backupToMinio(c.env, { fileName: minioFileName, contentType: submittedMimeType, body: fileBody }))
+      .catch((err) => console.error("Failed to back up proposal file to MinIO:", err)),
   );
 
   return c.json({ id }, 201);
