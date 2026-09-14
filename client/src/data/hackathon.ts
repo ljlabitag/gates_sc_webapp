@@ -195,11 +195,18 @@ export const PARTICIPANT_COSTS = [
   "Accommodation and meals beyond the covered night and activity meals.",
 ];
 
-// Per the mechanics §VIII. Cash amounts are deliberately not stated here —
-// they're to be announced closer to the finals — so keep that as a quiet
-// trailing note in the UI rather than its own callout.
+// Cash amounts confirmed 2026-09-14 via the official "Map. Innovate. Win."
+// prize announcement graphic (DOST GATES social channels) — supersedes the
+// mechanics §VIII placeholder, which deliberately left these unstated
+// pending this announcement. Each place also gets a trophy, medals, and
+// certificates for every team member.
+export const PRIZE_TIERS = [
+  { place: "1st Place", amount: "₱30,000", color: "blue" as const },
+  { place: "2nd Place", amount: "₱20,000", color: "orange" as const },
+  { place: "3rd Place", amount: "₱10,000", color: "teal" as const },
+];
+
 export const PRIZES = [
-  "The top 3 teams each receive a cash prize, a plaque, and medals for their members.",
   "Remaining finalist teams receive a certificate of recognition and a consolation prize.",
 ];
 

@@ -26,6 +26,7 @@ import {
   PARTICIPANT_COSTS,
   PHASES,
   PRIZES,
+  PRIZE_TIERS,
   PROPOSAL_SECTIONS,
   RESOURCES,
   RUBRICS,
@@ -52,11 +53,27 @@ const inputClass =
 
 const labelClass = "font-heading text-[12px] font-semibold text-white/62";
 
+// On Windows, <select> popups are drawn by the OS's own combo-box control,
+// which doesn't reliably pick up `color-scheme: dark` the way macOS/Linux
+// Chrome does — the popup renders with light-theme colors regardless,
+// unreadable against this site's dark theme. Explicit colors on each
+// <option> are respected everywhere color-scheme alone isn't.
+const optionStyle = { backgroundColor: "#08090b", color: "#ededf0" };
+
 const rubricAccent = {
   blue: "bg-gates-blue",
   orange: "bg-gates-orange",
   teal: "bg-gates-teal",
   plum: "bg-gates-plum",
+} as const;
+
+// Tinted card background/border per tier color — kept as full static class
+// strings (not built with template interpolation) since Tailwind's compiler
+// only picks up classes it can see written out in full.
+const tierCardAccent = {
+  blue: "bg-gates-blue/10 border-gates-blue/25",
+  orange: "bg-gates-orange/10 border-gates-orange/25",
+  teal: "bg-gates-teal/10 border-gates-teal/25",
 } as const;
 
 const TIMELINE_GROUPS = [
@@ -124,6 +141,12 @@ export default function Hackathon() {
     `${HACKATHON.name} — Official Mechanics`,
     `${HACKATHON.name}: build geospatial solutions on the GATES Lakehouse. Proposals are due by ${HACKATHON.submissionDeadlineLabel}. Open to DOST attached agencies, regional offices, PSTOs, and DOST-SEI scholars.`,
   );
+
+  // Split "11:59 PM on September 15, 2026" so the CTA banner below can force
+  // a line break before the date — without it, the date wraps wherever the
+  // viewport happens to cut it off, sometimes splitting "September" from
+  // "15, 2026" mid-phrase.
+  const [deadlineTime, deadlineDate] = HACKATHON.submissionDeadlineLabel.split(" on ");
 
   const [form, setForm] = useState(EMPTY_FORM);
   const [file, setFile] = useState<File | null>(null);
@@ -511,13 +534,38 @@ export default function Hackathon() {
             <p className="text-[12px] leading-[1.6] text-white/45 mt-4 mb-0">
               Process travel authority and agency endorsements early, using the milestone dates above.
             </p>
+            <p className="text-[12px] leading-[1.6] text-white/45 mt-2 mb-0">
+              For DOST-SEI scholar finalists: DOST-SEI covers airfare and incidental expenses, on
+              top of the accommodation and meals the Program provides during the finals.
+            </p>
           </div>
         </div>
 
         <div className="glass-panel program-card p-6 sm:p-7 mt-4">
           <IconDot color="plum" />
           <h3 className="text-[18px] font-semibold mb-3">What awaits the winners</h3>
-          <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+            {PRIZE_TIERS.map((tier, index) => (
+              <div key={tier.place} className={`rounded-2xl border p-5 ${tierCardAccent[tier.color]}`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <span
+                    aria-hidden="true"
+                    className={`shrink-0 grid place-items-center w-10 h-10 rounded-full font-mono text-base font-bold text-white ${rubricAccent[tier.color]}`}
+                  >
+                    {index + 1}
+                  </span>
+                  <span className="font-heading text-[12px] font-semibold uppercase tracking-[0.1em] text-white/70">
+                    {tier.place}
+                  </span>
+                </div>
+                <div className="text-[28px] font-bold leading-none tracking-tight">{tier.amount}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[13px] leading-[1.55] text-white/65 m-0">
+            Each winning team also receives a trophy, medals, and certificates for all team members.
+          </p>
+          <ul className="list-none m-0 p-0 flex flex-col gap-2.5 mt-3">
             {PRIZES.map((item) => (
               <li key={item} className="flex gap-2.5 text-[13px] leading-[1.55] text-white/65">
                 <span aria-hidden="true" className="shrink-0 mt-[6px] w-1.5 h-1.5 rounded-full bg-gates-plum" />
@@ -525,9 +573,6 @@ export default function Hackathon() {
               </li>
             ))}
           </ul>
-          <p className="text-[12px] leading-[1.6] text-white/45 mt-4 mb-0">
-            Specific prize amounts will be announced closer to the finals.
-          </p>
         </div>
       </PageSection>
 
@@ -782,9 +827,11 @@ export default function Hackathon() {
                       onChange={setField("domain")}
                       required
                     >
-                      <option value="">Select one…</option>
+                      <option value="" style={optionStyle}>
+                        Select one…
+                      </option>
                       {DOMAINS.map((domain) => (
-                        <option key={domain} value={domain}>
+                        <option key={domain} value={domain} style={optionStyle}>
                           {domain}
                         </option>
                       ))}
@@ -894,7 +941,9 @@ export default function Hackathon() {
       >
         <Eyebrow>SUBMISSION DEADLINE</Eyebrow>
         <h2 className="text-[clamp(24px,3vw,34px)] font-bold m-0 tracking-tight">
-          Proposal submissions close at {HACKATHON.submissionDeadlineLabel}
+          Proposal submissions close at {deadlineTime} on
+          <br />
+          {deadlineDate}
         </h2>
         <a
           href="#submit"
