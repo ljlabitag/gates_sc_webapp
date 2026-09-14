@@ -77,6 +77,7 @@ export const CONDITIONS = [
   "Members of the GATES organizing committee, screening panel, mentors, and judges — and their immediate staff involved in the hackathon — are not eligible.",
   "DOST staff must secure endorsement from their agency or office head for official time and travel authority. SEI scholars must be in good standing with SEI.",
   "Cross-agency and cross-office teams are allowed and encouraged.",
+  "DOST-SEI scholars should list \"DOST-SEI\" as their agency or office on the submission form.",
 ];
 
 export const TEAM_RULES = [

@@ -676,6 +676,9 @@ export default function Hackathon() {
                       autoComplete="organization"
                       placeholder="List each member's office if the team is cross-agency"
                     />
+                    <p className="text-[12px] leading-[1.5] text-white/45 m-0">
+                      For DOST-SEI scholars, enter &ldquo;DOST-SEI&rdquo; as the agency or office.
+                    </p>
                   </div>
                 </fieldset>
 
@@ -771,7 +774,14 @@ export default function Hackathon() {
                     <label className={labelClass} htmlFor="domain">
                       Priority innovation domain <span className="text-gates-orange">*</span>
                     </label>
-                    <select id="domain" className={inputClass} value={form.domain} onChange={setField("domain")} required>
+                    <select
+                      id="domain"
+                      className={inputClass}
+                      style={{ colorScheme: "dark" }}
+                      value={form.domain}
+                      onChange={setField("domain")}
+                      required
+                    >
                       <option value="">Select one…</option>
                       {DOMAINS.map((domain) => (
                         <option key={domain} value={domain}>
