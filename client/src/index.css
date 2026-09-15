@@ -236,6 +236,130 @@
     mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
   }
 
+  /* Aerial road-network line art behind the Hackathon hero — reference art in
+     src/assets/hero/, this is the actual bundled copy (renamed, no spaces, so
+     it resolves cleanly through Vite's asset pipeline). Sits on the plain
+     dark .hackathon-hero-bg below, not hero-brand-gradient's colorful
+     radial blooms — those were competing with the road-network texture, so
+     the hero uses this quieter background instead. */
+  .road-network-bg {
+    background-image: url("./assets/hero/road-network-bg.webp");
+    background-size: cover;
+    background-position: center 30%;
+    /* CSS opacity is clamped to the 0-1 range by spec — 1.2 and 1 render
+       identically, so this is the closest valid value to what was asked
+       for. If it still needs to read stronger than this, that takes a
+       different lever (e.g. a brightness/contrast filter, or trimming the
+       mask fade), not opacity — flag it if 1 isn't enough. */
+    opacity: 1;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 35%, rgba(0, 0, 0, 0.9) 75%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 35%, rgba(0, 0, 0, 0.9) 75%, transparent);
+  }
+
+  /* Plain dark base for the Hackathon hero — deliberately not
+     hero-brand-gradient (used by Home and the CTA banner further down this
+     page), since its colorful radial blooms were competing with the
+     road-network texture above. Same dark tone hero-brand-gradient itself
+     uses underneath its blooms, so the page doesn't jump in overall
+     brightness where this hero starts. */
+  .hackathon-hero-bg {
+    background: linear-gradient(155deg, #05060c 0%, #0b0c15 52%, #050608 100%);
+  }
+
+  /* Section-level decorative backgrounds (PageSection's `background` prop) —
+     reference art in src/assets/hero/, WebP copies actually bundled. Faded
+     on all four edges (not just top/bottom, unlike the hero treatments)
+     since these sit between two plain sections rather than at the top of
+     the page, and kept much lower opacity than the hero's — this is running
+     behind several paragraphs of body copy, not a few lines of hero text,
+     so it has to stay texture, not image. */
+  .page-section-bg {
+    background-size: cover;
+    background-position: center;
+    opacity: 0.07;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 15%,
+      black 85%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 15%,
+      black 85%,
+      transparent
+    );
+  }
+
+  .page-section-bg-grid-mono {
+    background-image: url("./assets/hero/grid-mono-bg.webp");
+  }
+
+  .page-section-bg-grid-color {
+    background-image: url("./assets/hero/grid-color-bg.webp");
+    opacity: 0.1;
+  }
+
+  .page-section-bg-horizon {
+    background-image: url("./assets/hero/horizon-bg.webp");
+    opacity: 0.05;
+  }
+
+  .page-section-bg-swirl {
+    background-image: url("./assets/hero/swirl-bg.webp");
+    opacity: 0.09;
+  }
+
+  /* The only background variant actually used on the Hackathon page (by
+     request) — bolder than the other variants above: 50% opacity, and no
+     mask fade, so the image genuinely covers the section edge to edge
+     instead of fading out top/bottom like the others do. */
+  .page-section-bg-road-network {
+    background-image: url("./assets/hero/road-network-bg.webp");
+    opacity: 0.5;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  /* Flanking hand illustrations either side of the Hackathon hero — the two
+     source images are mirrored (fingers reach inward toward the centered
+     copy), so hand-left always goes on the left and hand-right on the
+     right. Desktop-only (hidden below lg): the hero copy is centered with a
+     max-width, so there's only flanking space to place these in once the
+     viewport is wide enough — below that they'd overlap the text. Faded top
+     and bottom so a tall image doesn't hard-clip against header's
+     overflow-hidden on shorter viewports. */
+  .hackathon-hero-hand {
+    top: calc(50% + 30px);
+    width: clamp(192px, 17.6vw, 352px);
+    height: auto;
+    opacity: 0.92;
+    transform: translate(-50%, -50%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+  }
+
+  /* Symmetric around the hero's horizontal center (both 1/6 of the width
+     away from it) — 2/6 and 5/6 weren't actually symmetric (1/6 from center
+     vs 1/3 from center), which is why the two sides looked uneven. The left
+     hand's original 2/6 position is the fixed reference; the right hand
+     mirrors it at 4/6. left: N% + translateX(-50%) centers the image ON
+     that line, it isn't the image's edge sitting there. */
+  .hackathon-hero-hand-left {
+    /* Percentage-based (not the fixed-400px experiment — that held the gap
+       constant in px but let the hands crowd the hero's edges on narrower
+       widths near the lg breakpoint). -80px is three rounds of "add more
+       distance" stacked on the original symmetric 33.333%/66.667%: +20,
+       +20, +40px, split evenly each time. */
+    left: calc(33.333% - 80px);
+  }
+
+  .hackathon-hero-hand-right {
+    left: calc(66.667% + 80px);
+  }
+
   .hero-brand-gradient {
     background:
       radial-gradient(circle at 8% 8%, rgba(26, 26, 234, 0.42), transparent 38%),

@@ -42,6 +42,35 @@ export function IconDot({ color }: { color: DotColor }) {
   return <div aria-hidden="true" className={`w-[34px] h-[34px] rounded-[10px] mb-[14px] ${dotColors[color]}`} />;
 }
 
+// Tailwind v4 auto-generates a CSS custom property per @theme color token
+// (--color-gates-blue etc., defined in index.css) — reused directly here
+// rather than duplicating the hex values, so IconPin always matches
+// whatever IconDot's bg-gates-* classes resolve to.
+const dotColorVars = {
+  blue: "var(--color-gates-blue)",
+  orange: "var(--color-gates-orange)",
+  plum: "var(--color-gates-plum)",
+  teal: "var(--color-gates-teal)",
+} as const;
+
+/**
+ * Location-pin marker (classic map-marker teardrop) — a drop-in swap for
+ * IconDot's plain colored square, same color API and same footprint
+ * (mb-[14px] under it). Standard "place" glyph shape rather than a custom
+ * one — deliberately not reinventing a well-recognized icon, and it fits a
+ * geospatial program's branding better than a corkboard pushpin did.
+ */
+export function IconPin({ color }: { color: DotColor }) {
+  const fill = dotColorVars[color];
+  return (
+    <svg width="28" height="36" viewBox="0 0 24 32" className="mb-[14px]" aria-hidden="true">
+      <ellipse cx="12" cy="30" rx="5" ry="1.5" fill="black" opacity="0.2" />
+      <path d="M12 0C6.48 0 2 4.48 2 10c0 7.5 10 20 10 20s10-12.5 10-20c0-5.52-4.48-10-10-10z" fill={fill} />
+      <circle cx="12" cy="10" r="4" fill="white" />
+    </svg>
+  );
+}
+
 export function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`glass-panel p-6 sm:p-7 ${className}`}>{children}</div>;
 }
@@ -131,21 +160,32 @@ export const NAV_H = 69;
 /** Nav + SectionNav, used as scroll-margin so anchor targets clear both bars. */
 export const STICKY_OFFSET = 69 + 45;
 
+/** Section-level decorative background variants — see .page-section-bg-* in index.css. */
+export type PageSectionBackground = "grid-mono" | "grid-color" | "horizon" | "swirl" | "road-network";
+
 /**
  * Standard page section. `id` + `labelledBy` make it a named landmark and an
  * anchor target that isn't hidden under the two sticky bars.
+ *
+ * `background` opts into a full-bleed decorative texture behind the section
+ * (subtle by design — content still needs to read clearly over it). Omit it
+ * for the plain page background, same as before this existed; only some
+ * sections on a page should carry one, alternating with plain ones, or a
+ * page reads as visually noisy rather than varied.
  */
 export function PageSection({
   id,
   labelledBy,
   width = "default",
   className = "",
+  background,
   children,
 }: {
   id?: string;
   labelledBy?: string;
   width?: "default" | "wide" | "narrow";
   className?: string;
+  background?: PageSectionBackground;
   children: ReactNode;
 }) {
   const maxW = width === "wide" ? "max-w-[1120px]" : width === "narrow" ? "max-w-[820px]" : "max-w-[1000px]";
@@ -154,9 +194,14 @@ export function PageSection({
       id={id}
       aria-labelledby={labelledBy}
       style={{ scrollMarginTop: `${STICKY_OFFSET}px` }}
-      className={`py-10 sm:py-14 lg:py-16 px-5 sm:px-8 ${maxW} mx-auto ${className}`}
+      className={`relative ${background ? "overflow-hidden" : ""}`}
     >
-      {children}
+      {background && (
+        <div className={`page-section-bg page-section-bg-${background} absolute inset-0 z-0`} aria-hidden="true" />
+      )}
+      <div className={`relative z-10 py-10 sm:py-14 lg:py-16 px-5 sm:px-8 ${maxW} mx-auto ${className}`}>
+        {children}
+      </div>
     </section>
   );
 }
@@ -202,11 +247,19 @@ export function Stat({ value, label }: { value: string; label: string }) {
   );
 }
 
-/** Compact pill with a colour cue — used for strategic goals and domains. */
-export function Chip({ color, children }: { color: DotColor; children: ReactNode }) {
+/**
+ * Compact pill with a colour cue — used for strategic goals and domains.
+ * `icon` swaps the plain colour dot for a small badge image (e.g. the
+ * priority-domain icons); omit it to keep the original dot-only look.
+ */
+export function Chip({ color, icon, children }: { color: DotColor; icon?: string; children: ReactNode }) {
   return (
     <div className="glass-panel program-card flex items-center gap-3 px-4 py-3 rounded-2xl">
-      <span aria-hidden="true" className={`shrink-0 w-2.5 h-2.5 rounded-full ${dotColors[color]}`} />
+      {icon ? (
+        <img src={icon} alt="" aria-hidden="true" className="shrink-0 w-9 h-9 rounded-full" />
+      ) : (
+        <span aria-hidden="true" className={`shrink-0 w-2.5 h-2.5 rounded-full ${dotColors[color]}`} />
+      )}
       <span className="text-sm leading-[1.35] text-white/78">{children}</span>
     </div>
   );

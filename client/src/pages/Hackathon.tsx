@@ -5,7 +5,7 @@ import Footer from "../components/Footer";
 import {
   Chip,
   Eyebrow,
-  IconDot,
+  IconPin,
   PageSection,
   PrimaryButton,
   SectionHead,
@@ -36,6 +36,25 @@ import {
 } from "../data/hackathon";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { submitHackathonEntry } from "../lib/api";
+import handLeft from "../assets/hero/hand-left.webp";
+import handRight from "../assets/hero/hand-right.webp";
+import domainHealth from "../assets/icons/hands-heart-people.webp";
+import domainDisaster from "../assets/icons/warning-cracked-ground.webp";
+import domainEnvironment from "../assets/icons/plant-hand.webp";
+import domainKnowledge from "../assets/icons/head-lightbulb.webp";
+import domainInfrastructure from "../assets/icons/crane-construction.webp";
+import domainNaturalResources from "../assets/icons/globe-pin.webp";
+
+// Maps 1:1 to DOMAINS (client/src/data/hackathon.ts), same order — keep the
+// two in sync if the domain list ever changes.
+const DOMAIN_ICONS = [
+  domainHealth,
+  domainDisaster,
+  domainEnvironment,
+  domainKnowledge,
+  domainInfrastructure,
+  domainNaturalResources,
+];
 
 const SECTIONS = [
   { id: "objective", label: "Objective" },
@@ -218,7 +237,20 @@ export default function Hackathon() {
       <Nav />
 
       {/* Hero */}
-      <header className="hackathon-hero hero-brand-gradient relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
+      <header className="hackathon-hero hackathon-hero-bg relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
+        <div className="road-network-bg absolute inset-0 z-0" aria-hidden="true" />
+        <img
+          src={handLeft}
+          alt=""
+          aria-hidden="true"
+          className="hackathon-hero-hand hackathon-hero-hand-left hidden lg:block absolute z-[1] pointer-events-none select-none"
+        />
+        <img
+          src={handRight}
+          alt=""
+          aria-hidden="true"
+          className="hackathon-hero-hand hackathon-hero-hand-right hidden lg:block absolute z-[1] pointer-events-none select-none"
+        />
         <div className="relative z-10 max-w-[880px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
           <Eyebrow>AUGUST 24&ndash;NOVEMBER 10, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
           <h1 className="font-display text-[clamp(34px,5.6vw,62px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow-orange">
@@ -296,7 +328,9 @@ export default function Hackathon() {
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 list-none m-0 p-0">
             {DOMAINS.map((domain, index) => (
               <li key={domain}>
-                <Chip color={(["blue", "teal", "orange", "plum"] as const)[index % 4]}>{domain}</Chip>
+                <Chip color={(["blue", "teal", "orange", "plum"] as const)[index % 4]} icon={DOMAIN_ICONS[index]}>
+                  {domain}
+                </Chip>
               </li>
             ))}
           </ul>
@@ -304,11 +338,11 @@ export default function Hackathon() {
       </PageSection>
 
       {/* Eligibility & teams */}
-      <PageSection id="eligibility" labelledBy="eligibility-title" width="wide">
+      <PageSection id="eligibility" labelledBy="eligibility-title" width="wide" background="road-network">
         <SectionHead eyebrow="WHO CAN JOIN" title="Eligibility and team composition" titleId="eligibility-title" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="glass-panel program-card p-6 sm:p-7">
-            <IconDot color="teal" />
+            <IconPin color="teal" />
             <h3 className="text-[19px] font-semibold mb-3">Open to</h3>
             <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
               {ELIGIBLE.map((item) => (
@@ -332,7 +366,7 @@ export default function Hackathon() {
           </div>
 
           <div className="glass-panel program-card p-6 sm:p-7">
-            <IconDot color="orange" />
+            <IconPin color="orange" />
             <h3 className="text-[19px] font-semibold mb-3">Team composition</h3>
             <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
               {TEAM_RULES.map((item) => (
@@ -382,7 +416,7 @@ export default function Hackathon() {
       </PageSection>
 
       {/* Timeline */}
-      <PageSection id="timeline" labelledBy="timeline-title">
+      <PageSection id="timeline" labelledBy="timeline-title" background="road-network">
         <SectionHead
           eyebrow="TIMELINE"
           title="From proposal to final pitch"
@@ -493,11 +527,11 @@ export default function Hackathon() {
       </PageSection>
 
       {/* Support & logistics */}
-      <PageSection id="support" labelledBy="support-title" width="wide">
+      <PageSection id="support" labelledBy="support-title" width="wide" background="road-network">
         <SectionHead eyebrow="WHAT YOU GET" title="Resources and cost coverage" titleId="support-title" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="glass-panel program-card p-6 sm:p-7 lg:col-span-1">
-            <IconDot color="blue" />
+            <IconPin color="blue" />
             <h3 className="text-[18px] font-semibold mb-3">Provided to finalists</h3>
             <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
               {RESOURCES.map((item) => (
@@ -509,7 +543,7 @@ export default function Hackathon() {
             </ul>
           </div>
           <div className="glass-panel program-card p-6 sm:p-7">
-            <IconDot color="teal" />
+            <IconPin color="teal" />
             <h3 className="text-[18px] font-semibold mb-3">The Program covers</h3>
             <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
               {COVERED_COSTS.map((item) => (
@@ -521,7 +555,7 @@ export default function Hackathon() {
             </ul>
           </div>
           <div className="glass-panel program-card p-6 sm:p-7">
-            <IconDot color="orange" />
+            <IconPin color="orange" />
             <h3 className="text-[18px] font-semibold mb-3">You or your agency covers</h3>
             <ul className="list-none m-0 p-0 flex flex-col gap-2.5">
               {PARTICIPANT_COSTS.map((item) => (
@@ -542,7 +576,7 @@ export default function Hackathon() {
         </div>
 
         <div className="glass-panel program-card p-6 sm:p-7 mt-4">
-          <IconDot color="plum" />
+          <IconPin color="plum" />
           <h3 className="text-[18px] font-semibold mb-3">What awaits the winners</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             {PRIZE_TIERS.map((tier, index) => (
@@ -627,7 +661,7 @@ export default function Hackathon() {
       </PageSection>
 
       {/* Submission */}
-      <PageSection id="submit" labelledBy="submit-title" width="wide">
+      <PageSection id="submit" labelledBy="submit-title" width="wide" background="road-network">
         <SectionHead
           eyebrow="SUBMIT YOUR PROPOSAL"
           title="One proposal per team"
@@ -668,7 +702,7 @@ export default function Hackathon() {
           <div className="lg:col-span-3">
             {submitted ? (
               <div className="glass-panel p-6 sm:p-10 flex flex-col gap-2.5 items-start">
-                <IconDot color="teal" />
+                <IconPin color="teal" />
                 <h3 className="text-xl font-semibold m-0">Proposal received, {form.team}.</h3>
                 <p className="text-sm leading-[1.6] text-white/62 m-0">
                   &ldquo;{form.title}&rdquo; is in. We&apos;ve sent a confirmation to {form.leaderEmail}. Screening runs
