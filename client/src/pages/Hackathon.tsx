@@ -240,32 +240,6 @@ export default function Hackathon() {
       {/* Hero */}
       <header className="hackathon-hero hackathon-hero-bg relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
         <div className="road-network-bg absolute inset-0 z-0" aria-hidden="true" />
-        <img
-          src={keyboard}
-          alt=""
-          aria-hidden="true"
-          className="hackathon-hero-keyboard hidden lg:block absolute z-[1] pointer-events-none select-none"
-        />
-        <div
-          aria-hidden="true"
-          className="hackathon-hero-hand hackathon-hero-hand-left hidden lg:block absolute z-[2] pointer-events-none select-none"
-        >
-          <img src={handLeft} alt="" className="block w-full h-auto" />
-          <div
-            className="hackathon-hero-hand-shade absolute inset-0"
-            style={{ WebkitMaskImage: `url(${handLeft})`, maskImage: `url(${handLeft})` }}
-          />
-        </div>
-        <div
-          aria-hidden="true"
-          className="hackathon-hero-hand hackathon-hero-hand-right hidden lg:block absolute z-[2] pointer-events-none select-none"
-        >
-          <img src={handRight} alt="" className="block w-full h-auto" />
-          <div
-            className="hackathon-hero-hand-shade absolute inset-0"
-            style={{ WebkitMaskImage: `url(${handRight})`, maskImage: `url(${handRight})` }}
-          />
-        </div>
         <div className="relative z-10 max-w-[880px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
           <Eyebrow>AUGUST 24&ndash;NOVEMBER 10, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
           <h1 className="font-display text-[clamp(34px,5.6vw,62px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow-orange">
@@ -279,6 +253,37 @@ export default function Hackathon() {
             system &mdash; then pitch them at the 2nd Stakeholder Conference.
           </p>
 
+          {/* Hands flank the keyboard art — a relative wrapper, in-flow like
+              any other piece of copy (see the keyboard comment above), so
+              the fact grid below is still pushed down to make real room for
+              it. The hand cells inside are absolute (no in-flow content of
+              their own), so the wrapper's height is just the keyboard's own
+              rendered height, and the hands center on that via top:50% in
+              .hackathon-hero-hand. Horizontal position is tied directly to
+              the keyboard's own edge (see .hackathon-hero-hand-left/-right
+              in index.css), so it tracks the keyboard's clamp()-resolved
+              width rather than any fixed reference point. */}
+          <div className="relative w-full" aria-hidden="true">
+            <div className="hackathon-hero-hand hackathon-hero-hand-left hidden lg:block absolute z-[2] pointer-events-none select-none">
+              <img src={handLeft} alt="" className="block w-full h-auto" />
+              <div
+                className="hackathon-hero-hand-shade absolute inset-0"
+                style={{ WebkitMaskImage: `url(${handLeft})`, maskImage: `url(${handLeft})` }}
+              />
+            </div>
+            <img
+              src={keyboard}
+              alt=""
+              className="hackathon-hero-keyboard hidden lg:block mx-auto pointer-events-none select-none"
+            />
+            <div className="hackathon-hero-hand hackathon-hero-hand-right hidden lg:block absolute z-[2] pointer-events-none select-none">
+              <img src={handRight} alt="" className="block w-full h-auto" />
+              <div
+                className="hackathon-hero-hand-shade absolute inset-0"
+                style={{ WebkitMaskImage: `url(${handRight})`, maskImage: `url(${handRight})` }}
+              />
+            </div>
+          </div>
           <div className="hackathon-hero-facts grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-1 w-full max-w-[680px]">
             {[
               {

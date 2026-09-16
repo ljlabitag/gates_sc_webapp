@@ -318,20 +318,21 @@
     mask-image: none;
   }
 
-  /* Flanking hand illustrations either side of the Hackathon hero — the two
-     source images are mirrored (fingers reach inward toward the centered
-     copy), so hand-left always goes on the left and hand-right on the
-     right. Desktop-only (hidden below lg): the hero copy is centered with a
-     max-width, so there's only flanking space to place these in once the
-     viewport is wide enough — below that they'd overlap the text. Faded top
-     and bottom so a tall image doesn't hard-clip against header's
-     overflow-hidden on shorter viewports. */
+  /* Flanking hand illustrations either side of the keyboard art (see the
+     wrapper in Hackathon.tsx) — the two source images are mirrored (fingers
+     reach inward toward the centered copy), so hand-left always goes on the
+     left and hand-right on the right. Desktop-only (hidden below lg): below
+     that width there's no room to clear the copy column (see
+     .hackathon-hero-hand-left/-right). Faded top and bottom so a tall image
+     doesn't hard-clip against header's overflow-hidden on shorter
+     viewports. top:50% centers vertically on the keyboard row's own height
+     (not the hero's), since that row's height is just the keyboard's own
+     rendered height — the hand cell carries no in-flow content of its own. */
   .hackathon-hero-hand {
-    top: calc(50% + 70px);
+    top: calc(50% + 160px);
     width: clamp(192px, 17.6vw, 352px);
     height: auto;
     opacity: 0.92;
-    transform: translate(-50%, -50%);
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
   }
@@ -357,33 +358,33 @@
     mask-repeat: no-repeat;
   }
 
-  /* Symmetric around the hero's horizontal center (both 1/6 of the width
-     away from it) — 2/6 and 5/6 weren't actually symmetric (1/6 from center
-     vs 1/3 from center), which is why the two sides looked uneven. The left
-     hand's original 2/6 position is the fixed reference; the right hand
-     mirrors it at 4/6. left: N% + translateX(-50%) centers the image ON
-     that line, it isn't the image's edge sitting there. */
+  /* left: N% + translateX(-50%) centers the image ON that line, not its
+     edge. The line is solved so the hand's inner edge sits flush against
+     the keyboard's own current edge (0 gap — "touching"), using half the
+     keyboard's clamp()-resolved width so it holds at any viewport.
+     Note this dropped the earlier max(340px, ...) term that also kept the
+     hands clear of the wider 680px paragraph/fact-grid rows above and
+     below — at the keyboard's narrower clamp() sizes, flush-against-the-
+     keyboard can sit inside those rows again. Tilted 10deg toward the
+     keyboard on top of the hands' own inward-pointing source art. */
   .hackathon-hero-hand-left {
-    /* Percentage-based (not the fixed-400px experiment — that held the gap
-       constant in px but let the hands crowd the hero's edges on narrower
-       widths near the lg breakpoint). -120px is four rounds of "add more
-       distance" stacked on the original symmetric 33.333%/66.667%: +20,
-       +20, +40px, +40px, split evenly each time. */
-    left: calc(33.333% - 120px);
+    left: calc(50% - clamp(468px, 46.8vw, 864px) / 2 - clamp(192px, 17.6vw, 352px) / 2 + 80px);
+    transform: translate(-50%, -50%) rotate(10deg);
   }
 
   .hackathon-hero-hand-right {
-    left: calc(66.667% + 120px);
+    left: calc(50% + clamp(468px, 46.8vw, 864px) / 2 + clamp(192px, 17.6vw, 352px) / 2 - 80px);
+    transform: translate(-50%, -50%) rotate(-10deg);
   }
 
-  /* Keyboard art floating centered above the two hands — z-[1] (hands are
-     z-[2]) so the hands render in front where they overlap it. Vertical
-     position is pinned relative to the hands' own center line (calc(50% +
-     70px), see .hackathon-hero-hand) rather than the hero's raw 50%, so the
-     two stay in sync if that line ever moves. */
+  /* Keyboard art sits in-flow between the intro copy and the fact cards
+     (see Hackathon.tsx) — no position/z-index layering, so there's no
+     coordinate to keep in sync with the copy above it and no risk of ever
+     sharing space with it; the browser just gives it its own slot in the
+     flex column like any other element. Centered via mx-auto since its
+     wrapper (shared with the flanking hands, see .hackathon-hero-hand) is
+     full-width. */
   .hackathon-hero-keyboard {
-    top: calc(50% + 70px - 170px);
-    left: 50%;
     width: clamp(468px, 46.8vw, 864px);
     height: auto;
     opacity: 0.95;
@@ -391,7 +392,6 @@
        .hackathon-hero-hand — keeps the shape solid instead of letting the
        background show through it. */
     filter: brightness(0.45);
-    transform: translate(-50%, -50%);
   }
 
   .hero-brand-gradient {
