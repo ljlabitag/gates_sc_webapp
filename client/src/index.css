@@ -329,7 +329,7 @@
      (not the hero's), since that row's height is just the keyboard's own
      rendered height — the hand cell carries no in-flow content of its own. */
   .hackathon-hero-hand {
-    top: calc(50% + 160px);
+    top: calc(50% + 90px);
     width: clamp(192px, 17.6vw, 352px);
     height: auto;
     opacity: 0.92;
@@ -359,14 +359,14 @@
   }
 
   /* left: N% + translateX(-50%) centers the image ON that line, not its
-     edge. The line is solved so the hand's inner edge sits flush against
-     the keyboard's own current edge (0 gap — "touching"), using half the
-     keyboard's clamp()-resolved width so it holds at any viewport.
-     Note this dropped the earlier max(340px, ...) term that also kept the
-     hands clear of the wider 680px paragraph/fact-grid rows above and
-     below — at the keyboard's narrower clamp() sizes, flush-against-the-
-     keyboard can sit inside those rows again. Tilted 10deg toward the
-     keyboard on top of the hands' own inward-pointing source art. */
+     edge. This is the exact position deployed after the "touch the
+     keyboard, pull 80px closer, tilt 10deg" round of tuning — a
+     responsiveness pass found this genuinely overlapping the fact cards
+     (worst at ordinary laptop widths, 1024-1280px, where it fully covers
+     two of them), but per direction the fix for that is NOT to move the
+     hands relative to the keyboard — see .hackathon-hero-facts and the
+     buttons row below instead, which win the stacking order over the hands
+     wherever the two happen to overlap. */
   .hackathon-hero-hand-left {
     left: calc(50% - clamp(468px, 46.8vw, 864px) / 2 - clamp(192px, 17.6vw, 352px) / 2 + 80px);
     transform: translate(-50%, -50%) rotate(10deg);

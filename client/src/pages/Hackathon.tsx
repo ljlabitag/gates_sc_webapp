@@ -284,7 +284,12 @@ export default function Hackathon() {
               />
             </div>
           </div>
-          <div className="hackathon-hero-facts grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-1 w-full max-w-[680px]">
+          {/* relative z-[3]: the hands (z-[2], see .hackathon-hero-hand)
+              geometrically overlap this row at several viewport widths by
+              design — their position is fixed relative to the keyboard, not
+              this grid — so this wins the stacking order instead, keeping
+              the fact text fully legible wherever the two overlap. */}
+          <div className="hackathon-hero-facts relative z-[3] grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mt-1 w-full max-w-[680px]">
             {[
               {
                 value: HACKATHON.callForParticipantsLabel.replace("August", "Aug").replace(", 2026", ""),
@@ -306,7 +311,11 @@ export default function Hackathon() {
             ))}
           </div>
 
-          <div className="flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
+          {/* Same reasoning as the fact grid above: relative z-[3] so these
+              buttons stay fully visible/legible over the hands (z-[2])
+              wherever the hands' fixed-to-the-keyboard position happens to
+              reach this low. */}
+          <div className="relative z-[3] flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
             <a
               href="#submit"
               className="btn-hackathon px-[26px] py-3.5 rounded-full text-white font-bold text-[15px] no-underline text-center"
