@@ -29,7 +29,7 @@ const accentByColor = {
 const KEY_DATES = [
   {
     color: "orange",
-    date: "September 15, 2026",
+    date: "September 20, 2026",
     detail: "11:59 PM",
     title: "Hackathon proposals due",
     to: "/hackathon",

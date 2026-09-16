@@ -38,6 +38,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { submitHackathonEntry } from "../lib/api";
 import handLeft from "../assets/hero/hand-left.webp";
 import handRight from "../assets/hero/hand-right.webp";
+import keyboard from "../assets/hero/keyboard.webp";
 import domainHealth from "../assets/icons/hands-heart-people.webp";
 import domainDisaster from "../assets/icons/warning-cracked-ground.webp";
 import domainEnvironment from "../assets/icons/plant-hand.webp";
@@ -161,10 +162,10 @@ export default function Hackathon() {
     `${HACKATHON.name}: build geospatial solutions on the GATES Lakehouse. Proposals are due by ${HACKATHON.submissionDeadlineLabel}. Open to DOST attached agencies, regional offices, PSTOs, and DOST-SEI scholars.`,
   );
 
-  // Split "11:59 PM on September 15, 2026" so the CTA banner below can force
+  // Split "11:59 PM on September 20, 2026" so the CTA banner below can force
   // a line break before the date — without it, the date wraps wherever the
   // viewport happens to cut it off, sometimes splitting "September" from
-  // "15, 2026" mid-phrase.
+  // "20, 2026" mid-phrase.
   const [deadlineTime, deadlineDate] = HACKATHON.submissionDeadlineLabel.split(" on ");
 
   const [form, setForm] = useState(EMPTY_FORM);
@@ -240,17 +241,31 @@ export default function Hackathon() {
       <header className="hackathon-hero hackathon-hero-bg relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
         <div className="road-network-bg absolute inset-0 z-0" aria-hidden="true" />
         <img
-          src={handLeft}
+          src={keyboard}
           alt=""
           aria-hidden="true"
-          className="hackathon-hero-hand hackathon-hero-hand-left hidden lg:block absolute z-[1] pointer-events-none select-none"
+          className="hackathon-hero-keyboard hidden lg:block absolute z-[1] pointer-events-none select-none"
         />
-        <img
-          src={handRight}
-          alt=""
+        <div
           aria-hidden="true"
-          className="hackathon-hero-hand hackathon-hero-hand-right hidden lg:block absolute z-[1] pointer-events-none select-none"
-        />
+          className="hackathon-hero-hand hackathon-hero-hand-left hidden lg:block absolute z-[2] pointer-events-none select-none"
+        >
+          <img src={handLeft} alt="" className="block w-full h-auto" />
+          <div
+            className="hackathon-hero-hand-shade absolute inset-0"
+            style={{ WebkitMaskImage: `url(${handLeft})`, maskImage: `url(${handLeft})` }}
+          />
+        </div>
+        <div
+          aria-hidden="true"
+          className="hackathon-hero-hand hackathon-hero-hand-right hidden lg:block absolute z-[2] pointer-events-none select-none"
+        >
+          <img src={handRight} alt="" className="block w-full h-auto" />
+          <div
+            className="hackathon-hero-hand-shade absolute inset-0"
+            style={{ WebkitMaskImage: `url(${handRight})`, maskImage: `url(${handRight})` }}
+          />
+        </div>
         <div className="relative z-10 max-w-[880px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
           <Eyebrow>AUGUST 24&ndash;NOVEMBER 10, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
           <h1 className="font-display text-[clamp(34px,5.6vw,62px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow-orange">
@@ -706,7 +721,7 @@ export default function Hackathon() {
                 <h3 className="text-xl font-semibold m-0">Proposal received, {form.team}.</h3>
                 <p className="text-sm leading-[1.6] text-white/62 m-0">
                   &ldquo;{form.title}&rdquo; is in. We&apos;ve sent a confirmation to {form.leaderEmail}. Screening runs
-                  September 16&ndash;21, and finalists are announced {HACKATHON.finalistsAnnouncedLabel}.
+                  September 21&ndash;24, and finalists are announced {HACKATHON.finalistsAnnouncedLabel}.
                 </p>
                 <p className="text-[13px] leading-[1.6] text-white/50 m-0 mt-1">
                   If your agency endorsement isn&apos;t in progress yet, start it now &mdash; finalists need it to

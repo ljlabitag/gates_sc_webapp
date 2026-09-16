@@ -12,7 +12,14 @@
  * Call-for-participants opening slipped again after v2.0: August 24 → August
  * 27, 2026 (confirmed verbally 2026-08-26, not yet in a revised mechanics
  * doc). Only that one date moved — the submission window's start shifted with
- * it, but the September 15 deadline and everything after are unchanged.
+ * it, but the September 15 deadline and everything after were unchanged at
+ * the time.
+ *
+ * Submission deadline extended 2026-09-16: September 15 → September 20,
+ * 11:59 PM, which cascaded the rest of Phase 1 — screening September 21–24,
+ * finalists announced September 25, confirmation/back-out period September
+ * 26–29. The final-list-locked date (September 30) and everything in Phase 2
+ * are unaffected.
  *
  * v2.0 also references this site directly as the submission channel
  * ("...via https://gates-sc-webapp.dost-gates.workers.dev/hackathon"), so the
@@ -24,11 +31,11 @@ export const HACKATHON = {
   name: "GATES GeoHack 2026",
   /** Confirmed — matches the mechanics document's own title. */
   theme: "Charting Spatial Futures",
-  submissionDeadlineLabel: "11:59 PM on September 15, 2026",
+  submissionDeadlineLabel: "11:59 PM on September 20, 2026",
   /** For buttons and tight spaces where the full label won't fit. */
-  submissionDeadlineShort: "September 15",
+  submissionDeadlineShort: "September 20",
   callForParticipantsLabel: "August 27, 2026",
-  finalistsAnnouncedLabel: "September 22, 2026",
+  finalistsAnnouncedLabel: "September 25, 2026",
   maxFinalistTeams: 6,
   reserveTeams: 2,
   teamSize: 4,
@@ -95,9 +102,9 @@ export const PHASES = [
     window: "August 27 – September 30, 2026",
     steps: [
       "Call for participants — GATES publishes the mechanics, proposal template, and submission instructions (August 27).",
-      "Submission — one proposal per team using the official template, covering the domain and pain point, the proposed geospatial solution, GATES resources to be used, feasibility, and expected impact. Deadline September 15, 11:59 PM.",
-      "Screening — subject matter experts and organizers review submissions against the screening rubric (September 16–21).",
-      "Announcement — up to 6 finalist teams plus 2 ranked reserve teams announced September 22.",
+      "Submission — one proposal per team using the official template, covering the domain and pain point, the proposed geospatial solution, GATES resources to be used, feasibility, and expected impact. Deadline September 20, 11:59 PM.",
+      "Screening — subject matter experts and organizers review submissions against the screening rubric (September 21–24).",
+      "Announcement — up to 6 finalist teams plus 2 ranked reserve teams announced September 25.",
       "Confirmation — finalists confirm participation, including agency endorsement, by September 29. Any team that backs out is replaced by the next-ranked reserve. The final list locks September 30.",
     ],
   },
@@ -119,11 +126,11 @@ export const PHASES = [
 
 export const TIMELINE = [
   { date: "August 27, 2026", milestone: "Call for participants opens" },
-  { date: "August 27 – September 15", milestone: "Submission window" },
-  { date: "September 15, 11:59 PM", milestone: "Deadline for proposal submissions" },
-  { date: "September 16 – 21", milestone: "Screening by subject matter experts and organizers" },
-  { date: "September 22", milestone: "Announcement of finalists and 2 reserve teams" },
-  { date: "September 23 – 29", milestone: "Confirmation and back-out period" },
+  { date: "August 27 – September 20", milestone: "Submission window" },
+  { date: "September 20, 11:59 PM", milestone: "Deadline for proposal submissions" },
+  { date: "September 21 – 24", milestone: "Screening by subject matter experts and organizers" },
+  { date: "September 25", milestone: "Announcement of finalists and 2 reserve teams" },
+  { date: "September 26 – 29", milestone: "Confirmation and back-out period" },
   { date: "September 30", milestone: "Final list of finalist teams locked" },
   { date: "October 7", milestone: "Orientation and capacity building (online)" },
   { date: "October 8 – November 8", milestone: "Development period with mentorship" },

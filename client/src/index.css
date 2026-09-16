@@ -246,12 +246,7 @@
     background-image: url("./assets/hero/road-network-bg.webp");
     background-size: cover;
     background-position: center 30%;
-    /* CSS opacity is clamped to the 0-1 range by spec — 1.2 and 1 render
-       identically, so this is the closest valid value to what was asked
-       for. If it still needs to read stronger than this, that takes a
-       different lever (e.g. a brightness/contrast filter, or trimming the
-       mask fade), not opacity — flag it if 1 isn't enough. */
-    opacity: 1;
+    opacity: 0.7;
     -webkit-mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 35%, rgba(0, 0, 0, 0.9) 75%, transparent);
     mask-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.9) 35%, rgba(0, 0, 0, 0.9) 75%, transparent);
   }
@@ -313,12 +308,12 @@
   }
 
   /* The only background variant actually used on the Hackathon page (by
-     request) — bolder than the other variants above: 50% opacity, and no
+     request) — bolder than the other variants above: 30% opacity, and no
      mask fade, so the image genuinely covers the section edge to edge
      instead of fading out top/bottom like the others do. */
   .page-section-bg-road-network {
     background-image: url("./assets/hero/road-network-bg.webp");
-    opacity: 0.5;
+    opacity: 0.3;
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -332,13 +327,34 @@
      and bottom so a tall image doesn't hard-clip against header's
      overflow-hidden on shorter viewports. */
   .hackathon-hero-hand {
-    top: calc(50% + 30px);
+    top: calc(50% + 70px);
     width: clamp(192px, 17.6vw, 352px);
     height: auto;
     opacity: 0.92;
     transform: translate(-50%, -50%);
     -webkit-mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
     mask-image: linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+  }
+
+  /* Gradient dim, not a flat one: darkest at the bottom (near the text/CTA
+     row), fading to no darkening by 70% up so the fingertips stay at full
+     brightness. mix-blend-mode: multiply means a fully-transparent-black top
+     leaves the hand untouched there, while opaque black at the bottom
+     genuinely darkens it (unlike lowering opacity, which would let the
+     background show through the hand shape instead of darkening it).
+     mask-image (set inline per instance, since it's a different source image
+     for the left vs. right hand) reuses the hand art's own alpha channel as
+     a stencil, so the gradient rectangle only paints over actual hand
+     pixels — without it, the gradient's rectangular bounding box would dim
+     the transparent margin around the hand too, visibly darkening the
+     road-network background behind it. */
+  .hackathon-hero-hand-shade {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.92), rgba(0, 0, 0, 0) 70%);
+    mix-blend-mode: multiply;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
   }
 
   /* Symmetric around the hero's horizontal center (both 1/6 of the width
@@ -350,14 +366,32 @@
   .hackathon-hero-hand-left {
     /* Percentage-based (not the fixed-400px experiment — that held the gap
        constant in px but let the hands crowd the hero's edges on narrower
-       widths near the lg breakpoint). -80px is three rounds of "add more
+       widths near the lg breakpoint). -120px is four rounds of "add more
        distance" stacked on the original symmetric 33.333%/66.667%: +20,
-       +20, +40px, split evenly each time. */
-    left: calc(33.333% - 80px);
+       +20, +40px, +40px, split evenly each time. */
+    left: calc(33.333% - 120px);
   }
 
   .hackathon-hero-hand-right {
-    left: calc(66.667% + 80px);
+    left: calc(66.667% + 120px);
+  }
+
+  /* Keyboard art floating centered above the two hands — z-[1] (hands are
+     z-[2]) so the hands render in front where they overlap it. Vertical
+     position is pinned relative to the hands' own center line (calc(50% +
+     70px), see .hackathon-hero-hand) rather than the hero's raw 50%, so the
+     two stay in sync if that line ever moves. */
+  .hackathon-hero-keyboard {
+    top: calc(50% + 70px - 170px);
+    left: 50%;
+    width: clamp(468px, 46.8vw, 864px);
+    height: auto;
+    opacity: 0.95;
+    /* Dimmed via brightness rather than opacity, same reasoning as
+       .hackathon-hero-hand — keeps the shape solid instead of letting the
+       background show through it. */
+    filter: brightness(0.45);
+    transform: translate(-50%, -50%);
   }
 
   .hero-brand-gradient {
