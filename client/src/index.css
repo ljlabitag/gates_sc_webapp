@@ -16,6 +16,33 @@
     U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Garet — the actual display font --font-display was always asking for
+   (see @theme below); no @font-face for it existed until now, so every
+   "Garet" headline on the site had been silently falling back to
+   Montserrat. Two weights, since that's what was supplied: Book (400) and
+   Heavy (800) — Heavy is the one that matters today, since every current
+   font-display usage is font-extrabold (Tailwind's 800), but Book is
+   registered too for whenever a lighter Garet weight is needed. No
+   unicode-range subsetting (unlike Montserrat above) — that file is a
+   trimmed slice of a known-large Google variable font; these were supplied
+   directly as single-weight files, so there's no equivalent broader
+   charset to carve down from. */
+@font-face {
+  font-family: "Garet";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./assets/fonts/garet-book.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Garet";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("./assets/fonts/garet-heavy.woff2") format("woff2");
+}
+
 @property --brand-border-angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -208,6 +235,20 @@
       0 3px 14px rgba(26, 26, 234, 0.16);
   }
 
+  /* Conference hero: the edition name ("2nd GATES Program Stakeholder
+     Conference") as a small badge, so the theme line below it can be the
+     big, bold visual headline instead — same brand-gradient treatment as
+     nav-register-gradient, just its own class since a hero badge and a nav
+     button warrant independent sizing/padding tuning over time. */
+  .conference-hero-badge {
+    background:
+      linear-gradient(rgba(8, 9, 11, 0.3), rgba(8, 9, 11, 0.3)),
+      linear-gradient(110deg, #1a1aea 0%, #984077 34%, #118e8e 67%, #fd9404 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.28),
+      0 4px 18px rgba(26, 26, 234, 0.2);
+  }
+
   .btn-hackathon {
     background: linear-gradient(135deg, #fd9404, #984077);
     box-shadow: 0 4px 20px rgba(152, 64, 119, 0.45);
@@ -292,9 +333,60 @@
     background-image: url("./assets/hero/grid-mono-bg.webp");
   }
 
+  /* Used on the Conference page's alternating sections — bumped up from the
+     other page-section-bg-* variants' default ~0.1 since the "net color bg"
+     art reads much sparser/thinner (fine grid lines, not a filled photo
+     texture like horizon/swirl), so it needs more opacity to register at
+     all against several paragraphs of body copy.
+
+     Overrides .page-section-bg's plain `cover`/`center`/`no-repeat`: this
+     source image is a perspective dome that only widens out to the full
+     frame edge in roughly its bottom half (sampled directly — left/right-
+     edge alpha is ~0 above the image's own 50% mark, where the dome is
+     still narrow and centered, climbing to real coverage by ~64%). These
+     sections are much wider than tall, so a plain `cover` crop's visible
+     window is tall enough to dip into that narrow region, leaving the
+     section's own left and right edges blank. Tiled instead of zoomed
+     further into a single crop: background-size: auto 160% takes a
+     vertical slice from that same wide lower band (still tall enough to
+     avoid the narrow dome apex) and background-repeat: repeat-x tiles it
+     sideways to fill any section width, rather than relying on one
+     extreme-zoom crop to happen to be wide enough on its own. */
   .page-section-bg-grid-color {
     background-image: url("./assets/hero/grid-color-bg.webp");
-    opacity: 0.1;
+    background-size: auto 160%;
+    background-position: left 100%;
+    background-repeat: repeat-x;
+    opacity: 0.5;
+    /* Two mask layers combined with intersect: the first is
+       .page-section-bg's own top/bottom fade, repeated here because
+       redeclaring mask-image replaces rather than merges with the base
+       class's. The second dims the pattern toward the horizontal center
+       (down to 30% visible) and brightens it back up toward both edges —
+       partial, not fully transparent, so the center fades rather than
+       leaving a hard gap. */
+    -webkit-mask-image:
+      linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
+      linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.3) 50%, black 100%);
+    -webkit-mask-composite: source-over, source-in;
+    mask-image:
+      linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
+      linear-gradient(to right, black 0%, rgba(0, 0, 0, 0.3) 50%, black 100%);
+    mask-composite: intersect;
+  }
+
+  /* background-size is relative to each section's OWN height (see
+     .page-section-bg-grid-color above), so the grid tile — and therefore
+     how "zoomed in" the pattern reads — naturally differs per section
+     purely because their heights differ, with no per-section tuning. The
+     #schedule and #components sections (both shorter than #recap) came out
+     reading more zoomed out than #recap, which was the one that actually
+     landed well — this bumps their tile size to match it, centered instead
+     of the base class's left-anchored tiling phase. */
+  #schedule .page-section-bg-grid-color,
+  #components .page-section-bg-grid-color {
+    background-size: auto 190%;
+    background-position: center 100%;
   }
 
   .page-section-bg-horizon {
@@ -401,6 +493,62 @@
       radial-gradient(circle at 82% 92%, rgba(253, 148, 4, 0.22), transparent 34%),
       radial-gradient(circle at 18% 88%, rgba(17, 142, 142, 0.32), transparent 38%),
       linear-gradient(155deg, #05060c 0%, #0b0c15 52%, #050608 100%);
+  }
+
+  /* Conference hero — two aerial/perspective textures stacked, both fading
+     out before the hero's bottom edge so they blend into the plain section
+     below rather than hard-cutting:
+     1. .conference-hero-road-bg (painted first, so it sits furthest back,
+        right above hero-brand-gradient's blooms) — the same road-network
+        art as the Hackathon hero, at its own tuned opacity (0.6) rather
+        than sharing Hackathon's .road-network-bg class, so the two heroes'
+        treatments can be adjusted independently.
+     2. .conference-hero-grid-bg (painted second, in front) — the "net color
+        bg" reference art (bundled as grid-color-bg.webp): a perspective
+        grid line-drawing already tinted in the brand palette
+        (blue/plum/orange/teal). Unlike the Hackathon hero's monochrome
+        road-network art, both of these layer ON TOP of hero-brand-
+        gradient's colorful blooms rather than replacing them — same
+        palette throughout, so it reads as one coordinated background
+        instead of competing textures. */
+  /* Covers the hero's top band fully, EXCEPT a dome-shaped cutout roughly
+     matching the grid-bg globe/dome silhouette in front of it (tuned by
+     eye against the rendered dome, not derived from the source art — it's
+     a sparse line drawing, not a filled shape, so there's no alpha mask to
+     sample directly) — two mask layers combined with intersect so only
+     pixels both "within the vertical band" AND "outside the ellipse" show:
+     road-network is visible across the top and around the dome's edges,
+     clean and absent specifically where the dome itself renders. */
+  .conference-hero-road-bg {
+    background-image: url("./assets/hero/road-network-bg.webp");
+    /* Not `cover`: at this element's aspect ratio, cover's required scale
+       leaves zero vertical crop slack (height lands exactly flush with the
+       container), so background-position's Y value had no room to do
+       anything — the image's own sparse top ~10% (see the alpha sampling
+       in the commit that introduced this) was unavoidably pinned right to
+       the hero's top edge, directly under the nav. Explicitly oversizing
+       the height creates slack, so background-position can actually shift
+       past that sparse band. */
+    background-size: auto 120%;
+    background-position: center 84%;
+    opacity: 0.6;
+    -webkit-mask-image:
+      linear-gradient(to bottom, black 0%, black 70%, transparent 92%),
+      radial-gradient(ellipse 62% 55% at 50% 58%, transparent 0%, transparent 65%, black 100%);
+    -webkit-mask-composite: source-over, source-in;
+    mask-image:
+      linear-gradient(to bottom, black 0%, black 70%, transparent 92%),
+      radial-gradient(ellipse 62% 55% at 50% 58%, transparent 0%, transparent 65%, black 100%);
+    mask-composite: intersect;
+  }
+
+  .conference-hero-grid-bg {
+    background-image: url("./assets/hero/grid-color-bg.webp");
+    background-size: cover;
+    background-position: top center;
+    opacity: 0.9;
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 92%);
+    mask-image: linear-gradient(to bottom, black 0%, black 55%, transparent 92%);
   }
 
   .program-hero::after,

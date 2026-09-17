@@ -102,64 +102,48 @@ export const PARTICIPANTS = [
   },
 ] as const;
 
+export type AgendaItem = {
+  time: string;
+  title: string;
+  desc?: string;
+  /** Sub-items shown as a bullet list under the title (e.g. what an opening ceremony bundles together). */
+  notes?: string[];
+  /** Shades the row and groups it visually with the other break/walk slots. */
+  isBreak?: boolean;
+};
+
 /**
- * Draft programme for the conference proper. Deliberately no speaker names —
- * the source table uses internal initials and several rows have no time yet.
+ * Full-day run-of-show for the conference proper, replacing the earlier
+ * draft outline. Source: internal programme table supplied 2026-09-17 —
+ * deliberately no speaker names, matching that table (it uses internal
+ * initials, not names meant for public display).
+ *
+ * One line from that source is intentionally NOT reproduced here: the
+ * "GATES Collaborations" row carried an editorial aside in red —
+ * "(Improve with appropriate general term)" — flagging that the title
+ * itself was a placeholder pending a better name. That's a note to the
+ * programme's own authors, not copy meant for this site, so only "GATES
+ * Collaborations" is kept; swap in whatever term they settle on.
  */
-export const AGENDA = [
-  { time: "8:00 AM", title: "Registration", desc: "" },
-  {
-    time: "8:30 AM",
-    title: "Opening ceremony",
-    desc: "National anthem, invocation, and acknowledgement of attendees.",
-  },
-  {
-    time: "8:45 AM",
-    title: "Opening and keynote messages",
-    desc: "DOST leadership on the Department's geospatial and AI direction.",
-  },
-  {
-    time: "9:20 AM",
-    title: "GATES Program updates",
-    desc: "Progress and milestones since the first stakeholder conference.",
-  },
-  {
-    time: "9:35 AM",
-    title: "DOST's data governance rationale",
-    desc: "Why governance underpins everything the Program builds.",
-  },
-  {
-    time: "10:00 AM",
-    title: "The GATES Lakehouse",
-    desc: "The infrastructure behind the Program's data, AI models, and visualisation.",
-  },
-  {
-    time: "10:30 AM",
-    title: "Use Case Development Showcase",
-    desc: "Partner agencies present the mature use cases they are co-developing with GATES.",
-  },
-  { time: "12:00 NN", title: "Lunch break", desc: "" },
-  {
-    time: "1:15 PM",
-    title: "Hackathon finalists' pitches",
-    desc: "Finalist teams pitch to the judging panel.",
-  },
-  {
-    time: "2:00 PM",
-    title: "GATES collaborations",
-    desc: "Development partners on joint work strengthening the GATES ecosystem.",
-  },
-  { time: "To be confirmed", title: "Awarding of hackathon winners", desc: "" },
-  {
-    time: "To be confirmed",
-    title: "Way forward",
-    desc: "What is coming next for the Program.",
-  },
-  {
-    time: "To be confirmed",
-    title: "Map Your Commitment",
-    desc: "Closing interactive activity mapping where stakeholders are joining from.",
-  },
+export const AGENDA: AgendaItem[] = [
+  { time: "8:00 – 8:30 AM", title: "Registration" },
+  { time: "8:30 – 8:40 AM", title: "Opening Ceremony & Ribbon Cutting of Geospatial Gallery" },
+  { time: "8:40 – 8:50 AM", title: "Opening Message" },
+  { time: "8:50 – 9:10 AM", title: "Keynote Message" },
+  { time: "9:10 – 9:30 AM", title: "Messages of Support" },
+  { time: "9:30 – 9:35 AM", title: "Photo Opportunity" },
+  { time: "9:40 – 10:00 AM", title: "Morning Break + Geospatial Gallery Walk", isBreak: true },
+  { time: "10:00 – 10:30 AM", title: "DOST's Data Governance Rationale" },
+  { time: "10:30 – 10:50 AM", title: "The GATES Data Lakehouse" },
+  { time: "10:50 AM – 12:00 NN", title: "Use Case Development Showcase" },
+  { time: "12:00 NN – 1:00 PM", title: "Lunch Break + Geospatial Gallery Walk", isBreak: true },
+  { time: "1:00 – 1:15 PM", title: "Energizer" },
+  { time: "1:15 – 2:00 PM", title: "GATES Collaborations" },
+  { time: "2:00 – 2:45 PM", title: "Hackathon Finalists' Pitches" },
+  { time: "2:45 – 3:00 PM", title: "Map Your Commitment" },
+  { time: "3:00 – 3:15 PM", title: "Awarding of Hackathon Winners" },
+  { time: "3:15 – 3:30 PM", title: "Closing Message" },
+  { time: "3:30 – 4:00 PM", title: "Afternoon Break, Networking, Geospatial Gallery Walk", isBreak: true },
 ];
 
 /* ------------------------------------------------------------------ *
@@ -167,7 +151,7 @@ export const AGENDA = [
  * ------------------------------------------------------------------ */
 
 export const RECAP_2025 = {
-  title: "The First Stakeholder Conference, 2025",
+  title: "1st GATES Program Stakeholder Conference 2025",
   dateLabel: "October 16, 2025",
   formatLabel: "Hybrid",
   theme: "#SpatialTogether",

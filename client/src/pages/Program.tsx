@@ -13,6 +13,7 @@ import {
 } from "../components/ui";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { DOST, GATES, SOCIALS } from "../data/org";
+import { CONFERENCE } from "../data/conference";
 
 /*
  * All copy on this page is drawn from the official "DOST GATES Program Briefer".
@@ -94,7 +95,7 @@ function SocialIcon({ platform }: { platform: string }) {
 
 export default function Program() {
   usePageMeta(
-    "About GATES — GATES Stakeholder Conference 2026",
+    `About GATES — ${CONFERENCE.edition}`,
     "The Geospatial Analytics and Technology Solutions (GATES) Program unifies DOST's geospatial data into one integrative, interoperable platform. Explore its objectives, innovation domains, and four component projects.",
   );
 

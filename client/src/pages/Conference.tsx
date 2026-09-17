@@ -2,9 +2,14 @@ import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import {
   Eyebrow,
+  IconCalendar,
+  IconClipboardCheck,
+  IconCode,
   IconDot,
+  IconMap,
+  IconPresentation,
   PageSection,
-  PhotoPlaceholder,
+  Photo,
   PrimaryButton,
   SecondaryButton,
   SectionHead,
@@ -13,6 +18,10 @@ import {
   TextLink,
   STICKY_OFFSET,
 } from "../components/ui";
+import recapKeynote from "../assets/photos/2025-keynote.jpg";
+import recapPlenarySession from "../assets/photos/2025-plenary-session.jpg";
+import recapOpenForum from "../assets/photos/2025-open-forum.jpg";
+import recapMappingSharedCommitment from "../assets/photos/2025-mapping-shared-commitment.jpg";
 import {
   AGENDA,
   COMPONENTS,
@@ -33,6 +42,15 @@ const SECTIONS = [
   { id: "recap", label: "2025 recap" },
 ];
 
+/* Keyed by title (from data/conference.ts's COMPONENTS) rather than baked
+   into the data file itself — icon choice is a UI concern, and keeping it
+   here means data/conference.ts stays free of JSX/component imports. */
+const componentIcons: Record<string, typeof IconMap> = {
+  "Geospatial Gallery": IconMap,
+  "Use Case Development Showcase": IconPresentation,
+  "GATES GeoHack 2026": IconCode,
+};
+
 const dotByColor = {
   blue: "bg-gates-blue",
   teal: "bg-gates-teal",
@@ -40,19 +58,22 @@ const dotByColor = {
   plum: "bg-gates-plum",
 } as const;
 
-const agendaColors = ["blue", "teal", "orange", "plum"] as const;
+/* Split at the lunch break (AGENDA[13]) — the last morning-programme row —
+   so the boundary moves with the data instead of a hardcoded index if the
+   programme changes again. */
+const AGENDA_LUNCH_INDEX = AGENDA.findIndex((item) => item.title === "Lunch Break + Geospatial Gallery Walk");
 const AGENDA_GROUPS = [
   {
     label: "Morning programme",
-    range: "8:00 AM–12:00 NN",
+    range: "8:00 AM–1:00 PM",
     color: "blue",
-    items: AGENDA.slice(0, 7).map((item, index) => ({ ...item, color: agendaColors[index % 4] })),
+    items: AGENDA.slice(0, AGENDA_LUNCH_INDEX + 1),
   },
   {
     label: "Afternoon programme",
-    range: "12:00 NN onwards",
+    range: "1:00 PM–4:00 PM",
     color: "orange",
-    items: AGENDA.slice(7).map((item, index) => ({ ...item, color: agendaColors[(index + 7) % 4] })),
+    items: AGENDA.slice(AGENDA_LUNCH_INDEX + 1),
   },
 ] as const;
 
@@ -76,17 +97,19 @@ export default function Conference() {
 
       {/* Hero */}
       <header className="conference-hero hero-brand-gradient relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
-        <div className="relative z-10 max-w-[900px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
+        <div className="conference-hero-road-bg absolute inset-0 z-0" aria-hidden="true" />
+        <div className="conference-hero-grid-bg absolute inset-0 z-0" aria-hidden="true" />
+        <div className="relative z-10 max-w-[900px] mx-auto py-14 sm:py-20 text-center flex flex-col items-center">
           <Eyebrow>
             {CONFERENCE.dateLabel} &middot; {CONFERENCE.venueLabel}
           </Eyebrow>
-          <h1 className="font-display text-[clamp(30px,5.8vw,66px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow">
-            GATES Program <span className="whitespace-nowrap">2nd Stakeholder</span> Conference
+          <h1 className="conference-hero-badge inline-flex items-center m-0 mt-3 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-white font-heading font-bold text-base sm:text-xl tracking-[0.01em]">
+            2<sup className="text-[0.65em] font-semibold">nd</sup>&nbsp;GATES Program Stakeholder Conference
           </h1>
-          <p className="font-heading text-xs font-bold tracking-[0.14em] uppercase text-white/60 m-0">
+          <p className="font-display text-[clamp(34px,6.4vw,72px)] font-extrabold m-0 mt-6 sm:mt-7 tracking-[0.01em] uppercase text-glow leading-[1.05]">
             {CONFERENCE.theme}
           </p>
-          <p className="text-[17px] sm:text-lg leading-[1.6] text-white/70 m-0 max-w-[700px]">
+          <p className="text-[17px] sm:text-lg leading-[1.6] text-white/70 m-0 mt-6 sm:mt-7 max-w-[700px]">
             The Program&apos;s second stakeholder conference moves from introducing GATES to showing how it is helping
             agencies and partners co-develop geospatial, data-driven solutions to real problems.
           </p>
@@ -94,7 +117,7 @@ export default function Conference() {
           <div
             role="group"
             aria-label="Countdown to the conference"
-            className="grid grid-cols-4 gap-2 sm:gap-3 mt-1 w-full max-w-[420px]"
+            className="grid grid-cols-4 gap-2 sm:gap-3 mt-9 sm:mt-10 w-full max-w-[420px]"
           >
             {countdown.map((item) => (
               <div key={item.label} className="glass-panel rounded-2xl px-2 sm:px-4 py-3.5 text-center">
@@ -106,7 +129,7 @@ export default function Conference() {
             ))}
           </div>
 
-          <div className="flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
+          <div className="flex flex-col min-[420px]:flex-row gap-3 mt-5 sm:mt-6 w-full min-[420px]:w-auto">
             <PrimaryButton to="/registration">Registration Info</PrimaryButton>
             <a
               href="#programme"
@@ -140,7 +163,7 @@ export default function Conference() {
       </PageSection>
 
       {/* Hackathon pre-event */}
-      <PageSection id="schedule" labelledBy="schedule-title">
+      <PageSection id="schedule" labelledBy="schedule-title" background="grid-color">
         <SectionHead
           eyebrow="HACKATHON PRE-EVENT"
           title="Building toward the conference"
@@ -149,7 +172,7 @@ export default function Conference() {
         />
         <div className="glass-panel glass-panel-strong max-w-[860px] mx-auto p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-5 sm:gap-7 sm:items-center">
           <div>
-            <IconDot color="orange" />
+            <IconClipboardCheck color="orange" />
             <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/45 mb-1">Pre-event</div>
             <h3 className="text-[19px] font-semibold mb-2">{CONFERENCE.hackathonDayLabel}</h3>
             <p className="text-sm leading-[1.6] text-white/62 m-0">
@@ -161,7 +184,7 @@ export default function Conference() {
             &rarr;
           </div>
           <div>
-            <IconDot color="blue" />
+            <IconCalendar color="blue" />
             <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/45 mb-1">Main event</div>
             <h3 className="text-[19px] font-semibold mb-2">{CONFERENCE.conferenceProperLabel}</h3>
             <p className="text-sm leading-[1.6] text-white/62 m-0">
@@ -202,13 +225,13 @@ export default function Conference() {
               </div>
 
               <ol className="list-none m-0 p-0 divide-y divide-white/8">
-                {group.items.map((item) => {
+                {group.items.map((item, itemIndex) => {
                   const pending = item.time === "To be confirmed";
                   return (
                     <li
-                      key={item.title}
+                      key={`${item.time}-${item.title}-${itemIndex}`}
                       className={`conference-programme-row grid grid-cols-[82px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)] gap-3 sm:gap-6 px-4 sm:px-6 py-4 ${
-                        item.title === "Lunch break" ? "bg-white/[0.025]" : ""
+                        item.isBreak ? "bg-white/[0.025]" : ""
                       }`}
                     >
                       <div>
@@ -225,7 +248,7 @@ export default function Conference() {
                       <div className="flex gap-3">
                         <span
                           aria-hidden="true"
-                          className={`shrink-0 w-2 h-2 rounded-full mt-[7px] ${dotByColor[item.color]}`}
+                          className={`shrink-0 w-2 h-2 rounded-full mt-[7px] ${dotByColor[group.color]}`}
                         />
                         <div>
                           <h4 className="text-[15px] sm:text-base font-semibold leading-snug text-white/88 m-0">
@@ -233,6 +256,13 @@ export default function Conference() {
                           </h4>
                           {item.desc && (
                             <p className="text-[13px] sm:text-sm leading-[1.55] text-white/57 m-0 mt-1">{item.desc}</p>
+                          )}
+                          {item.notes && (
+                            <ul className="text-[13px] sm:text-sm leading-[1.55] text-white/57 m-0 mt-1 pl-4 list-disc">
+                              {item.notes.map((note) => (
+                                <li key={note}>{note}</li>
+                              ))}
+                            </ul>
                           )}
                         </div>
                       </div>
@@ -246,12 +276,14 @@ export default function Conference() {
       </PageSection>
 
       {/* Major components */}
-      <PageSection id="components" labelledBy="components-title" width="wide">
+      <PageSection id="components" labelledBy="components-title" width="wide" background="grid-color">
         <SectionHead eyebrow="MAJOR COMPONENTS" title="Three things running alongside the programme" titleId="components-title" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {COMPONENTS.map((component) => (
+          {COMPONENTS.map((component) => {
+            const Icon = componentIcons[component.title] ?? IconDot;
+            return (
             <div key={component.title} className="glass-panel program-card p-6 sm:p-7 h-full flex flex-col gap-3">
-              <IconDot color={component.color} />
+              <Icon color={component.color} />
               <h3 className="text-[19px] font-semibold m-0">{component.title}</h3>
               <p className="text-sm leading-[1.6] text-white/62 m-0">{component.desc}</p>
               {"to" in component && component.to && (
@@ -260,7 +292,8 @@ export default function Conference() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </PageSection>
 
@@ -301,12 +334,12 @@ export default function Conference() {
       </PageSection>
 
       {/* 2025 recap */}
-      <PageSection id="recap" labelledBy="recap-title" width="wide">
+      <PageSection id="recap" labelledBy="recap-title" width="wide" background="grid-color">
         <SectionHead
           eyebrow="LOOKING BACK"
-          title="The First Stakeholder Conference, 2025"
+          title={RECAP_2025.title}
           titleId="recap-title"
-          intro={`${RECAP_2025.title} · ${RECAP_2025.dateLabel} · ${RECAP_2025.formatLabel} · ${RECAP_2025.theme}`}
+          intro={`${RECAP_2025.dateLabel} · ${RECAP_2025.formatLabel} · ${RECAP_2025.theme}`}
         />
 
         <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-3 mb-7">
@@ -315,11 +348,26 @@ export default function Conference() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 sm:grid-cols-4 gap-3.5 mb-7">
-          <PhotoPlaceholder label="photo: 2025 keynote" />
-          <PhotoPlaceholder label="photo: plenary session" />
-          <PhotoPlaceholder label="photo: open forum" />
-          <PhotoPlaceholder label="photo: mapping shared commitment" />
+        {/* Plenary session gets its own full-width row so it renders larger
+            than the other three, spanning the whole row alone instead of
+            sharing it. Its source file is itself a wide (~21:9) crop of the
+            crowd, so aspect matches that exactly rather than the other
+            three's aspect-[4/3] default — using 4/3 here would make object-cover
+            crop it a second time to fit, undoing the intentional crop. */}
+        <div className="flex flex-col gap-3.5 mb-7">
+          <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-3.5">
+            <Photo src={recapKeynote} alt="Keynote address at the 2025 GATES Stakeholder Conference" />
+            <Photo src={recapOpenForum} alt="Open forum at the 2025 GATES Stakeholder Conference" />
+            <Photo
+              src={recapMappingSharedCommitment}
+              alt="Attendees at the closing Mapping Shared Commitment activity, 2025 GATES Stakeholder Conference"
+            />
+          </div>
+          <Photo
+            src={recapPlenarySession}
+            alt="Plenary session at the 2025 GATES Stakeholder Conference"
+            aspect="aspect-[21/9]"
+          />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

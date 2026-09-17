@@ -71,6 +71,85 @@ export function IconPin({ color }: { color: DotColor }) {
   );
 }
 
+/** Solid-color rounded-square badge wrapping a 22px glyph — shared frame for the Icon* components below, so swapping which glyph a card uses is just swapping the child markup. Background is the full brand color (not a tint), so every glyph below is drawn in white with the brand color itself used only for the occasional accent/contrast line on top — the inverse of an earlier version (tinted background, colored glyph). */
+function IconBadge({ color, children }: { color: DotColor; children: ReactNode }) {
+  const c = dotColorVars[color];
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] mb-[14px]"
+      style={{ background: c }}
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24">{children}</svg>
+    </span>
+  );
+}
+
+/** Solid folded-map glyph — for the Geospatial Gallery component (maps built from DOST datasets). */
+export function IconMap({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <path d="M3 6.5 9 4l6 2.5 6-2.5v15l-6 2.5-6-2.5-6 2.5z" fill="white" />
+      <path d="M9 4v15M15 6.5V21" stroke={c} strokeWidth="1.4" strokeLinecap="round" opacity="0.75" />
+    </IconBadge>
+  );
+}
+
+/** Solid screen-with-a-chart glyph — for the Use Case Development Showcase component (partner agencies presenting to the room). */
+export function IconPresentation({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="3" y="4" width="18" height="12" rx="2" fill="white" />
+      <path d="M8 20h8M12 16v4" stroke="white" strokeWidth="1.75" strokeLinecap="round" fill="none" />
+      <path
+        d="M7 12.5 10 9l3 2.5 4-4.5"
+        stroke={c}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </IconBadge>
+  );
+}
+
+/** Solid code-brackets glyph — for the GATES GeoHack 2026 component (the hackathon build). */
+export function IconCode({ color }: { color: DotColor }) {
+  return (
+    <IconBadge color={color}>
+      <path d="M9.5 5.5 3.5 12l6 6.5 2-1.8L7.3 12l4.2-4.7z" fill="white" />
+      <path d="M14.5 5.5l6 6.5-6 6.5-2-1.8 4.2-4.7-4.2-4.7z" fill="white" />
+    </IconBadge>
+  );
+}
+
+/** Solid clipboard-check glyph — for the Hackathon pre-event card (final coaching and technical judging). */
+export function IconClipboardCheck({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="5" y="4" width="14" height="17" rx="2" fill="white" />
+      <rect x="9" y="2.5" width="6" height="3" rx="1" fill="white" />
+      <path d="M8.5 12.7 11 15.2l4.5-5" stroke={c} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </IconBadge>
+  );
+}
+
+/** Solid calendar glyph — for the Hackathon pre-event card's Main event slot (the conference day itself). */
+export function IconCalendar({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="3" y="5" width="18" height="16" rx="2" fill="white" />
+      <rect x="3" y="5" width="18" height="4.5" rx="2" fill={c} opacity="0.18" />
+      <path d="M7.5 3v4M16.5 3v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="14.5" r="2.2" fill={c} />
+    </IconBadge>
+  );
+}
+
 export function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`glass-panel p-6 sm:p-7 ${className}`}>{children}</div>;
 }
@@ -80,6 +159,15 @@ export function PhotoPlaceholder({ label }: { label: string }) {
     <div className="photo-placeholder aspect-[4/3] rounded-2xl border border-white/12 flex items-center justify-center font-mono text-[11px] text-white/40 text-center p-1.5">
       {label}
       {/* TODO: replace with a real photo from client/src/assets/photos/ (see ASSETS.md) */}
+    </div>
+  );
+}
+
+/** Real recap photo — same frame as PhotoPlaceholder, once the actual image exists. Defaults to its aspect ratio; pass `aspect` when a source image was cropped to a different one (e.g. a wide banner crop) so object-cover doesn't crop it a second time to fit. */
+export function Photo({ src, alt, aspect = "aspect-[4/3]" }: { src: string; alt: string; aspect?: string }) {
+  return (
+    <div className={`${aspect} rounded-2xl border border-white/12 overflow-hidden`}>
+      <img src={src} alt={alt} className="w-full h-full object-cover" />
     </div>
   );
 }

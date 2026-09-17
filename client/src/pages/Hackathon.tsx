@@ -36,6 +36,7 @@ import {
 } from "../data/hackathon";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { submitHackathonEntry } from "../lib/api";
+import { CONFERENCE } from "../data/conference";
 import handLeft from "../assets/hero/hand-left.webp";
 import handRight from "../assets/hero/hand-right.webp";
 import keyboard from "../assets/hero/keyboard.webp";
@@ -250,7 +251,7 @@ export default function Hackathon() {
           </p>
           <p className="text-[17px] sm:text-lg leading-[1.6] text-white/70 m-0 max-w-[680px]">
             Build geospatial solutions on the GATES Lakehouse that fix real operational pain points across the DOST
-            system &mdash; then pitch them at the 2nd Stakeholder Conference.
+            system &mdash; then pitch them at the {CONFERENCE.edition}.
           </p>
 
           {/* Hands flank the keyboard art — a relative wrapper, in-flow like

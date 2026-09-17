@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import gatesVerticalLogo from "../assets/logos/gates-lockup-vertical.webp";
+import recapKeynote from "../assets/photos/2025-keynote.jpg";
 import {
   Eyebrow,
   IconDot,
@@ -85,7 +86,7 @@ export default function Home() {
             November 10, 2026 &middot; {CONFERENCE.venueLabel}
           </Eyebrow>
           <h1 className="font-display text-[clamp(30px,6.6vw,78px)] font-extrabold leading-[0.98] m-0 tracking-[0.01em] uppercase text-glow">
-            GATES Program <span className="whitespace-nowrap">2nd Stakeholder</span> Conference
+            <span className="whitespace-nowrap">2nd GATES</span> Program Stakeholder Conference
           </h1>
           <p className="font-heading text-xs font-bold tracking-[0.14em] uppercase text-white/60 m-0">
             {CONFERENCE.theme}
@@ -230,13 +231,16 @@ export default function Home() {
       <PageSection labelledBy="recap-title" width="wide">
         <SectionHead
           eyebrow="LOOKING BACK"
-          title="The First Stakeholder Conference, 2025"
+          title={RECAP_2025.title}
           titleId="recap-title"
           intro={`October 16, 2025 · ${RECAP_2025.formatLabel} · ${RECAP_2025.theme}`}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-4 items-stretch">
-          <div className="home-recap-feature hero-brand-gradient glass-panel relative overflow-hidden p-6 sm:p-9 flex flex-col justify-end min-h-[280px] sm:min-h-[300px]">
+          <div
+            className="home-recap-feature glass-panel relative overflow-hidden p-6 sm:p-9 flex flex-col justify-end min-h-[280px] sm:min-h-[300px] bg-[#08090b] bg-cover bg-center"
+            style={{ backgroundImage: `url(${recapKeynote})` }}
+          >
             <div className="relative z-10">
               <Eyebrow>2025 CONFERENCE THEME</Eyebrow>
               <div className="font-display text-[clamp(22px,3.1vw,42px)] font-extrabold uppercase leading-none tracking-[-0.025em] whitespace-nowrap text-glow mt-3">

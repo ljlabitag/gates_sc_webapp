@@ -7,8 +7,8 @@ import { usePageMeta } from "../hooks/usePageMeta";
 
 export default function Registration() {
   usePageMeta(
-    "Register — GATES Stakeholder Conference 2026",
-    "Attendance at the GATES Stakeholder Conference is by invitation. Invited agencies and offices receive a registration code in September.",
+    `Register — ${CONFERENCE.edition}`,
+    `Attendance at the ${CONFERENCE.edition} is by invitation. Invited agencies and offices receive a registration code in September.`,
   );
 
   return (
@@ -22,7 +22,7 @@ export default function Registration() {
             Register to Attend
           </h1>
           <p className="text-base sm:text-[17px] leading-[1.6] text-white/65 m-0">
-            Reserve your seat at the GATES Stakeholder Conference.
+            Reserve your seat at the {CONFERENCE.edition}.
           </p>
         </div>
       </header>
