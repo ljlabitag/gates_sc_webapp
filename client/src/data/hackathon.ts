@@ -28,11 +28,14 @@
  */
 
 // Anchored to +08:00 explicitly, same reasoning as conference.ts's
-// CONFERENCE_DATE — used to order the Home page's "what's coming up" list
-// against the current date, not just for display.
+// CONFERENCE_DATE — used by Home's "what's coming up" list and the
+// Hackathon page's own "what's next" CTA to order/pick against the current
+// date, not just for display. Date-only (no time given in the mechanics
+// doc) except the submission deadline, which has a real cutoff time.
 export const SUBMISSION_DEADLINE_DATE = new Date("2026-09-20T23:59:00+08:00");
-/** No time of day given in the mechanics doc for this one — date-only. */
 export const FINALISTS_ANNOUNCED_DATE = new Date("2026-09-25T00:00:00+08:00");
+export const FINAL_LIST_LOCKED_DATE = new Date("2026-09-30T00:00:00+08:00");
+export const ORIENTATION_DATE = new Date("2026-10-07T00:00:00+08:00");
 
 export const HACKATHON = {
   name: "GATES GeoHack 2026",

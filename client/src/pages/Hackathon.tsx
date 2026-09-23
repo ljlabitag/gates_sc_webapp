@@ -19,10 +19,13 @@ import {
   DATA_RULES,
   DOMAINS,
   ELIGIBLE,
+  FINALISTS_ANNOUNCED_DATE,
+  FINAL_LIST_LOCKED_DATE,
   GENERAL_RULES,
   HACKATHON,
   IP_RULES,
   OBJECTIVE,
+  ORIENTATION_DATE,
   PARTICIPANT_COSTS,
   PHASES,
   PRIZES,
@@ -30,13 +33,14 @@ import {
   PROPOSAL_SECTIONS,
   RESOURCES,
   RUBRICS,
+  SUBMISSION_DEADLINE_DATE,
   SUB_OBJECTIVES,
   TEAM_RULES,
   TIMELINE,
 } from "../data/hackathon";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { submitHackathonEntry } from "../lib/api";
-import { CONFERENCE } from "../data/conference";
+import { CONFERENCE, CONFERENCE_DATE, HACKATHON_DAY_DATE } from "../data/conference";
 import handLeft from "../assets/hero/hand-left.webp";
 import handRight from "../assets/hero/hand-right.webp";
 import keyboard from "../assets/hero/keyboard.webp";
@@ -157,10 +161,74 @@ const EMPTY_FORM = {
   members: "",
 };
 
+/** "September 25, 2026" -> "Sep 25" — same abbreviation the hero fact tiles already use, generalized past just September since NEXT_MILESTONES spans August through November. */
+function abbreviateDate(label: string): string {
+  return label
+    .replace(", 2026", "")
+    .replace("September", "Sep")
+    .replace("October", "Oct")
+    .replace("November", "Nov")
+    .replace("August", "Aug");
+}
+
+/**
+ * Every checkpoint after the submission deadline that's worth surfacing as
+ * "what's next" (hero stat tile, bottom CTA, closed-submissions panel —
+ * see `nextMilestone` in the component below), each anchored to a real
+ * Date so those spots advance on their own as the hackathon proceeds —
+ * announcement, then confirmation lock, then orientation, then the
+ * hackathon day, then the conference itself — instead of needing a manual
+ * edit every time one date passes (which is what prompted this: it used to
+ * be hardcoded to "Finalists announced" forever, even after that date).
+ * Mirrors data/conference.ts's TIMELINE, just reduced to single-point
+ * dates and phrased for a one-line "next up" display rather than a full
+ * schedule.
+ */
+const NEXT_MILESTONES = [
+  {
+    when: FINALISTS_ANNOUNCED_DATE,
+    label: "Finalists announced",
+    dateLabel: HACKATHON.finalistsAnnouncedLabel,
+  },
+  {
+    when: FINAL_LIST_LOCKED_DATE,
+    label: "Final list locked",
+    dateLabel: "September 30, 2026",
+  },
+  {
+    when: ORIENTATION_DATE,
+    label: "Orientation and capacity building",
+    dateLabel: "October 7, 2026",
+  },
+  {
+    when: HACKATHON_DAY_DATE,
+    label: "Final coaching and technical judging",
+    dateLabel: CONFERENCE.hackathonDayLabel.replace(/^\w+, /, ""),
+  },
+  {
+    when: CONFERENCE_DATE,
+    label: "Final pitches, judging, and awarding",
+    dateLabel: CONFERENCE.conferenceProperLabel.replace(/^\w+, /, ""),
+  },
+] as const;
+
 export default function Hackathon() {
+  // Recomputed on every render (like Home's own MILESTONES filter) rather
+  // than once at module load, so this flips over to "closed" copy the
+  // moment a visitor's clock crosses the deadline without needing a
+  // deploy — nothing here needs second-level precision, just per-visit
+  // freshness.
+  const submissionsClosed = Date.now() >= SUBMISSION_DEADLINE_DATE.getTime();
+  // Same idea, one step further: whichever NEXT_MILESTONES entry hasn't
+  // happened yet. Falls back to the last one (the conference itself) once
+  // everything has passed, so this never has nothing to show.
+  const nextMilestone = NEXT_MILESTONES.find((m) => m.when.getTime() >= Date.now()) ?? NEXT_MILESTONES[NEXT_MILESTONES.length - 1];
+
   usePageMeta(
     `${HACKATHON.name} — Official Mechanics`,
-    `${HACKATHON.name}: build geospatial solutions on the GATES Lakehouse. Proposals are due by ${HACKATHON.submissionDeadlineLabel}. Open to DOST attached agencies, regional offices, PSTOs, and DOST-SEI scholars.`,
+    submissionsClosed
+      ? `${HACKATHON.name}: proposal submissions are closed. Next up: ${nextMilestone.label}, ${nextMilestone.dateLabel}, ahead of the ${CONFERENCE.edition}.`
+      : `${HACKATHON.name}: build geospatial solutions on the GATES Lakehouse. Proposals are due by ${HACKATHON.submissionDeadlineLabel}. Open to DOST attached agencies, regional offices, PSTOs, and DOST-SEI scholars.`,
   );
 
   // Split "11:59 PM on September 20, 2026" so the CTA banner below can force
@@ -242,7 +310,15 @@ export default function Hackathon() {
       <header className="hackathon-hero hackathon-hero-bg relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
         <div className="road-network-bg absolute inset-0 z-0" aria-hidden="true" />
         <div className="relative z-10 max-w-[880px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
-          <Eyebrow>AUGUST 24&ndash;NOVEMBER 10, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
+          {/* callForParticipantsLabel drives the start date directly (this
+              used to be hand-typed as "August 24", which had drifted from
+              the data file's real "August 27" — see hackathon.ts's own
+              header comment on that slip). Phase label flips to closed once
+              past SUBMISSION_DEADLINE_DATE. */}
+          <Eyebrow>
+            {HACKATHON.callForParticipantsLabel.replace(", 2026", "").toUpperCase()}&ndash;NOVEMBER 10, 2026 &middot;{" "}
+            {submissionsClosed ? "SUBMISSIONS CLOSED" : "OPEN CALL TO FINALS"}
+          </Eyebrow>
           <h1 className="font-display text-[clamp(34px,5.6vw,62px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow-orange">
             {HACKATHON.name}
           </h1>
@@ -296,7 +372,9 @@ export default function Hackathon() {
                 value: HACKATHON.callForParticipantsLabel.replace("August", "Aug").replace(", 2026", ""),
                 label: "Call opens",
               },
-              { value: HACKATHON.submissionDeadlineShort.replace("September", "Sep"), label: "Proposals due · 11:59 PM" },
+              submissionsClosed
+                ? { value: abbreviateDate(nextMilestone.dateLabel), label: nextMilestone.label }
+                : { value: HACKATHON.submissionDeadlineShort.replace("September", "Sep"), label: "Proposals due · 11:59 PM" },
               { value: `${HACKATHON.maxFinalistTeams}`, label: "Finalist teams" },
               { value: `${HACKATHON.teamSize}`, label: "Members per team" },
             ].map((fact) => (
@@ -321,7 +399,7 @@ export default function Hackathon() {
               href="#submit"
               className="btn-hackathon px-[26px] py-3.5 rounded-full text-white font-bold text-[15px] no-underline text-center"
             >
-              Submit a Proposal
+              {submissionsClosed ? "Submission Status" : "Submit a Proposal"}
             </a>
             <PrimaryButton to="/conference">See the Conference</PrimaryButton>
           </div>
@@ -693,10 +771,14 @@ export default function Hackathon() {
       {/* Submission */}
       <PageSection id="submit" labelledBy="submit-title" width="wide" background="road-network">
         <SectionHead
-          eyebrow="SUBMIT YOUR PROPOSAL"
-          title="One proposal per team"
+          eyebrow={submissionsClosed ? "SUBMISSIONS CLOSED" : "SUBMIT YOUR PROPOSAL"}
+          title={submissionsClosed ? "The submission window has closed" : "One proposal per team"}
           titleId="submit-title"
-          intro={`Submit by ${HACKATHON.submissionDeadlineLabel}. Proposals must be PDF files of no more than ${HACKATHON.proposalMaxPages} pages and under ${HACKATHON.proposalMaxSizeMB}MB.`}
+          intro={
+            submissionsClosed
+              ? `Submissions closed at ${HACKATHON.submissionDeadlineLabel}. Next up: ${nextMilestone.label}, ${nextMilestone.dateLabel}.`
+              : `Submit by ${HACKATHON.submissionDeadlineLabel}. Proposals must be PDF files of no more than ${HACKATHON.proposalMaxPages} pages and under ${HACKATHON.proposalMaxSizeMB}MB.`
+          }
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
@@ -719,13 +801,15 @@ export default function Hackathon() {
                 </li>
               ))}
             </ol>
-            <a
-              href="/templates/GATESGeoHack2026_Proposal_Template.docx"
-              download
-              className="btn-hackathon inline-flex w-full sm:w-auto justify-center px-[22px] py-3 rounded-full text-white font-semibold text-sm text-center no-underline mt-6"
-            >
-              &#8595; Download proposal template (.docx)
-            </a>
+            {!submissionsClosed && (
+              <a
+                href="/templates/GATESGeoHack2026_Proposal_Template.docx"
+                download
+                className="btn-hackathon inline-flex w-full sm:w-auto justify-center px-[22px] py-3 rounded-full text-white font-semibold text-sm text-center no-underline mt-6"
+              >
+                &#8595; Download proposal template (.docx)
+              </a>
+            )}
           </div>
 
           {/* Form */}
@@ -741,6 +825,18 @@ export default function Hackathon() {
                 <p className="text-[13px] leading-[1.6] text-white/50 m-0 mt-1">
                   If your agency endorsement isn&apos;t in progress yet, start it now &mdash; finalists need it to
                   confirm by September 29.
+                </p>
+                <div className="mt-1.5">
+                  <TextLink to="/conference">See the conference programme &rarr;</TextLink>
+                </div>
+              </div>
+            ) : submissionsClosed ? (
+              <div className="glass-panel p-6 sm:p-10 flex flex-col gap-2.5 items-start">
+                <IconPin color="orange" />
+                <h3 className="text-xl font-semibold m-0">Submissions are closed.</h3>
+                <p className="text-sm leading-[1.6] text-white/62 m-0">
+                  The proposal window closed at {deadlineTime} on {deadlineDate}. Next up: {nextMilestone.label},{" "}
+                  {nextMilestone.dateLabel}.
                 </p>
                 <div className="mt-1.5">
                   <TextLink to="/conference">See the conference programme &rarr;</TextLink>
@@ -1003,18 +1099,37 @@ export default function Hackathon() {
         style={{ scrollMarginTop: `${STICKY_OFFSET}px` }}
         className="hero-brand-gradient glass-panel relative overflow-hidden max-w-[1000px] mx-5 sm:mx-8 lg:mx-auto my-10 sm:my-16 px-6 sm:px-10 py-10 sm:py-14 text-center flex flex-col gap-[18px] items-center"
       >
-        <Eyebrow>SUBMISSION DEADLINE</Eyebrow>
+        <Eyebrow>{submissionsClosed ? "WHAT'S NEXT" : "SUBMISSION DEADLINE"}</Eyebrow>
         <h2 className="text-[clamp(24px,3vw,34px)] font-bold m-0 tracking-tight">
-          Proposal submissions close at {deadlineTime} on
-          <br />
-          {deadlineDate}
+          {submissionsClosed ? (
+            <>
+              {nextMilestone.label}
+              <br />
+              {nextMilestone.dateLabel}
+            </>
+          ) : (
+            <>
+              Proposal submissions close at {deadlineTime} on
+              <br />
+              {deadlineDate}
+            </>
+          )}
         </h2>
-        <a
-          href="#submit"
-          className="btn-hackathon w-full min-[420px]:w-auto px-[26px] py-3.5 rounded-full text-white font-bold text-[15px] text-center no-underline"
-        >
-          Submit a Proposal
-        </a>
+        {submissionsClosed ? (
+          <Link
+            to="/conference"
+            className="btn-hackathon w-full min-[420px]:w-auto px-[26px] py-3.5 rounded-full text-white font-bold text-[15px] text-center no-underline"
+          >
+            See the Conference
+          </Link>
+        ) : (
+          <a
+            href="#submit"
+            className="btn-hackathon w-full min-[420px]:w-auto px-[26px] py-3.5 rounded-full text-white font-bold text-[15px] text-center no-underline"
+          >
+            Submit a Proposal
+          </a>
+        )}
       </section>
 
       <Footer />
