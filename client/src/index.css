@@ -276,17 +276,6 @@
     );
   }
 
-  /* Blue-tinted perspective grid floor behind the Home hero. */
-  .grid-floor {
-    background-image:
-      linear-gradient(rgba(111, 116, 255, 0.28) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(111, 116, 255, 0.28) 1px, transparent 1px);
-    background-size: 44px 44px;
-    transform: perspective(420px) rotateX(58deg);
-    transform-origin: bottom;
-    -webkit-mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-    mask-image: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
-  }
 
   /* Aerial road-network line art behind the Hackathon hero — reference art in
      src/assets/hero/, this is the actual bundled copy (renamed, no spaces, so
@@ -525,6 +514,30 @@
       radial-gradient(circle at 82% 92%, rgba(253, 148, 4, 0.22), transparent 34%),
       radial-gradient(circle at 18% 88%, rgba(17, 142, 142, 0.32), transparent 38%),
       linear-gradient(155deg, #05060c 0%, #0b0c15 52%, #050608 100%);
+  }
+
+  /* Home hero carousel — its two slides (Conference- and Hackathon-style
+     hero content, see Home.tsx) are `absolute inset-0`, so they don't
+     contribute to this wrapper's height on their own; it needs an explicit
+     height to lay out against. Values below are each breakpoint's measured
+     taller-of-the-two-slides content height (the Hackathon slide, once its
+     hands/keyboard art shows at lg), plus room for the dot/arrow controls
+     (also absolutely positioned, pinned near the bottom — see Home.tsx) so
+     they never sit flush against a slide's own CTA row. */
+  .home-hero-slides {
+    min-height: 830px;
+  }
+
+  @media (min-width: 640px) {
+    .home-hero-slides {
+      min-height: 630px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-hero-slides {
+      min-height: 740px;
+    }
   }
 
   /* Same colour blooms as .hero-brand-gradient, without its baked-in dark
@@ -846,8 +859,14 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
+    /* Much stronger/taller than a typical bottom scrim — the open-forum
+       photo's paper/brochure area is bright cream, not dark like the
+       previous keynote-stage shot, and the text block (eyebrow + a large
+       display heading + a full paragraph) covers most of the card's height,
+       not just a thin strip at the bottom. Darkens the bottom ~85% at high
+       opacity; only the top ~15% is left to show the photo clearly. */
     background:
-      linear-gradient(to top, rgba(5, 6, 12, 0.5), transparent 60%),
+      linear-gradient(to top, rgba(5, 6, 12, 0.92), rgba(5, 6, 12, 0.75) 55%, rgba(5, 6, 12, 0.15) 85%, transparent),
       linear-gradient(120deg, transparent 28%, rgba(255, 255, 255, 0.05) 50%, transparent 72%);
   }
 
@@ -904,10 +923,6 @@
       transform: none;
     }
 
-    .orb {
-      animation: none;
-    }
-
     .home-program-mark {
       transition: none;
     }
@@ -928,52 +943,6 @@
     }
   }
 
-  .orb {
-    position: absolute;
-    border-radius: 9999px;
-  }
-  .orb-1 {
-    top: -160px;
-    left: -100px;
-    width: 520px;
-    height: 520px;
-    background: var(--color-gates-blue);
-    filter: blur(110px);
-    opacity: 0.6;
-    animation: orbFloat 16s ease-in-out infinite;
-  }
-  .orb-2 {
-    bottom: -160px;
-    right: -140px;
-    width: 560px;
-    height: 560px;
-    background: var(--color-gates-plum);
-    filter: blur(120px);
-    opacity: 0.5;
-    animation: orbFloat2 18s ease-in-out infinite;
-  }
-  .orb-3 {
-    bottom: -120px;
-    left: 30%;
-    width: 380px;
-    height: 380px;
-    background: var(--color-gates-orange);
-    filter: blur(130px);
-    opacity: 0.28;
-    animation: orbFloat 20s ease-in-out infinite;
-  }
-}
-
-@keyframes orbFloat {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(30px, -24px) scale(1.06);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
 }
 
 @keyframes brandBorderOrbit {
@@ -982,14 +951,3 @@
   }
 }
 
-@keyframes orbFloat2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-24px, 20px) scale(1.08);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}

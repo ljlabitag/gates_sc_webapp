@@ -26,6 +26,16 @@
 /** Conference proper, used for the countdown. */
 export const CONFERENCE_DATE = new Date("2026-11-10T09:00:00+08:00");
 
+/**
+ * Hackathon final coaching and technical judging day — used only to order
+ * this pair of dates against the other Home-page milestones (see
+ * data/hackathon.ts's own milestone Dates); no source document gives this
+ * day's own start time the way the conference proper's agenda does, so 9 AM
+ * is a placeholder matching the conference day's own start, not a confirmed
+ * call time.
+ */
+export const HACKATHON_DAY_DATE = new Date("2026-11-09T09:00:00+08:00");
+
 export const CONFERENCE = {
   edition: "2nd GATES Program Stakeholder Conference",
   dateLabel: "November 10, 2026",

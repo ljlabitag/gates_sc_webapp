@@ -150,6 +150,19 @@ export function IconCalendar({ color }: { color: DotColor }) {
   );
 }
 
+/**
+ * Icon per COMPONENTS entry (data/conference.ts), keyed by title rather than
+ * baked into the data file itself — icon choice is a UI concern, and keeping
+ * it here means data/conference.ts stays free of JSX/component imports.
+ * Shared by every page that renders the component-projects list (Conference,
+ * Home), so the same badge always represents the same component.
+ */
+export const componentIcons: Record<string, typeof IconMap> = {
+  "Geospatial Gallery": IconMap,
+  "Use Case Development Showcase": IconPresentation,
+  "GATES GeoHack 2026": IconCode,
+};
+
 /** Solid heart glyph with a pulse-line accent — for the Human Well-being strategic goal. */
 export function IconHeart({ color }: { color: DotColor }) {
   const c = dotColorVars[color];

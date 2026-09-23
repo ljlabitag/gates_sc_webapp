@@ -1,13 +1,11 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import {
+  componentIcons,
   Eyebrow,
   IconCalendar,
   IconClipboardCheck,
-  IconCode,
   IconDot,
-  IconMap,
-  IconPresentation,
   PageSection,
   Photo,
   PrimaryButton,
@@ -41,15 +39,6 @@ const SECTIONS = [
   { id: "attending", label: "Who attends" },
   { id: "recap", label: "2025 recap" },
 ];
-
-/* Keyed by title (from data/conference.ts's COMPONENTS) rather than baked
-   into the data file itself — icon choice is a UI concern, and keeping it
-   here means data/conference.ts stays free of JSX/component imports. */
-const componentIcons: Record<string, typeof IconMap> = {
-  "Geospatial Gallery": IconMap,
-  "Use Case Development Showcase": IconPresentation,
-  "GATES GeoHack 2026": IconCode,
-};
 
 const dotByColor = {
   blue: "bg-gates-blue",

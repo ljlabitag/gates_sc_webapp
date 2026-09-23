@@ -27,6 +27,13 @@
  * again before launch.
  */
 
+// Anchored to +08:00 explicitly, same reasoning as conference.ts's
+// CONFERENCE_DATE — used to order the Home page's "what's coming up" list
+// against the current date, not just for display.
+export const SUBMISSION_DEADLINE_DATE = new Date("2026-09-20T23:59:00+08:00");
+/** No time of day given in the mechanics doc for this one — date-only. */
+export const FINALISTS_ANNOUNCED_DATE = new Date("2026-09-25T00:00:00+08:00");
+
 export const HACKATHON = {
   name: "GATES GeoHack 2026",
   /** Confirmed — matches the mechanics document's own title. */
