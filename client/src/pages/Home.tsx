@@ -120,19 +120,28 @@ function ConferenceHeroSlide({
       <div className="hero-brand-gradient absolute inset-0" aria-hidden="true" />
       <div className="conference-hero-road-bg absolute inset-0 z-0" aria-hidden="true" />
       <div className="conference-hero-grid-bg absolute inset-0 z-0" aria-hidden="true" />
-      <div className="relative z-10 max-w-[900px] mx-auto px-5 sm:px-8 py-10 sm:py-14 text-center flex flex-col items-center">
-        <Eyebrow>
-          {CONFERENCE.dateLabel} &middot; {CONFERENCE.venueLabel}
-        </Eyebrow>
-        <h2 className="conference-hero-badge inline-flex items-center m-0 mt-3 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-white font-heading font-bold text-base sm:text-xl tracking-[0.01em]">
+      {/* w-full: this div's parent (the slide wrapper above) is itself a
+          flex row centering its content, so without an explicit width this
+          child would shrink-to-fit its content instead of filling out to
+          max-w-1150 — collapsing the @container query context to a few px
+          and, with it, the cqw-sized theme text below. */}
+      <div className="relative z-10 w-full max-w-[1150px] mx-auto px-5 sm:px-8 py-10 sm:py-14 text-center flex flex-col items-center @container">
+        <h2 className="conference-hero-badge inline-flex items-center m-0 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-white font-heading font-bold text-base sm:text-xl tracking-[0.01em]">
           2<sup className="text-[0.65em] font-semibold">nd</sup>&nbsp;GATES Program Stakeholder Conference
         </h2>
-        <p className="font-display text-[clamp(30px,5.6vw,60px)] font-extrabold m-0 mt-6 sm:mt-7 tracking-[0.01em] uppercase text-glow leading-[1.05]">
+        {/* Same cqw approach as Conference.tsx's own hero (see that file for
+            the full reasoning) — vw-based sizing outgrew this slide's own
+            column before the viewport did, same bug, same fix. */}
+        <p className="font-display text-[clamp(19px,6.3cqw,60px)] font-extrabold m-0 mt-6 sm:mt-7 tracking-[0.01em] uppercase text-glow leading-[1.05] whitespace-nowrap">
           {CONFERENCE.theme}
         </p>
-        <p className="text-[16px] sm:text-lg leading-[1.6] text-white/70 m-0 mt-5 sm:mt-6 max-w-[640px]">
-          Keynotes, use case showcases, and the first GATES GeoHack 2026 &mdash; bringing the geospatial data
-          community together to co-develop what comes next.
+        <div className="mt-5 sm:mt-6 font-mono text-xs sm:text-sm leading-relaxed tracking-[0.1em] sm:tracking-[0.12em] text-white/65">
+          {CONFERENCE.dateLabel} &middot; {CONFERENCE.venueLabel}
+        </div>
+        <p className="text-[16px] sm:text-lg leading-[1.6] text-white/70 m-0 mt-3 sm:mt-4 max-w-[640px]">
+          The {CONFERENCE.edition} brings together stakeholders from DOST attached agencies and regional offices,
+          national government agencies, and development partners to learn about the latest developments of the
+          GATES Program and engage stakeholders in charting its next phase.
         </p>
 
         <div
@@ -179,7 +188,10 @@ function HackathonHeroSlide({ active }: { active: boolean }) {
     >
       <div className="hackathon-hero-bg absolute inset-0" aria-hidden="true" />
       <div className="road-network-bg absolute inset-0 z-0" aria-hidden="true" />
-      <div className="relative z-10 max-w-[880px] mx-auto px-5 sm:px-8 py-10 sm:py-14 text-center flex flex-col gap-[18px] items-center">
+      {/* w-full for the same reason as ConferenceHeroSlide's own content div
+          — the slide wrapper is a flex row, so this would otherwise shrink
+          to its content instead of filling out to max-w-880. */}
+      <div className="relative z-10 w-full max-w-[880px] mx-auto px-5 sm:px-8 py-10 sm:py-14 text-center flex flex-col gap-[18px] items-center">
         <Eyebrow>AUGUST 24&ndash;NOVEMBER 10, 2026 &middot; OPEN CALL TO FINALS</Eyebrow>
         <h2 className="font-display text-[clamp(30px,5vw,54px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow-orange">
           {HACKATHON.name}

@@ -398,14 +398,21 @@
   /* background-size is relative to each section's OWN height (see
      .page-section-bg-grid-color above), so the grid tile — and therefore
      how "zoomed in" the pattern reads — naturally differs per section
-     purely because their heights differ, with no per-section tuning. The
-     #schedule and #components sections (both shorter than #recap) came out
-     reading more zoomed out than #recap, which was the one that actually
-     landed well — this bumps their tile size to match it, centered instead
-     of the base class's left-anchored tiling phase. */
-  #schedule .page-section-bg-grid-color,
-  #components .page-section-bg-grid-color {
+     purely because their heights differ, with no per-section tuning.
+     #schedule (short) came out reading more zoomed out than #recap, which
+     was the one that actually landed well — this bumps its tile size to
+     match, centered instead of the base class's left-anchored tiling
+     phase. #components used to need this too, back when it (not
+     #programme) carried the grid-color background. */
+  #schedule .page-section-bg-grid-color {
     background-size: auto 190%;
+    background-position: center 100%;
+  }
+
+  /* Same horizontal re-centering as #schedule above, without the extra
+     zoom — #programme is tall enough that the base 160% tile size already
+     reads fine, it just needed to stop starting from the left edge. */
+  #programme .page-section-bg-grid-color {
     background-position: center 100%;
   }
 
@@ -714,6 +721,31 @@
     content: "";
     position: absolute;
     inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(
+      180deg,
+      var(--color-gates-blue),
+      var(--color-gates-plum) 34%,
+      var(--color-gates-teal) 68%,
+      var(--color-gates-orange)
+    );
+    box-shadow: 0 0 18px rgba(152, 64, 119, 0.5);
+  }
+
+  /* Same treatment as .conference-about-lead, mirrored to the right edge
+     for the "About the theme" card sitting next to/below it. */
+  .conference-theme-card {
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      inset -18px 0 42px rgba(152, 64, 119, 0.06),
+      0 18px 54px rgba(0, 0, 0, 0.16);
+  }
+
+  .conference-theme-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 0 auto;
     width: 3px;
     background: linear-gradient(
       180deg,

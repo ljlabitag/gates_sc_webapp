@@ -16,9 +16,8 @@ const linkInactive = "text-white/62 bg-transparent border-transparent hover:text
 export default function Nav() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // id="top" is the target for the footer's "Back to top" link.
   return (
-    <nav id="top" className="sticky top-0 z-50 glass-nav border-b border-white/8">
+    <nav className="sticky top-0 z-50 glass-nav border-b border-white/8">
       <div className="flex items-center justify-between gap-3 sm:gap-6 px-5 sm:px-8 py-3.5">
         <Link to="/" className="font-sans font-bold text-[19px] tracking-wide text-white/96 no-underline">
           <img src={gatesLogo} alt="GATES" className="h-10 w-auto" />
