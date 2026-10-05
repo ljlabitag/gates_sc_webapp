@@ -16,6 +16,9 @@ export type Env = {
   PRIVACY_NOTICE_VERSION: string;
   BREVO_API_KEY: string;
   MAIL_FROM: string;
+  // Public origin of this deployment, no trailing slash. Emails can't use
+  // relative URLs, so images in them (banner, QR code) are built from this.
+  SITE_URL: string;
   // Optional: sendSecretariatNotification skips (and logs) rather than
   // throwing when this isn't set.
   SECRETARIAT_EMAIL?: string;

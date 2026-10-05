@@ -1,8 +1,10 @@
 import { Hono } from "hono";
+import { eq } from "drizzle-orm";
 import type { Env } from "../index";
 import { getDb } from "../db/client";
 import { registrations } from "../db/schema";
 import { sendRegistrationConfirmation } from "../lib/mailer";
+import { qrPng } from "../lib/qr";
 import { checkRateLimit } from "../lib/rateLimit";
 
 export const registrationsRoute = new Hono<{ Bindings: Env }>();
@@ -196,10 +198,34 @@ registrationsRoute.post("/", async (c) => {
   // failure must never fail or delay the registration, but an unawaited
   // promise can be torn down the instant the response returns.
   c.executionCtx.waitUntil(
-    sendRegistrationConfirmation(c.env, email, { id, name, agency }).catch((err) =>
+    sendRegistrationConfirmation(c.env, email, { id, name }).catch((err) =>
       console.error("Failed to send registration confirmation email:", err),
     ),
   );
 
   return c.json({ id }, 201);
+});
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+// The check-in QR shown in the confirmation email. Email clients can't render
+// SVG or data: images reliably, so the email links to this PNG instead. The QR
+// encodes just the registration id (a random UUID, so the URL isn't guessable
+// and carries no personal data); an unknown id 404s rather than turning this
+// into a QR generator for arbitrary input.
+registrationsRoute.get("/:id/qr.png", async (c) => {
+  const id = c.req.param("id");
+  if (!UUID_RE.test(id)) return c.notFound();
+
+  const db = getDb(c.env.DB);
+  const [row] = await db.select({ id: registrations.id }).from(registrations).where(eq(registrations.id, id)).limit(1);
+  if (!row) return c.notFound();
+
+  return new Response(await qrPng(id), {
+    headers: {
+      "Content-Type": "image/png",
+      // The image for a given id never changes.
+      "Cache-Control": "public, max-age=86400, immutable",
+    },
+  });
 });
