@@ -47,9 +47,7 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
   const footerUrl = `${base}/email/footer.png`;
   const conferenceUrl = `${base}/conference`;
   const privacyUrl = `${base}/privacy`;
-  // Display form of the origin, e.g. "gates-sc-webapp.dost-gates.workers.dev".
-  const siteLabel = base.replace(/^https?:\/\//, "");
-  const qrUrl =`${base}/api/registrations/${encodeURIComponent(id)}/qr.png`;
+  const qrUrl = `${base}/api/registrations/${encodeURIComponent(id)}/qr.png`;
   const safeName = escapeHtml(name);
 
   const detailRows: [string, string][] = [
@@ -102,11 +100,8 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
 <p style="margin:0 0 24px 0;">For questions, contact the secretariat at <a href="mailto:${EVENT.contact}" style="color:#1a1aea;">${EVENT.contact}</a>.</p>
 <p style="margin:0;">Regards,<br>${escapeHtml(EVENT.secretariat)}</p>
 </td></tr>
-<tr><td bgcolor="#000000" align="center" style="background-color:#000000;padding:28px 32px 4px 32px;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
-<p style="margin:0 0 6px 0;font-size:15px;font-weight:bold;letter-spacing:0.5px;color:#ffffff;">DOST GATES Program</p>
-<p style="margin:0 0 14px 0;font-size:13px;line-height:1.5;color:#c9cbe0;">${escapeHtml(EVENT.name)}<br>${escapeHtml(EVENT.date)}</p>
-<p style="margin:0 0 14px 0;font-size:13px;line-height:1.6;"><a href="${base}" style="color:#8f94ff;text-decoration:underline;">${escapeHtml(siteLabel)}</a> &nbsp;&middot;&nbsp; <a href="mailto:${EVENT.contact}" style="color:#8f94ff;text-decoration:underline;">${EVENT.contact}</a></p>
-<p style="margin:0;font-size:11px;line-height:1.5;color:#8a8ca3;">You received this email because you registered for the conference. Your information is handled under the Data Privacy Act of 2012 (RA 10173) &mdash; see our <a href="${privacyUrl}" style="color:#8f94ff;text-decoration:underline;">Privacy Notice</a>.</p>
+<tr><td bgcolor="#000000" align="center" style="background-color:#000000;padding:16px 24px 12px 24px;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
+<p style="margin:0;font-size:11px;line-height:16px;color:#8a8ca3;">Your information is handled under the Data Privacy Act of 2012 (RA 10173). <a href="${privacyUrl}" style="color:#8f94ff;text-decoration:underline;">Privacy Notice</a></p>
 </td></tr>
 <tr><td style="padding:0;line-height:0;font-size:0;background-color:#000000;">
 <img src="${footerUrl}" width="600" alt="" style="display:block;width:100%;max-width:600px;height:auto;border:0;">
@@ -144,12 +139,7 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
     "Regards,",
     EVENT.secretariat,
     "",
-    "--",
-    "DOST GATES Program",
-    `${EVENT.name} · ${EVENT.date}`,
-    base,
-    "You received this email because you registered for the conference. Your information is " +
-      `handled under the Data Privacy Act of 2012 (RA 10173). Privacy Notice: ${privacyUrl}`,
+    `Your information is handled under the Data Privacy Act of 2012 (RA 10173). Privacy Notice: ${privacyUrl}`,
   ].join("\n");
 
   return {
