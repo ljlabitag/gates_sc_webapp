@@ -64,14 +64,17 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
     )
     .join("");
 
-  // Table layout with inline styles throughout: email clients strip <style>
-  // blocks and ignore modern CSS. Width is capped at 600px, the usual safe size.
+  // Table layout with inline styles throughout: many email clients strip <style>
+  // blocks and ignore modern CSS, so the one <style> rule (a shorter footer on
+  // phones, where the header image scales down) is a progressive enhancement.
+  // Width is capped at 600px, the usual safe size.
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Registration confirmed — ${escapeHtml(EVENT.name)}</title>
+<style>@media only screen and (max-width:620px){.ft{height:80px !important;}}</style>
 </head>
 <body style="margin:0;padding:0;background-color:#f1f3f7;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#f1f3f7;">
@@ -100,11 +103,8 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
 <p style="margin:0 0 24px 0;">For questions, contact the secretariat at <a href="mailto:${EVENT.contact}" style="color:#1a1aea;">${EVENT.contact}</a>.</p>
 <p style="margin:0;">Regards,<br>${escapeHtml(EVENT.secretariat)}</p>
 </td></tr>
-<tr><td bgcolor="#000000" align="center" style="background-color:#000000;padding:16px 24px 12px 24px;font-family:Arial,Helvetica,sans-serif;color:#ffffff;">
-<p style="margin:0;font-size:11px;line-height:16px;color:#8a8ca3;">Your information is handled under the Data Privacy Act of 2012 (RA 10173). <a href="${privacyUrl}" style="color:#8f94ff;text-decoration:underline;">Privacy Notice</a></p>
-</td></tr>
-<tr><td style="padding:0;line-height:0;font-size:0;background-color:#000000;">
-<img src="${footerUrl}" width="600" alt="" style="display:block;width:100%;max-width:600px;height:auto;border:0;">
+<tr><td class="ft" align="center" valign="middle" height="106" bgcolor="#000000" background="${footerUrl}" style="height:106px;padding:0 24px;background-color:#000000;background-image:url('${footerUrl}');background-size:cover;background-position:center;font-family:Arial,Helvetica,sans-serif;">
+<p style="margin:0;font-size:13px;line-height:20px;color:#e4e6f7;text-shadow:0 1px 3px #000000;">Your information is handled under the Data Privacy Act of 2012 (RA 10173).<br><a href="${privacyUrl}" style="color:#ffffff;font-weight:bold;text-decoration:underline;">Privacy Notice</a></p>
 </td></tr>
 </table>
 </td></tr>
