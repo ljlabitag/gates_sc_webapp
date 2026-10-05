@@ -129,6 +129,55 @@ export function sendHackathonConfirmation(
   });
 }
 
+export interface RegistrationConfirmationDetails {
+  id: string;
+  /** Full display name, e.g. "Ana D. Reyes". */
+  name: string;
+  agency: string;
+}
+
+// Deliberately sparse on event specifics: the date is confirmed, but the
+// venue and run-of-show aren't final (the site itself says the venue is "to
+// be announced" and the programme is provisional), so this commits to the
+// date, says the venue is coming, and points to the secretariat — rather than
+// restating details that would go stale the way the hackathon confirmation
+// above has. No secretariat notification accompanies this: unlike a proposal,
+// a registration doesn't need a human to look at it, and one email per
+// registrant would bury the shared inbox — the admin panel lists them all.
+export function sendRegistrationConfirmation(
+  env: Env,
+  to: string,
+  details: RegistrationConfirmationDetails,
+): Promise<void> {
+  return sendMail(env, {
+    to,
+    subject: "Your registration for the 2nd GATES Program Stakeholder Conference",
+    text: [
+      `Dear ${details.name},`,
+      "",
+      "Thank you for registering for the 2nd GATES Program Stakeholder Conference. This email " +
+        "confirms that your registration has been received.",
+      "",
+      "REGISTRATION SUMMARY",
+      `  Name: ${details.name}`,
+      `  Agency / Office: ${details.agency}`,
+      `  Reference ID: ${details.id}`,
+      "",
+      "EVENT DETAILS",
+      "  • Date: Tuesday, November 10, 2026",
+      "  • Venue: Metro Manila — the exact location is still being finalized. Venue and travel " +
+        "details will be sent to this email address as soon as they are confirmed.",
+      "",
+      "Should you have any questions or concerns, please contact the secretariat directly " +
+        "at dostgates@dost.gov.ph.",
+      "",
+      "Sincerely,",
+      "GATES Program Secretariat",
+      "Department of Science and Technology",
+    ].join("\n"),
+  });
+}
+
 export interface SecretariatSubmissionMetadata {
   id: string;
   team: string;

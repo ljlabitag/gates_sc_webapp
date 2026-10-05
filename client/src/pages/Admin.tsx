@@ -5,9 +5,21 @@ interface Registration {
   id: string;
   name: string;
   email: string;
+  mobile: string | null;
+  agency: string | null;
   organization: string | null;
-  dietaryAccessibility: string | null;
+  designation: string | null;
+  dietaryPreferences: string | null;
+  foodAllergies: string | null;
+  specialAssistance: string | null;
+  assistanceNeeded: string | null;
   createdAt: number;
+}
+
+// A checklist selection and its free-text note read as one cell:
+// "Halal; No pork · Allergic to shellfish".
+function joinDetails(...parts: (string | null)[]) {
+  return parts.filter(Boolean).join(" · ") || "—";
 }
 
 interface HackathonSubmission {
@@ -173,36 +185,45 @@ export default function Admin() {
           </a>
         </div>
         <div className="glass-panel overflow-x-auto">
-          <table className="w-full min-w-[760px] text-sm text-left border-collapse">
+          <table className="w-full min-w-[1180px] text-sm text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 text-white/50">
                 <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Organization / Role</th>
-                <th className="px-4 py-3 font-medium">Dietary / Accessibility</th>
+                <th className="px-4 py-3 font-medium">Contact</th>
+                <th className="px-4 py-3 font-medium">Agency / Office</th>
+                <th className="px-4 py-3 font-medium">Designation</th>
+                <th className="px-4 py-3 font-medium">Organization</th>
+                <th className="px-4 py-3 font-medium">Dietary</th>
+                <th className="px-4 py-3 font-medium">Special assistance</th>
                 <th className="px-4 py-3 font-medium">Submitted</th>
               </tr>
             </thead>
             <tbody>
               {registrations === null && (
                 <tr>
-                  <td className="px-4 py-6 text-white/40" colSpan={5}>
+                  <td className="px-4 py-6 text-white/40" colSpan={8}>
                     Loading registrations…
                   </td>
                 </tr>
               )}
               {registrations?.map((r) => (
-                <tr key={r.id} className="border-b border-white/5">
+                <tr key={r.id} className="border-b border-white/5 align-top">
                   <td className="px-4 py-3">{r.name}</td>
-                  <td className="px-4 py-3">{r.email}</td>
+                  <td className="px-4 py-3">
+                    {r.email}
+                    {r.mobile && <div className="text-white/50">{r.mobile}</div>}
+                  </td>
+                  <td className="px-4 py-3">{r.agency || "—"}</td>
+                  <td className="px-4 py-3">{r.designation || "—"}</td>
                   <td className="px-4 py-3">{r.organization || "—"}</td>
-                  <td className="px-4 py-3">{r.dietaryAccessibility || "—"}</td>
+                  <td className="px-4 py-3">{joinDetails(r.dietaryPreferences, r.foodAllergies)}</td>
+                  <td className="px-4 py-3">{joinDetails(r.specialAssistance, r.assistanceNeeded)}</td>
                   <td className="px-4 py-3 text-white/60">{formatDate(r.createdAt)}</td>
                 </tr>
               ))}
               {registrations?.length === 0 && (
                 <tr>
-                  <td className="px-4 py-6 text-white/40" colSpan={5}>
+                  <td className="px-4 py-6 text-white/40" colSpan={8}>
                     No registrations yet.
                   </td>
                 </tr>

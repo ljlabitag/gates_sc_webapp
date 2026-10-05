@@ -15,6 +15,25 @@ export interface HackathonInput {
   memberConsentAttested: boolean;
 }
 
+export interface RegistrationInput {
+  firstName: string;
+  middleInitial: string;
+  lastName: string;
+  email: string;
+  mobile: string;
+  agency: string;
+  organization: string;
+  designation: string;
+  /** Checked options from DIETARY_OPTIONS (data/registration.ts). */
+  dietaryPreferences: string[];
+  foodAllergies: string;
+  /** Checked options from ASSISTANCE_OPTIONS (data/registration.ts). */
+  specialAssistance: string[];
+  assistanceNeeded: string;
+  consent: boolean;
+  documentationConsent: boolean;
+}
+
 class ApiError extends Error {}
 
 async function parseErrorMessage(res: Response, fallback: string): Promise<string> {
@@ -69,6 +88,17 @@ export async function submitHackathonEntry(input: HackathonInput): Promise<void>
       fileSize: file.size,
       mimeType: contentType,
     }),
+  });
+  if (!res.ok) {
+    throw new ApiError(await parseErrorMessage(res, "Please check the required fields and try again."));
+  }
+}
+
+export async function submitRegistration(input: RegistrationInput): Promise<void> {
+  const res = await fetch("/api/registrations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
   });
   if (!res.ok) {
     throw new ApiError(await parseErrorMessage(res, "Please check the required fields and try again."));

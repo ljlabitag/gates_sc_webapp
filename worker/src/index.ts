@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { presignUpload } from "./storage/s3";
 import { hackathonSubmissionsRoute } from "./routes/hackathonSubmissions";
+import { registrationsRoute } from "./routes/registrations";
 import { adminRoute } from "./routes/admin";
 import { checkRateLimit } from "./lib/rateLimit";
 
@@ -113,6 +114,7 @@ app.post("/api/uploads/presign", async (c) => {
 });
 
 app.route("/api/hackathon-submissions", hackathonSubmissionsRoute);
+app.route("/api/registrations", registrationsRoute);
 app.route("/api/admin", adminRoute);
 
 // Everything that isn't an API route falls through to static assets.

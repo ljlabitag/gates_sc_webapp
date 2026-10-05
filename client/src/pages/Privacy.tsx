@@ -51,13 +51,17 @@ export default function Privacy() {
             evaluate and screen proposals, notify your team of results, and coordinate the hackathon program.
           </p>
           <p className="m-0">
-            <strong className="text-white/85 font-semibold">Conference registration.</strong> Attendance is currently
-            by invitation — see the{" "}
+            <strong className="text-white/85 font-semibold">Conference registration.</strong> Attendance is by
+            invitation — invited participants register through the link in their invitation email, on the{" "}
             <a href="/registration" className="text-gates-link no-underline font-semibold">
               registration page
             </a>
-            . When registration opens to invited agencies, it will collect name, email, organization/role, and any
-            dietary or accessibility needs, used to manage attendance and logistics for the conference.
+            . It collects your name, email address, mobile number, agency or office, designation, and (optionally)
+            your organization, used to manage attendance and to send you your confirmation and venue details. It
+            also lets you share dietary preferences, food allergies, and special-assistance needs (such as senior
+            citizen or PWD status). That information can reveal health conditions, so it is optional, limited to a
+            short checklist and a short note, and used only to arrange catering, access, and seating at the
+            conference.
           </p>
           <p className="m-0">
             We do not collect payment information, government IDs, or any data beyond what a form on this site
