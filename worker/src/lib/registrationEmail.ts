@@ -104,7 +104,7 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
 <p style="margin:0;">Regards,<br>${escapeHtml(EVENT.secretariat)}</p>
 </td></tr>
 <tr><td class="ft" align="center" valign="middle" height="106" bgcolor="#000000" background="${footerUrl}" style="height:106px;padding:0 24px;background-color:#000000;background-image:url('${footerUrl}');background-size:cover;background-position:center;font-family:Arial,Helvetica,sans-serif;">
-<p style="margin:0;font-size:13px;line-height:20px;color:#e4e6f7;text-shadow:0 1px 3px #000000;">Your information is handled under the Data Privacy Act of 2012 (RA 10173).<br><a href="${privacyUrl}" style="color:#ffffff;font-weight:bold;text-decoration:underline;">Privacy Notice</a></p>
+<p style="margin:0;font-size:11px;line-height:16px;color:#b4b7d1;text-shadow:0 1px 2px #000000;">Your information is handled under the Data Privacy Act of 2012 (RA 10173).<br><a href="${privacyUrl}" style="color:#d3d6ee;text-decoration:underline;">Privacy Notice</a></p>
 </td></tr>
 </table>
 </td></tr>
