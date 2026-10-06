@@ -12,3 +12,7 @@ dist
 
 # Wrangler local dev state (simulated D1/R2 data, telemetry)
 .wrangler
+
+# IEC hero masters (11-15 MB each). The site ships the WebP exports generated
+# from them (conference-hero-*.webp); keep the originals out of git history.
+client/src/assets/hero/GATES_2nd SC Event Banner*.jpg

@@ -251,21 +251,32 @@
      big, bold visual headline instead — same brand-gradient treatment as
      nav-register-gradient, just its own class since a hero badge and a nav
      button warrant independent sizing/padding tuning over time. */
-  /* The IEC poster (components/ConferencePoster.tsx). Capped at its native
-     1600px width; on wider screens it sits centred on the page's near-black
-     hero background, and a soft edge fade stops it reading as a hard
-     box. The fade is confined to the outer 6% (sides) and 4% (top/bottom),
-     where the artwork is only dark texture — no text or logos live there. */
+  /* The IEC poster (components/ConferencePoster.tsx). Capped at 1600px wide;
+     on wider screens it sits centred on the page's near-black hero
+     background, and a soft edge fade stops it reading as a hard box. The fade
+     is confined to the outer 6% (sides) and 4% (top/bottom), where the
+     artwork is only dark texture — no text or logos live there. Phones get
+     the portrait design, which already runs edge to edge, so they only fade
+     the bottom (768px = Tailwind's md, matching the <picture> breakpoint). */
   .conference-poster {
     max-width: 1600px;
-    -webkit-mask-image:
-      linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
-    mask-composite: intersect;
+    /* Phones: only the bottom edge needs softening, where the artwork meets
+       the page. */
+    -webkit-mask-image: linear-gradient(to bottom, black 96%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 96%, transparent 100%);
+  }
+
+  @media (min-width: 768px) {
+    .conference-poster {
+      -webkit-mask-image:
+        linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+      mask-composite: intersect;
+    }
   }
 
   .conference-poster-hero {
