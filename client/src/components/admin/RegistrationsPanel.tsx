@@ -58,7 +58,7 @@ function StatusCell({ r }: { r: Registration }) {
       </span>
       {r.checkedInBy && <span className="text-[12px] text-white/45">{r.checkedInBy}</span>}
       <span className={`text-[12px] ${r.kitSentAt ? "text-white/45" : "text-amber-300"}`}>
-        {r.kitSentAt ? "Kit sent" : "Kit not sent"}
+        {r.kitSentAt ? "Virtual kit sent" : "Virtual kit not sent"}
       </span>
     </div>
   );
@@ -232,7 +232,7 @@ export default function RegistrationsPanel({
           { id: "all", label: "All", count: counts.all },
           { id: "in", label: "Arrived", count: counts.in },
           { id: "out", label: "Not yet arrived", count: counts.out },
-          { id: "kit", label: "Kit not sent", count: counts.kit },
+          { id: "kit", label: "Virtual kit not sent", count: counts.kit },
           { id: "needs", label: "Dietary / assistance", count: counts.needs },
         ]}
       />

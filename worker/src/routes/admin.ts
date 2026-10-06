@@ -217,6 +217,7 @@ const STATION_MAX_LENGTH = 40;
 const attendeeColumns = {
   id: registrations.id,
   name: registrations.name,
+  firstName: registrations.firstName,
   nickname: registrations.nickname,
   agency: registrations.agency,
   division: registrations.division,

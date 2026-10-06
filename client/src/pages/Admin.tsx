@@ -5,6 +5,9 @@ import RegistrationsPanel from "../components/admin/RegistrationsPanel";
 import SubmissionsPanel from "../components/admin/SubmissionsPanel";
 import { StatCard, adminInputClass, formatTime } from "../components/admin/AdminUi";
 import type { HackathonSubmission, Registration } from "../components/admin/types";
+import BrandLogos from "../components/admin/BrandLogos";
+import { ACTIVE_EVENT, ADMIN_TITLE } from "../data/adminEvent";
+import { usePageMeta } from "../hooks/usePageMeta";
 
 type Status = "checking" | "loginRequired" | "authenticated";
 type Tab = "registrations" | "hackathon";
@@ -13,6 +16,7 @@ type Notice = { kind: "ok" | "error"; text: string } | null;
 const NOTICE_MS = 8000;
 
 export default function Admin() {
+  usePageMeta(`${ADMIN_TITLE} — GATES Program`, "Staff area for managing event registrations, check-in and virtual kits.");
   const [status, setStatus] = useState<Status>("checking");
   const [loginUser, setLoginUser] = useState("");
   const [loginPass, setLoginPass] = useState("");
@@ -163,10 +167,12 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
 
   if (status === "loginRequired") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-5 sm:px-8 py-8">
-        <form className="glass-panel p-6 sm:p-8 w-full max-w-[380px] flex flex-col gap-4" onSubmit={handleLogin}>
-          <h1 className="font-display text-2xl font-extrabold uppercase tracking-[0.01em] m-0">GATES Admin</h1>
-          <p className="text-[13px] text-white/50 m-0 -mt-2">Sign in to manage registrations and check-in.</p>
+      <div className="relative isolate min-h-screen flex items-center justify-center px-5 sm:px-8 py-8 overflow-hidden">
+        <div aria-hidden="true" className="hero-brand-gradient absolute inset-0 -z-10" />
+        <form className="glass-panel glass-panel-strong p-6 sm:p-8 w-full max-w-[400px] flex flex-col gap-4" onSubmit={handleLogin}>
+          <BrandLogos compact className="mb-1" />
+          <h1 className="font-display text-2xl font-extrabold uppercase tracking-[0.01em] m-0">{ADMIN_TITLE}</h1>
+          <p className="text-[13px] text-white/55 m-0 -mt-2">Sign in to manage registrations, check-in and virtual kits.</p>
           {error && <div className="text-gates-error text-[13px]">{error}</div>}
           <div className="flex flex-col gap-2">
             <label htmlFor="admin-user" className="text-[13px] text-white/60 font-semibold">
@@ -215,10 +221,17 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
   const arrivedShare = stats.registered ? stats.arrived / stats.registered : 0;
 
   return (
-    <div className="min-h-screen px-5 sm:px-8 py-6 sm:py-9 max-w-[1280px] mx-auto flex flex-col gap-6 sm:gap-7">
-      <header className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-[0.01em] m-0">GATES Admin</h1>
+    <div className="relative isolate min-h-screen">
+      <div aria-hidden="true" className="admin-bloom hero-bloom-bg absolute inset-x-0 top-0 h-[420px] -z-10 opacity-35" />
+      <div className="px-5 sm:px-8 py-6 sm:py-9 max-w-[1280px] mx-auto flex flex-col gap-6 sm:gap-7">
+      <header className="flex items-center justify-between flex-wrap gap-x-6 gap-y-4">
+        <div className="flex flex-col gap-3">
+          <BrandLogos />
+          <div>
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-[0.01em] m-0">{ADMIN_TITLE}</h1>
+          <p className="m-0 mt-1 text-[14px] text-white/60">
+            {ACTIVE_EVENT.name} <span aria-hidden="true">&middot;</span> {ACTIVE_EVENT.dateLabel}
+          </p>
           <p className="m-0 mt-1 text-[13px] text-white/45">
             {updatedAt ? `Updated ${formatTime(updatedAt)}` : ""}
             <button
@@ -230,6 +243,7 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
               {refreshing ? "Refreshing…" : "Refresh"}
             </button>
           </p>
+          </div>
         </div>
         <nav aria-label="Admin" className="flex items-center gap-4 flex-wrap">
           <Link
@@ -264,12 +278,12 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
           note={stats.registered ? `${Math.round(arrivedShare * 100)}% checked in` : "No registrations yet"}
         />
         <StatCard
-          label="Kits sent"
+          label="Virtual kits sent"
           value={stats.kitsSent}
           of={stats.arrived}
           tone={stats.kitsPending > 0 ? "warn" : "default"}
           progress={stats.arrived ? stats.kitsSent / stats.arrived : 0}
-          note={stats.kitsPending > 0 ? `${stats.kitsPending} not sent — see the “Kit not sent” filter` : "All arrivals have their kit"}
+          note={stats.kitsPending > 0 ? `${stats.kitsPending} not sent — see the “Virtual kit not sent” filter` : "All arrivals have their virtual kit"}
         />
         <StatCard label="Hackathon" value={submissions?.length ?? "—"} note="Proposals submitted" />
       </section>
@@ -350,6 +364,7 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
           }}
         />
       )}
+      </div>
     </div>
   );
 }

@@ -283,6 +283,24 @@
     background: #050506;
   }
 
+  /* Staff pages (admin, check-in) wear the site's look. The check-in screen is
+     seen by arriving participants, so it gets the full brand backdrop: the
+     hero gradient plus the net-grid artwork rising from the bottom edge. The
+     admin only gets a faint bloom along the top, so dense tables stay calm. */
+  .checkin-grid-bg {
+    background-image: url("./assets/hero/grid-color-bg.webp");
+    background-size: cover;
+    background-position: center bottom;
+    opacity: 0.42;
+    -webkit-mask-image: linear-gradient(to top, black 0%, black 35%, transparent 80%);
+    mask-image: linear-gradient(to top, black 0%, black 35%, transparent 80%);
+  }
+
+  .admin-bloom {
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+  }
+
   .conference-hero-badge {
     background:
       linear-gradient(rgba(8, 9, 11, 0.3), rgba(8, 9, 11, 0.3)),
