@@ -11,10 +11,11 @@ import Privacy from "./pages/Privacy";
 // public page's bundle (brief §10 performance pass).
 const Admin = lazy(() => import("./pages/Admin"));
 
-// Early-access gate: Home/Program/Conference/Registration aren't signed off
-// for production yet, so every path except /hackathon, /privacy, and /admin
-// redirects to /hackathon there (nav links included, since they route
-// through here too). Same build runs on every environment — no separate
+// Early-access gate: Home/Program/Conference aren't signed off for
+// production yet, so every path except /registration, /hackathon, /privacy,
+// and /admin redirects to /hackathon there (nav links included, since they
+// route through here too). /registration is open on production because
+// invitations link straight to it. Same build runs on every environment — no separate
 // staging build exists (worker:deploy and worker:deploy:staging both just
 // run `npm run build -w client`) — so this is a runtime hostname check, not
 // a build-time flag. Defaults to GATE ACTIVE for any host not explicitly
@@ -46,9 +47,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/program" element={<Program />} />
             <Route path="/conference" element={<Conference />} />
-            <Route path="/registration" element={<Registration />} />
           </>
         )}
+        <Route path="/registration" element={<Registration />} />
         <Route path="/hackathon" element={<Hackathon />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route
@@ -60,8 +61,8 @@ function App() {
           }
         />
         {/* React Router ranks literal paths above wildcards regardless of
-            declaration order, so Home/Program/Conference/Registration above
-            and this catch-all must be mutually exclusive — both present at
+            declaration order, so Home/Program/Conference above and this
+            catch-all must be mutually exclusive — both present at
             once would mean the catch-all never fires for those paths and
             the gate silently does nothing. */}
         {gateActive && <Route path="*" element={<Navigate to="/hackathon" replace />} />}
