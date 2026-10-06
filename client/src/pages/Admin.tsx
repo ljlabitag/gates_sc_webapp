@@ -18,6 +18,8 @@ interface Registration {
   foodAllergies: string | null;
   specialAssistance: string | null;
   assistanceNeeded: string | null;
+  checkedInAt: number | null;
+  checkedInBy: string | null;
   createdAt: number;
 }
 
@@ -214,13 +216,25 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
 
       <section className="flex flex-col gap-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <h2 className="text-xl font-semibold m-0">Registrations {registrations ? `(${registrations.length})` : ""}</h2>
-          <a
-            href="/api/admin/registrations/export"
-            className="glass-panel px-4 py-2 rounded-full text-sm text-white/90 no-underline"
-          >
-            Export CSV
-          </a>
+          <h2 className="text-xl font-semibold m-0">
+            Registrations {registrations ? `(${registrations.length})` : ""}
+            {registrations && (
+              <span className="ml-3 text-sm font-normal text-white/50">
+                {registrations.filter((r) => r.checkedInAt).length} checked in
+              </span>
+            )}
+          </h2>
+          <div className="flex items-center gap-3">
+            <Link to="/admin/checkin" className="btn-primary px-4 py-2 rounded-full text-sm text-white font-semibold no-underline">
+              Open check-in scanner
+            </Link>
+            <a
+              href="/api/admin/registrations/export"
+              className="glass-panel px-4 py-2 rounded-full text-sm text-white/90 no-underline"
+            >
+              Export CSV
+            </a>
+          </div>
         </div>
         {notice && (
           <div role="status" className="text-sm text-white/75">
@@ -228,7 +242,7 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
           </div>
         )}
         <div className="glass-panel overflow-x-auto">
-          <table className="w-full min-w-[1320px] text-sm text-left border-collapse">
+          <table className="w-full min-w-[1420px] text-sm text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 text-white/50">
                 <th className="px-4 py-3 font-medium">Name</th>
@@ -238,6 +252,7 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
                 <th className="px-4 py-3 font-medium">Position / Designation</th>
                 <th className="px-4 py-3 font-medium">Dietary</th>
                 <th className="px-4 py-3 font-medium">Special assistance</th>
+                <th className="px-4 py-3 font-medium">Checked in</th>
                 <th className="px-4 py-3 font-medium">Submitted</th>
                 <th className="px-4 py-3 font-medium">Actions</th>
               </tr>
@@ -245,7 +260,7 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
             <tbody>
               {registrations === null && (
                 <tr>
-                  <td className="px-4 py-6 text-white/40" colSpan={9}>
+                  <td className="px-4 py-6 text-white/40" colSpan={10}>
                     Loading registrations…
                   </td>
                 </tr>
@@ -265,12 +280,30 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
                   <td className="px-4 py-3">{r.designation || "—"}</td>
                   <td className="px-4 py-3">{joinDetails(r.dietaryPreferences, r.foodAllergies)}</td>
                   <td className="px-4 py-3">{joinDetails(r.specialAssistance, r.assistanceNeeded)}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {r.checkedInAt ? (
+                      <span className="text-emerald-300">
+                        {new Date(r.checkedInAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                        {r.checkedInBy && <span className="block text-white/45 text-[12px]">{r.checkedInBy}</span>}
+                      </span>
+                    ) : (
+                      <span className="text-white/35">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-white/60">{formatDate(r.createdAt)}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <span className="flex gap-3 text-[13px] font-semibold">
                       <button type="button" onClick={() => setEditing(r)} className="text-gates-link bg-transparent border-none cursor-pointer p-0">
                         Edit
                       </button>
+                      <a
+                        href={`/api/registrations/${r.id}/qr.png`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-gates-link no-underline"
+                      >
+                        QR
+                      </a>
                       <button type="button" onClick={() => handleResend(r)} className="text-gates-link bg-transparent border-none cursor-pointer p-0">
                         Re-send
                       </button>
@@ -283,7 +316,7 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
               ))}
               {registrations?.length === 0 && (
                 <tr>
-                  <td className="px-4 py-6 text-white/40" colSpan={9}>
+                  <td className="px-4 py-6 text-white/40" colSpan={10}>
                     No registrations yet.
                   </td>
                 </tr>

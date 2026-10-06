@@ -51,6 +51,12 @@ export const registrations = sqliteTable("registrations", {
   documentationConsent: integer("documentation_consent", { mode: "boolean" }).notNull(),
   retentionUntil: integer("retention_until").notNull(),
   deletedAt: integer("deleted_at"),
+  // Arrival at the venue: set when the registrant's QR code is scanned (or
+  // they're checked in by name). `checkedInBy` is the scanning station's
+  // label, or the admin login when no station name was given. Null until
+  // they arrive.
+  checkedInAt: integer("checked_in_at"),
+  checkedInBy: text("checked_in_by"),
   createdAt: integer("created_at").notNull(),
 }, (t) => [
   // One live registration per email address, case-insensitively. The route
@@ -98,7 +104,7 @@ export const hackathonSubmissions = sqliteTable("hackathon_submissions", {
 export const auditLog = sqliteTable("audit_log", {
   id: text("id").primaryKey(),
   actor: text("actor").notNull(),
-  action: text("action", { enum: ["view", "export", "download", "update", "resend", "delete"] }).notNull(),
+  action: text("action", { enum: ["view", "export", "download", "update", "resend", "delete", "checkin", "checkin_undo"] }).notNull(),
   resource: text("resource", { enum: ["registrations", "hackathon_submissions"] }).notNull(),
   resourceId: text("resource_id"),
   createdAt: integer("created_at").notNull(),

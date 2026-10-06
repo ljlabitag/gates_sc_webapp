@@ -64,6 +64,11 @@ export default function Privacy() {
             conference.
           </p>
           <p className="m-0">
+            <strong className="text-white/85 font-semibold">Attendance.</strong> At the venue, staff scan the QR code
+            in your confirmation email (or look you up by name) to record that you arrived, along with the time. This
+            is used to confirm attendance and to send you follow-up materials for the conference.
+          </p>
+          <p className="m-0">
             <strong className="text-white/85 font-semibold">Spam protection.</strong> The registration form may use
             Cloudflare Turnstile to tell people from automated bots. It runs in your browser and may process
             technical information such as your IP address and browser characteristics; we do not use it to identify

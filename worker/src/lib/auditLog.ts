@@ -3,7 +3,7 @@ import { auditLog } from "../db/schema";
 
 interface AuditEntry {
   actor: string;
-  action: "view" | "export" | "download" | "update" | "resend" | "delete";
+  action: "view" | "export" | "download" | "update" | "resend" | "delete" | "checkin" | "checkin_undo";
   resource: "registrations" | "hackathon_submissions";
   resourceId?: string;
 }

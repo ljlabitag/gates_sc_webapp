@@ -177,6 +177,117 @@ adminRoute.delete("/registrations/:id", adminAuth, async (c) => {
   return c.json({ ok: true });
 });
 
+// --- Venue check-in -------------------------------------------------------
+// Staff scan each registrant's QR code (which encodes their registration id)
+// at the door. Check-in is idempotent and race-safe: the UPDATE only matches
+// a row that hasn't been checked in yet, so two stations scanning the same
+// code at once can't both "win" — one gets checked_in, the other
+// already_checked_in with the first scan's time.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const STATION_MAX_LENGTH = 40;
+
+// What a staff screen at a public door may show about someone: enough to
+// match the name to the person, and deliberately no dietary or assistance
+// details (health-adjacent data stays out of the list-at-the-door view).
+const attendeeColumns = {
+  id: registrations.id,
+  name: registrations.name,
+  nickname: registrations.nickname,
+  agency: registrations.agency,
+  division: registrations.division,
+  designation: registrations.designation,
+  checkedInAt: registrations.checkedInAt,
+  checkedInBy: registrations.checkedInBy,
+};
+
+adminRoute.post("/checkin", adminAuth, async (c) => {
+  const body = await c.req.json().catch(() => null);
+  const id = typeof body?.id === "string" ? body.id.trim().toLowerCase() : "";
+  if (!UUID_RE.test(id)) {
+    return c.json({ status: "invalid", error: "That doesn't look like a registration QR code." }, 400);
+  }
+  const station = typeof body?.station === "string" ? body.station.trim().slice(0, STATION_MAX_LENGTH) : "";
+  const by = station || c.get("actor");
+
+  const db = getDb(c.env.DB);
+  const now = Date.now();
+  const [fresh] = await db
+    .update(registrations)
+    .set({ checkedInAt: now, checkedInBy: by })
+    .where(and(eq(registrations.id, id), isNull(registrations.deletedAt), isNull(registrations.checkedInAt)))
+    .returning(attendeeColumns);
+  if (fresh) {
+    await logAudit(c.env.DB, { actor: c.get("actor"), action: "checkin", resource: "registrations", resourceId: id });
+    return c.json({ status: "checked_in", attendee: fresh });
+  }
+
+  const [existing] = await db
+    .select(attendeeColumns)
+    .from(registrations)
+    .where(and(eq(registrations.id, id), isNull(registrations.deletedAt)))
+    .limit(1);
+  if (!existing) {
+    return c.json({ status: "not_found", error: "No registration matches this QR code." }, 404);
+  }
+  return c.json({ status: "already_checked_in", attendee: existing });
+});
+
+// Undo a mistaken check-in (wrong person scanned, test scan, etc.).
+adminRoute.delete("/checkin/:id", adminAuth, async (c) => {
+  const id = c.req.param("id");
+  if (!id) return c.notFound();
+  const db = getDb(c.env.DB);
+  const cleared = await db
+    .update(registrations)
+    .set({ checkedInAt: null, checkedInBy: null })
+    .where(and(eq(registrations.id, id), isNull(registrations.deletedAt)))
+    .returning({ id: registrations.id });
+  if (cleared.length === 0) {
+    return c.json({ error: "Registration not found." }, 404);
+  }
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "checkin_undo", resource: "registrations", resourceId: id });
+  return c.json({ ok: true });
+});
+
+// Fallback for people who can't show their QR code: find by name, nickname,
+// email or agency. Returns at most a handful of rows — this is a lookup at
+// the door, not a way to browse the list.
+adminRoute.get("/checkin/search", adminAuth, async (c) => {
+  const q = (c.req.query("q") ?? "").trim().toLowerCase();
+  if (q.length < 2) return c.json([]);
+  // "!" is the LIKE escape character: backslashes inside a template literal are a trap.
+  const like = `%${q.replace(/[!%_]/g, (m) => "!" + m)}%`;
+  const db = getDb(c.env.DB);
+  const rows = await db
+    .select({ ...attendeeColumns, email: registrations.email })
+    .from(registrations)
+    .where(
+      and(
+        isNull(registrations.deletedAt),
+        sql`(lower(${registrations.name}) like ${like} escape '!'
+          or lower(coalesce(${registrations.nickname}, '')) like ${like} escape '!'
+          or lower(${registrations.email}) like ${like} escape '!'
+          or lower(coalesce(${registrations.agency}, '')) like ${like} escape '!')`,
+      ),
+    )
+    .orderBy(registrations.name)
+    .limit(8);
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "view", resource: "registrations" });
+  return c.json(rows);
+});
+
+adminRoute.get("/checkin/stats", adminAuth, async (c) => {
+  const db = getDb(c.env.DB);
+  const [row] = await db
+    .select({
+      registered: sql<number>`count(*)`,
+      checkedIn: sql<number>`count(${registrations.checkedInAt})`,
+    })
+    .from(registrations)
+    .where(isNull(registrations.deletedAt));
+  return c.json({ registered: row?.registered ?? 0, checkedIn: row?.checkedIn ?? 0 });
+});
+
 const REGISTRATION_COLUMNS = [
   "id",
   "eventId",
@@ -198,6 +309,8 @@ const REGISTRATION_COLUMNS = [
   "privacyNoticeVersion",
   "documentationConsent",
   "retentionUntil",
+  "checkedInAt",
+  "checkedInBy",
   "createdAt",
 ] as const;
 
