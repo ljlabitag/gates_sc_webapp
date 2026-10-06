@@ -64,6 +64,12 @@ export default function Privacy() {
             conference.
           </p>
           <p className="m-0">
+            <strong className="text-white/85 font-semibold">Spam protection.</strong> The registration form may use
+            Cloudflare Turnstile to tell people from automated bots. It runs in your browser and may process
+            technical information such as your IP address and browser characteristics; we do not use it to identify
+            you or receive that information ourselves beyond a pass/fail result.
+          </p>
+          <p className="m-0">
             We do not collect payment information, government IDs, or any data beyond what a form on this site
             explicitly asks for.
           </p>

@@ -1,9 +1,13 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import AdminRegistrationEditor from "../components/AdminRegistrationEditor";
 
 interface Registration {
   id: string;
   name: string;
+  firstName: string | null;
+  middleInitial: string | null;
+  lastName: string | null;
   nickname: string | null;
   email: string;
   mobile: string | null;
@@ -54,6 +58,8 @@ export default function Admin() {
   const [registrations, setRegistrations] = useState<Registration[] | null>(null);
   const [submissions, setSubmissions] = useState<HackathonSubmission[] | null>(null);
   const [error, setError] = useState("");
+  const [editing, setEditing] = useState<Registration | null>(null);
+  const [notice, setNotice] = useState("");
 
   async function loadData() {
     try {
@@ -104,6 +110,37 @@ export default function Admin() {
       setLoginError("Could not reach the server.");
     } finally {
       setSigningIn(false);
+    }
+  };
+
+  // Row actions. Each one calls the admin API (cookie-authenticated, audit-
+  // logged server-side) and reports the outcome in the notice line above the
+  // table rather than with alert() popups.
+  const handleResend = async (r: Registration) => {
+    if (!window.confirm(`Re-send the confirmation email to ${r.email}?`)) return;
+    setNotice("");
+    const res = await fetch(`/api/admin/registrations/${r.id}/resend`, { method: "POST", credentials: "include" });
+    const data = await res.json().catch(() => ({}));
+    setNotice(res.ok ? `Confirmation re-sent to ${r.email}.` : (data.error ?? "Could not re-send the confirmation."));
+  };
+
+  const handleDelete = async (r: Registration) => {
+    if (
+      !window.confirm(
+        `Permanently delete the registration of ${r.name} (${r.email})?
+
+This erases all their data and invalidates their QR code. It cannot be undone.`,
+      )
+    )
+      return;
+    setNotice("");
+    const res = await fetch(`/api/admin/registrations/${r.id}`, { method: "DELETE", credentials: "include" });
+    if (res.ok) {
+      setRegistrations((rows) => rows?.filter((row) => row.id !== r.id) ?? null);
+      setNotice(`Deleted the registration of ${r.name}.`);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      setNotice(data.error ?? "Could not delete the registration.");
     }
   };
 
@@ -185,8 +222,13 @@ export default function Admin() {
             Export CSV
           </a>
         </div>
+        {notice && (
+          <div role="status" className="text-sm text-white/75">
+            {notice}
+          </div>
+        )}
         <div className="glass-panel overflow-x-auto">
-          <table className="w-full min-w-[1180px] text-sm text-left border-collapse">
+          <table className="w-full min-w-[1320px] text-sm text-left border-collapse">
             <thead>
               <tr className="border-b border-white/10 text-white/50">
                 <th className="px-4 py-3 font-medium">Name</th>
@@ -197,12 +239,13 @@ export default function Admin() {
                 <th className="px-4 py-3 font-medium">Dietary</th>
                 <th className="px-4 py-3 font-medium">Special assistance</th>
                 <th className="px-4 py-3 font-medium">Submitted</th>
+                <th className="px-4 py-3 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {registrations === null && (
                 <tr>
-                  <td className="px-4 py-6 text-white/40" colSpan={8}>
+                  <td className="px-4 py-6 text-white/40" colSpan={9}>
                     Loading registrations…
                   </td>
                 </tr>
@@ -223,11 +266,24 @@ export default function Admin() {
                   <td className="px-4 py-3">{joinDetails(r.dietaryPreferences, r.foodAllergies)}</td>
                   <td className="px-4 py-3">{joinDetails(r.specialAssistance, r.assistanceNeeded)}</td>
                   <td className="px-4 py-3 text-white/60">{formatDate(r.createdAt)}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="flex gap-3 text-[13px] font-semibold">
+                      <button type="button" onClick={() => setEditing(r)} className="text-gates-link bg-transparent border-none cursor-pointer p-0">
+                        Edit
+                      </button>
+                      <button type="button" onClick={() => handleResend(r)} className="text-gates-link bg-transparent border-none cursor-pointer p-0">
+                        Re-send
+                      </button>
+                      <button type="button" onClick={() => handleDelete(r)} className="text-gates-error bg-transparent border-none cursor-pointer p-0">
+                        Delete
+                      </button>
+                    </span>
+                  </td>
                 </tr>
               ))}
               {registrations?.length === 0 && (
                 <tr>
-                  <td className="px-4 py-6 text-white/40" colSpan={8}>
+                  <td className="px-4 py-6 text-white/40" colSpan={9}>
                     No registrations yet.
                   </td>
                 </tr>
@@ -310,6 +366,17 @@ export default function Admin() {
           </table>
         </div>
       </section>
+      {editing && (
+        <AdminRegistrationEditor
+          registration={editing}
+          onClose={() => setEditing(null)}
+          onSaved={(updated) => {
+            setRegistrations((rows) => rows?.map((row) => (row.id === updated.id ? { ...row, ...updated } : row)) ?? null);
+            setNotice(`Saved changes to ${updated.name}.`);
+            setEditing(null);
+          }}
+        />
+      )}
     </div>
   );
 }

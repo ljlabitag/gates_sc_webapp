@@ -1,12 +1,13 @@
-import { useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import Turnstile from "../components/Turnstile";
 import { Eyebrow, IconPin, TextLink } from "../components/ui";
 import { GATES } from "../data/org";
 import { CONFERENCE } from "../data/conference";
 import { ASSISTANCE_OPTIONS, DIETARY_OPTIONS, REGISTRATION_LIMITS } from "../data/registration";
-import { submitRegistration } from "../lib/api";
+import { fetchRegistrationConfig, submitRegistration, type RegistrationResult } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
 
 const inputClass =
@@ -111,7 +112,16 @@ export default function Registration() {
   const [documentationConsent, setDocumentationConsent] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [result, setResult] = useState<RegistrationResult | null>(null);
+  // Bot check: the server says whether it's on (and the public site key);
+  // when it's off, the form works exactly as before.
+  const [siteKey, setSiteKey] = useState<string | null>(null);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileReset, setTurnstileReset] = useState(0);
+
+  useEffect(() => {
+    fetchRegistrationConfig().then((config) => setSiteKey(config.turnstileSiteKey));
+  }, []);
 
   const setField =
     (key: keyof typeof form) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -158,20 +168,28 @@ export default function Registration() {
       setError("You must consent to data processing to register — see the privacy notice.");
       return;
     }
+    if (siteKey && !turnstileToken) {
+      setError("Please complete the verification check above the Register button.");
+      return;
+    }
     setSubmitting(true);
     setError("");
     try {
-      await submitRegistration({
-        ...form,
-        dietaryPreferences,
-        specialAssistance,
-        consent,
-        documentationConsent,
-      });
-      setSubmitted(true);
+      setResult(
+        await submitRegistration({
+          ...form,
+          dietaryPreferences,
+          specialAssistance,
+          consent,
+          documentationConsent,
+          ...(turnstileToken ? { turnstileToken } : {}),
+        }),
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
     } finally {
+      // A Turnstile token is single-use, whether or not the attempt worked.
+      setTurnstileReset((n) => n + 1);
       setSubmitting(false);
     }
   };
@@ -194,14 +212,27 @@ export default function Registration() {
 
       <section className="py-10 sm:py-14 lg:py-16 px-5 sm:px-8 max-w-[1000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(260px,1fr)] gap-4 items-start">
-          {submitted ? (
+          {result ? (
             <div className="glass-panel p-6 sm:p-10 flex flex-col gap-2.5 items-start">
               <IconPin color="teal" />
-              <h3 className="text-xl font-semibold m-0">You&apos;re registered, {form.firstName.trim()}.</h3>
-              <p className="text-sm leading-[1.6] text-white/62 m-0">
-                We&apos;ve sent a confirmation to {form.email.trim()}. Venue and travel details will be sent to that
-                address as soon as they&apos;re confirmed.
-              </p>
+              <h3 className="text-xl font-semibold m-0">
+                {result.alreadyRegistered ? "You're already registered" : "You're registered"}, {form.firstName.trim()}.
+              </h3>
+              {result.alreadyRegistered ? (
+                <p className="text-sm leading-[1.6] text-white/62 m-0">
+                  {form.email.trim()} already has a registration, so we haven&apos;t created a second one and
+                  we&apos;ve kept the details you first gave.{" "}
+                  {result.resent
+                    ? "We've sent your original confirmation again — your QR code is in that email."
+                    : "We sent your confirmation a short while ago — check your inbox and spam folder, and try again later if it still hasn't arrived."}{" "}
+                  To change your details, contact the secretariat.
+                </p>
+              ) : (
+                <p className="text-sm leading-[1.6] text-white/62 m-0">
+                  We&apos;ve sent a confirmation to {form.email.trim()}. Venue and travel details will be sent to
+                  that address as soon as they&apos;re confirmed.
+                </p>
+              )}
               <p className="text-[13px] leading-[1.6] text-white/50 m-0 mt-1">
                 Don&apos;t see the email in a few minutes? Check your spam folder, or contact{" "}
                 <a href={`mailto:${GATES.email}`} className="text-gates-link no-underline font-semibold">
@@ -443,6 +474,10 @@ export default function Registration() {
                   </span>
                 </label>
               </fieldset>
+
+              {siteKey && (
+                <Turnstile siteKey={siteKey} resetKey={turnstileReset} onToken={setTurnstileToken} />
+              )}
 
               {error && (
                 <div

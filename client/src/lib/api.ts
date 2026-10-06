@@ -35,6 +35,16 @@ export interface RegistrationInput {
   assistanceNeeded: string;
   consent: boolean;
   documentationConsent: boolean;
+  /** Cloudflare Turnstile token; only sent when the bot check is enabled. */
+  turnstileToken?: string;
+}
+
+/** What the server says happened to a registration attempt. */
+export interface RegistrationResult {
+  /** This email already had a registration, so no new one was created. */
+  alreadyRegistered: boolean;
+  /** The original confirmation was sent again (rate-limited to a couple per hour). */
+  resent: boolean;
 }
 
 class ApiError extends Error {}
@@ -97,7 +107,18 @@ export async function submitHackathonEntry(input: HackathonInput): Promise<void>
   }
 }
 
-export async function submitRegistration(input: RegistrationInput): Promise<void> {
+/** The public Turnstile site key, or null when the bot check is switched off. */
+export async function fetchRegistrationConfig(): Promise<{ turnstileSiteKey: string | null }> {
+  try {
+    const res = await fetch("/api/registrations/config");
+    if (res.ok) return await res.json();
+  } catch {
+    // fall through — the form still works; the server enforces the check
+  }
+  return { turnstileSiteKey: null };
+}
+
+export async function submitRegistration(input: RegistrationInput): Promise<RegistrationResult> {
   const res = await fetch("/api/registrations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -106,4 +127,6 @@ export async function submitRegistration(input: RegistrationInput): Promise<void
   if (!res.ok) {
     throw new ApiError(await parseErrorMessage(res, "Please check the required fields and try again."));
   }
+  const data = await res.json().catch(() => ({}));
+  return { alreadyRegistered: data.alreadyRegistered === true, resent: data.resent === true };
 }

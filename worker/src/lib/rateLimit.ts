@@ -28,8 +28,14 @@ export async function checkRateLimit(
   // Opportunistic cleanup of expired windows — cheap at this traffic volume
   // (a few hundred requests total per the ops plan), so a dedicated purge
   // job isn't worth it. Never blocks the actual rate-limit decision above.
-  db.prepare(`DELETE FROM rate_limit_hits WHERE window_start < ?`)
-    .bind(windowStart - opts.windowMs)
+  //
+  // Scoped to this limiter's own rows: windows differ per scope (a minute for
+  // most, an hour for registration re-sends), and a scope-blind delete would
+  // let a minute-window request wipe an hour-window counter early — silently
+  // resetting that limit.
+  const prefix = `${opts.scope}:`;
+  db.prepare(`DELETE FROM rate_limit_hits WHERE substr(bucket_key, 1, ?) = ? AND window_start < ?`)
+    .bind(prefix.length, prefix, windowStart - opts.windowMs)
     .run()
     .catch(() => {});
 

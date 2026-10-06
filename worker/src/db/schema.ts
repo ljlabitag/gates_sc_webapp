@@ -1,4 +1,5 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // SQLite has no native enum or boolean type: statuses are validated in app
 // code against a TS union, and 0/1 integers stand in for booleans (Drizzle's
@@ -51,7 +52,12 @@ export const registrations = sqliteTable("registrations", {
   retentionUntil: integer("retention_until").notNull(),
   deletedAt: integer("deleted_at"),
   createdAt: integer("created_at").notNull(),
-});
+}, (t) => [
+  // One live registration per email address, case-insensitively. The route
+  // checks first so repeats get a friendly answer; this is what makes that
+  // airtight when two submissions arrive at the same moment.
+  uniqueIndex("registrations_email_unique").on(sql`lower(${t.email})`).where(sql`${t.deletedAt} is null`),
+]);
 
 // Mirrors Annex A of the GATES GeoHack 2026 mechanics.
 export const hackathonSubmissions = sqliteTable("hackathon_submissions", {
@@ -92,7 +98,7 @@ export const hackathonSubmissions = sqliteTable("hackathon_submissions", {
 export const auditLog = sqliteTable("audit_log", {
   id: text("id").primaryKey(),
   actor: text("actor").notNull(),
-  action: text("action", { enum: ["view", "export", "download"] }).notNull(),
+  action: text("action", { enum: ["view", "export", "download", "update", "resend", "delete"] }).notNull(),
   resource: text("resource", { enum: ["registrations", "hackathon_submissions"] }).notNull(),
   resourceId: text("resource_id"),
   createdAt: integer("created_at").notNull(),
