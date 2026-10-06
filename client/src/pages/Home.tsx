@@ -313,7 +313,7 @@ export default function Home() {
         onFocus={() => setPaused(true)}
         onBlur={() => setPaused(false)}
       >
-        <div className="home-hero-slides relative w-full flex flex-col justify-center">
+        <div className="home-hero-slides relative w-full flex flex-col justify-start">
           <ConferenceHeroSlide active={activeSlide === 0} countdownItems={countdownItems} />
           <HackathonHeroSlide active={activeSlide === 1} />
 
