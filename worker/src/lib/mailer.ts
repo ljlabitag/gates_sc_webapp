@@ -1,5 +1,6 @@
 import type { Env } from "../index";
 import { buildRegistrationConfirmation } from "./registrationEmail";
+import { buildVirtualKitEmail } from "./virtualKitEmail";
 
 export interface MailAttachment {
   name: string;
@@ -40,7 +41,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 // swap itself, this one platform difference does thread `env` through the
 // public functions below; every other call shape is untouched.
 async function sendMail(env: Env, { to, subject, text, html, attachment }: MailInput): Promise<void> {
-  const res = await fetch(BREVO_SEND_URL, {
+  const res = await fetch(env.BREVO_API_URL ?? BREVO_SEND_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -154,6 +155,13 @@ export function sendRegistrationConfirmation(
     id: details.id,
     name: details.name,
   });
+  return sendMail(env, { to, subject, html, text });
+}
+
+// Sent when an attendee's QR code is scanned at the venue (see the check-in
+// endpoint). Throws on failure — the caller decides whether that matters.
+export function sendVirtualKit(env: Env, to: string, details: { name: string }): Promise<void> {
+  const { subject, html, text } = buildVirtualKitEmail({ siteUrl: env.SITE_URL, name: details.name });
   return sendMail(env, { to, subject, html, text });
 }
 

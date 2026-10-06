@@ -15,6 +15,9 @@ export type Env = {
   R2_SECRET_ACCESS_KEY: string;
   PRIVACY_NOTICE_VERSION: string;
   BREVO_API_KEY: string;
+  // Test hook: points the mailer at a stand-in server instead of Brevo, so
+  // local runs can exercise the real send path. Unset everywhere that matters.
+  BREVO_API_URL?: string;
   MAIL_FROM: string;
   // Public origin of this deployment, no trailing slash. Emails can't use
   // relative URLs, so images in them (banner, QR code) are built from this.

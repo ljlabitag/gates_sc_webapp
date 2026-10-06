@@ -57,6 +57,10 @@ export const registrations = sqliteTable("registrations", {
   // they arrive.
   checkedInAt: integer("checked_in_at"),
   checkedInBy: text("checked_in_by"),
+  // When the virtual-kit email went out after check-in. Null until it has
+  // been sent successfully, so a failed send is visible (and retryable) and
+  // undoing then repeating a check-in can't email the kit twice.
+  kitSentAt: integer("kit_sent_at"),
   createdAt: integer("created_at").notNull(),
 }, (t) => [
   // One live registration per email address, case-insensitively. The route

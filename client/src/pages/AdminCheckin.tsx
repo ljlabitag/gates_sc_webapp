@@ -31,7 +31,7 @@ interface Attendee {
 }
 
 type Outcome =
-  | { kind: "checked_in"; attendee: Attendee }
+  | { kind: "checked_in"; attendee: Attendee; kit: "sending" | "already_sent" }
   | { kind: "already"; attendee: Attendee }
   | { kind: "error"; message: string };
 
@@ -127,7 +127,7 @@ export default function AdminCheckin() {
         }
         const data = await res.json().catch(() => ({}));
         if (data.status === "checked_in") {
-          setOutcome({ kind: "checked_in", attendee: data.attendee });
+          setOutcome({ kind: "checked_in", attendee: data.attendee, kit: data.kit });
           loadStats();
           beep("ok");
         } else if (data.status === "already_checked_in") {
@@ -463,6 +463,9 @@ export default function AdminCheckin() {
                         .filter(Boolean)
                         .join(" · ")}
                     </div>
+                    {outcome.kind === "checked_in" && outcome.kit === "sending" && (
+                      <div className="text-[13px] text-emerald-200/80 mt-1">Virtual kit email is on its way.</div>
+                    )}
                     {outcome.kind === "checked_in" && (
                       <button
                         type="button"

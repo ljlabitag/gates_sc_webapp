@@ -8,7 +8,8 @@ import { timingSafeEqual } from "../lib/auth";
 import { toCsv } from "../lib/csv";
 import { logAudit } from "../lib/auditLog";
 import { parseRegistrationFields } from "../lib/registrationFields";
-import { sendRegistrationConfirmation } from "../lib/mailer";
+import { sendRegistrationConfirmation, sendVirtualKit } from "../lib/mailer";
+import type { Env } from "../index";
 import { presignDownload } from "../storage/s3";
 import { adminAuth, SESSION_COOKIE } from "../middleware/adminAuth";
 import { checkRateLimit } from "../lib/rateLimit";
@@ -161,6 +162,30 @@ adminRoute.post("/registrations/:id/resend", adminAuth, async (c) => {
   return c.json({ ok: true, email: row.email });
 });
 
+// Re-sends the virtual kit to someone who has checked in (e.g. the automatic
+// send failed, or they lost the email). Awaited so the admin sees a failure.
+adminRoute.post("/registrations/:id/resend-kit", adminAuth, async (c) => {
+  const id = c.req.param("id");
+  if (!id) return c.notFound();
+  const db = getDb(c.env.DB);
+  const [row] = await db
+    .select({ id: registrations.id, name: registrations.name, email: registrations.email, checkedInAt: registrations.checkedInAt })
+    .from(registrations)
+    .where(and(eq(registrations.id, id), isNull(registrations.deletedAt)))
+    .limit(1);
+  if (!row) return c.json({ error: "Registration not found." }, 404);
+  if (!row.checkedInAt) return c.json({ error: "This person hasn't checked in yet." }, 409);
+  try {
+    await sendVirtualKit(c.env, row.email, { name: row.name });
+  } catch (err) {
+    console.error("Admin re-send of virtual kit failed:", err);
+    return c.json({ error: "The email provider rejected the message. Check the logs and try again." }, 502);
+  }
+  await db.update(registrations).set({ kitSentAt: Date.now() }).where(eq(registrations.id, id));
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "resend", resource: "registrations", resourceId: id });
+  return c.json({ ok: true, email: row.email });
+});
+
 // Permanent erasure, not a soft delete: a soft-deleted row would keep every
 // piece of personal data, which is the opposite of an erasure request. What
 // survives is the audit entry — the registration id, who deleted it and when,
@@ -200,6 +225,18 @@ const attendeeColumns = {
   checkedInBy: registrations.checkedInBy,
 };
 
+// Emails the virtual kit and, only once it has actually gone out, stamps
+// kit_sent_at. A failure leaves it null — visible in the admin table and
+// retryable — and never affects the check-in itself.
+async function deliverVirtualKit(env: Env, reg: { id: string; name: string; email: string }) {
+  try {
+    await sendVirtualKit(env, reg.email, { name: reg.name });
+    await getDb(env.DB).update(registrations).set({ kitSentAt: Date.now() }).where(eq(registrations.id, reg.id));
+  } catch (err) {
+    console.error("Failed to send virtual kit email:", err);
+  }
+}
+
 adminRoute.post("/checkin", adminAuth, async (c) => {
   const body = await c.req.json().catch(() => null);
   const id = typeof body?.id === "string" ? body.id.trim().toLowerCase() : "";
@@ -215,10 +252,18 @@ adminRoute.post("/checkin", adminAuth, async (c) => {
     .update(registrations)
     .set({ checkedInAt: now, checkedInBy: by })
     .where(and(eq(registrations.id, id), isNull(registrations.deletedAt), isNull(registrations.checkedInAt)))
-    .returning(attendeeColumns);
+    .returning({ ...attendeeColumns, email: registrations.email, kitSentAt: registrations.kitSentAt });
   if (fresh) {
     await logAudit(c.env.DB, { actor: c.get("actor"), action: "checkin", resource: "registrations", resourceId: id });
-    return c.json({ status: "checked_in", attendee: fresh });
+    // The email address and kit status stay server-side: the door screen gets
+    // the attendee card only.
+    const { email, kitSentAt, ...attendee } = fresh;
+    // Not re-sent if it already went out (undo, then check in again).
+    const sendKit = !kitSentAt;
+    if (sendKit) {
+      c.executionCtx.waitUntil(deliverVirtualKit(c.env, { id, name: attendee.name, email }));
+    }
+    return c.json({ status: "checked_in", attendee, kit: sendKit ? "sending" : "already_sent" });
   }
 
   const [existing] = await db
@@ -311,6 +356,7 @@ const REGISTRATION_COLUMNS = [
   "retentionUntil",
   "checkedInAt",
   "checkedInBy",
+  "kitSentAt",
   "createdAt",
 ] as const;
 

@@ -20,6 +20,7 @@ interface Registration {
   assistanceNeeded: string | null;
   checkedInAt: number | null;
   checkedInBy: string | null;
+  kitSentAt: number | null;
   createdAt: number;
 }
 
@@ -124,6 +125,19 @@ export default function Admin() {
     const res = await fetch(`/api/admin/registrations/${r.id}/resend`, { method: "POST", credentials: "include" });
     const data = await res.json().catch(() => ({}));
     setNotice(res.ok ? `Confirmation re-sent to ${r.email}.` : (data.error ?? "Could not re-send the confirmation."));
+  };
+
+  const handleResendKit = async (r: Registration) => {
+    if (!window.confirm(`Send the virtual kit email to ${r.email}?`)) return;
+    setNotice("");
+    const res = await fetch(`/api/admin/registrations/${r.id}/resend-kit`, { method: "POST", credentials: "include" });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) {
+      setRegistrations((rows) => rows?.map((row) => (row.id === r.id ? { ...row, kitSentAt: Date.now() } : row)) ?? null);
+      setNotice(`Virtual kit sent to ${r.email}.`);
+    } else {
+      setNotice(data.error ?? "Could not send the virtual kit.");
+    }
   };
 
   const handleDelete = async (r: Registration) => {
@@ -285,6 +299,9 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
                       <span className="text-emerald-300">
                         {new Date(r.checkedInAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
                         {r.checkedInBy && <span className="block text-white/45 text-[12px]">{r.checkedInBy}</span>}
+                        <span className={`block text-[12px] ${r.kitSentAt ? "text-white/45" : "text-amber-300"}`}>
+                          {r.kitSentAt ? "Kit sent" : "Kit not sent"}
+                        </span>
                       </span>
                     ) : (
                       <span className="text-white/35">—</span>
@@ -307,6 +324,11 @@ This erases all their data and invalidates their QR code. It cannot be undone.`,
                       <button type="button" onClick={() => handleResend(r)} className="text-gates-link bg-transparent border-none cursor-pointer p-0">
                         Re-send
                       </button>
+                      {r.checkedInAt && (
+                        <button type="button" onClick={() => handleResendKit(r)} className="text-gates-link bg-transparent border-none cursor-pointer p-0">
+                          Send kit
+                        </button>
+                      )}
                       <button type="button" onClick={() => handleDelete(r)} className="text-gates-error bg-transparent border-none cursor-pointer p-0">
                         Delete
                       </button>
