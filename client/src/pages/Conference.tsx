@@ -79,14 +79,14 @@ export default function Conference() {
       {/* Hero — the IEC poster carries the title, theme, date and venue, so
           the <h1> is screen-reader-only and the hero is the poster alone. The
           calls to action sit directly beneath it. */}
-      <header className="conference-hero conference-poster-hero relative overflow-hidden">
+      <header className="conference-hero hero-poster-bg relative overflow-hidden">
         <h1 className="sr-only">{CONFERENCE.edition}</h1>
         <ConferencePoster priority />
       </header>
 
       <section
         aria-label="Registration and conference details"
-        className="conference-poster-hero border-b border-white/8 px-5 sm:px-8 pt-2 pb-10 sm:pb-12"
+        className="hero-poster-bg border-b border-white/8 px-5 sm:px-8 pt-2 pb-10 sm:pb-12"
       >
         <div className="max-w-[1150px] mx-auto flex flex-col items-center">
           <ConferenceActions detailsHref="#programme" detailsLabel="View Agenda" />

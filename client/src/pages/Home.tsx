@@ -121,7 +121,7 @@ function ConferenceHeroSlide({
 }) {
   return (
     <div
-      className={`conference-poster-hero relative md:pb-16 transition-opacity duration-700 ease-in-out ${
+      className={`hero-poster-bg relative md:pb-16 transition-opacity duration-700 ease-in-out ${
         active ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!active}

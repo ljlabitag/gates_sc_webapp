@@ -18,6 +18,7 @@ import {
   SectionNav,
   STICKY_OFFSET,
 } from "../components/ui";
+import ProgramPoster from "../components/ProgramPoster";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { DOST, GATES, SOCIALS } from "../data/org";
 import { CONFERENCE } from "../data/conference";
@@ -151,39 +152,11 @@ export default function Program() {
     <div className="program-page min-h-screen">
       <Nav />
 
-      {/* Hero */}
-      <header className="program-hero hackathon-hero-bg relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
-        <div className="program-hero-swirl-bg absolute inset-0 z-0" aria-hidden="true" />
-        <div className="hero-bloom-bg absolute inset-0 z-0" aria-hidden="true" />
-        <div className="relative z-10 max-w-[900px] mx-auto py-14 sm:py-20 text-center flex flex-col gap-[18px] items-center">
-          <Eyebrow>ABOUT THE PROGRAM</Eyebrow>
-          <h1 className="font-display text-[clamp(28px,5vw,56px)] font-extrabold m-0 tracking-[0.01em] uppercase text-glow">
-            {GATES.programName}
-          </h1>
-          <p className="font-heading text-base sm:text-lg font-bold tracking-[0.14em] uppercase text-white/60 m-0">
-            For a Spatially Intelligent Nation
-          </p>
-          <p className="text-[17px] sm:text-lg leading-[1.55] text-white/70 m-0 max-w-[720px] lg:max-w-none lg:whitespace-nowrap">
-            GATES harmonizes geospatial information, tools, and applications into one integrated, interoperable
-            platform.
-          </p>
-
-          <div className="flex flex-col min-[420px]:flex-row gap-3 mt-2 w-full min-[420px]:w-auto">
-            <a
-              href="#overview"
-              className="btn-primary px-[26px] py-3.5 rounded-full text-white font-bold text-[15px] no-underline text-center"
-            >
-              Explore the Program
-            </a>
-            <a
-              href="#projects"
-              className="glass-panel px-[26px] py-3.5 rounded-full text-white/90 font-semibold text-[15px] no-underline text-center"
-            >
-              View Component Projects
-            </a>
-          </div>
-
-        </div>
+      {/* Hero — the IEC cover carries the Program name, tagline and logos, so the
+          <h1> is screen-reader-only and the hero is the poster alone. */}
+      <header className="program-hero hero-poster-bg relative overflow-hidden border-b border-white/8">
+        <h1 className="sr-only">{GATES.programName}</h1>
+        <ProgramPoster priority />
       </header>
 
       <SectionNav items={SECTIONS} />
