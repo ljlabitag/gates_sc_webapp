@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import ConferencePoster from "../components/ConferencePoster";
+import {
+  ConferenceActions,
+  ConferenceCountdown,
+  type CountdownItem,
+} from "../components/ConferenceHeroInfo";
+import { EventSnapshot, KeyDatesTimeline } from "../components/HomeSnapshot";
 import gatesVerticalLogo from "../assets/logos/gates-lockup-vertical.webp";
 import recapOpenForum from "../assets/photos/2025-open-forum.jpg";
 import handLeft from "../assets/hero/hand-left.webp";
@@ -24,14 +30,6 @@ import { useCountdown } from "../hooks/useCountdown";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { AGENDA, COMPONENTS, CONFERENCE, CONFERENCE_DATE, HACKATHON_DAY_DATE, RECAP_2025 } from "../data/conference";
 import { FINALISTS_ANNOUNCED_DATE, HACKATHON, SUBMISSION_DEADLINE_DATE } from "../data/hackathon";
-
-/* Tailwind scans for literal class names, so these can't be built by interpolation. */
-const accentByColor = {
-  blue: "bg-gates-blue",
-  teal: "bg-gates-teal",
-  orange: "bg-gates-orange",
-  plum: "bg-gates-plum",
-} as const;
 
 /* "11:59 PM on September 20, 2026" -> ["11:59 PM", "September 20, 2026"] — split
    from HACKATHON's own combined label rather than duplicating the date/time
@@ -90,7 +88,7 @@ const MILESTONES = [
     detail: `${conferenceOpensTime} onwards`,
     title: "Stakeholder conference proper",
     to: "/conference",
-    linkLabel: "See the programme",
+    linkLabel: "See the agenda",
   },
 ] as const;
 
@@ -98,59 +96,43 @@ const HERO_SLIDE_LABELS = ["Conference", "Hackathon"] as const;
 const HERO_AUTOPLAY_MS = 5000;
 
 /**
- * Conference hero as one carousel slide: the IEC poster (which carries the
- * title, theme, date and venue) with the live countdown and CTAs beneath it.
- * "View the Programme" points at the Conference page's own #programme anchor
- * instead of a same-page one, since that section doesn't exist here.
+ * Conference hero as one carousel slide: the IEC poster, which carries the
+ * title, theme, date and venue. The page's <h1> is sr-only text in Home.
  *
- * Unlike the Hackathon slide, this one is in normal flow rather than
- * `absolute inset-0`: the poster has a fixed aspect ratio and must never be
- * cropped, so it — not a hand-measured min-height — sets how tall the hero
- * is at each width (the absolute Hackathon slide fills whatever that
- * works out to). The page's <h1> is sr-only text in Home itself.
+ * It's in normal flow rather than `absolute inset-0` like the Hackathon slide,
+ * because the poster has a fixed aspect ratio and must never be cropped — it,
+ * not a hand-measured min-height, sets how tall the hero is at each width.
+ *
+ * Where the countdown and calls to action live depends on width, to keep the
+ * hero from ballooning:
+ * - md and up: the hero is the poster alone, and they sit in a strip right
+ *   beneath it (the first section below the hero) — otherwise the Hackathon slide
+ *   would be stretched to poster + countdown height (~1070px at 1440).
+ * - phones: the Hackathon slide needs ~830px, far more than the portrait
+ *   poster alone (~470px), so the countdown and buttons stay inside this
+ *   slide to fill that height instead of leaving an empty band.
  */
 function ConferenceHeroSlide({
   active,
   countdownItems,
 }: {
   active: boolean;
-  countdownItems: { value: string; label: string }[];
+  countdownItems: CountdownItem[];
 }) {
   return (
     <div
-      className={`conference-poster-hero relative transition-opacity duration-700 ease-in-out ${
+      className={`conference-poster-hero relative md:pb-16 transition-opacity duration-700 ease-in-out ${
         active ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!active}
     >
       <ConferencePoster priority />
       {/* pb-20 leaves room for the carousel dots/arrows, which are pinned to
-          the bottom of the hero over this slide. */}
-      <div className="relative z-10 w-full max-w-[1150px] mx-auto px-5 sm:px-8 pt-2 pb-20 sm:pb-24 text-center flex flex-col items-center">
-        <div
-          role="group"
-          aria-label="Countdown to the conference"
-          className="grid grid-cols-4 gap-2 sm:gap-3 w-full max-w-[420px]"
-        >
-          {countdownItems.map((item) => (
-            <div key={item.label} className="glass-panel rounded-2xl px-2 sm:px-4 py-3.5 text-center">
-              <div className="font-mono tabular-nums text-[22px] sm:text-[26px] font-semibold">{item.value}</div>
-              <div className="font-heading text-[9px] sm:text-[10px] text-white/50 mt-1 tracking-[0.08em]">
-                {item.label}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex flex-col min-[420px]:flex-row gap-3 mt-5 sm:mt-6 w-full min-[420px]:w-auto">
-          <PrimaryButton to="/registration">Registration Info</PrimaryButton>
-          <a
-            href="/conference#programme"
-            className="glass-panel px-[26px] py-3.5 rounded-full text-white/90 font-semibold text-[15px] no-underline text-center"
-          >
-            View the Programme
-          </a>
-        </div>
+          the bottom of the hero over this slide; md:pb-16 on the wrapper does
+          the same once the countdown moves out. */}
+      <div className="md:hidden relative z-10 w-full max-w-[1150px] mx-auto px-5 sm:px-8 pt-2 pb-20 text-center flex flex-col items-center">
+        <ConferenceCountdown items={countdownItems} />
+        <ConferenceActions detailsHref="/conference#programme" className="mt-5" />
       </div>
     </div>
   );
@@ -313,7 +295,7 @@ export default function Home() {
         onFocus={() => setPaused(true)}
         onBlur={() => setPaused(false)}
       >
-        <div className="home-hero-slides relative w-full flex flex-col justify-start">
+        <div className="home-hero-slides relative w-full flex flex-col justify-start md:justify-center">
           <ConferenceHeroSlide active={activeSlide === 0} countdownItems={countdownItems} />
           <HackathonHeroSlide active={activeSlide === 1} />
 
@@ -353,43 +335,28 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Key dates — the soonest deadline is the most useful thing on this page */}
-      <PageSection labelledBy="dates-title" width="wide" className="mt-8 sm:mt-12">
-        <SectionHead eyebrow="KEY DATES" title="What's coming up" titleId="dates-title" />
-        <ol className="grid grid-cols-1 md:grid-cols-3 gap-4 list-none m-0 p-0">
-          {KEY_DATES.map((entry, index) => (
-            <li
-              key={entry.title}
-              className={`glass-panel program-card relative overflow-hidden p-6 h-full flex flex-col gap-2 ${
-                index === 0 ? "home-next-date glass-panel-strong" : ""
-              }`}
-            >
-              <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-1 ${accentByColor[entry.color]}`} />
-              {index === 0 && (
-                <span className="self-start rounded-full border border-gates-orange/25 bg-gates-orange/10 px-2.5 py-1 font-heading text-[9px] font-semibold uppercase tracking-[0.08em] text-orange-200 mb-1">
-                  Next deadline
-                </span>
-              )}
-              <div className="flex flex-col min-[420px]:flex-row min-[420px]:items-baseline min-[420px]:justify-between gap-1 min-[420px]:gap-3">
-                <span className="font-mono text-[13px] text-white/80">{entry.date}</span>
-                <span className="font-heading text-[10px] uppercase tracking-[0.1em] text-white/42">
-                  {entry.detail}
-                </span>
-              </div>
-              <h3 className="text-[16px] font-semibold m-0 leading-snug">{entry.title}</h3>
-              <div className="mt-auto pt-2">
-                <TextLink to={entry.to}>{entry.linkLabel} &rarr;</TextLink>
-              </div>
-            </li>
-          ))}
-        </ol>
+      {/* Conference snapshot and key dates, as one section: what the conference
+          is (with the countdown and calls to action) and then the next dates —
+          the soonest one is the most useful thing on this page. On phones the
+          countdown and buttons stay up in the hero slide (see
+          ConferenceHeroSlide), so only the description leads here. */}
+      <PageSection labelledBy="dates-title" width="wide">
+        <EventSnapshot
+          countdownItems={countdownItems}
+          dateLine={`${CONFERENCE.dateLabel} · ${conferenceOpensTime} onwards`}
+        />
+
+        <div className="mt-14 sm:mt-16">
+          <SectionHead eyebrow="KEY DATES" title="What's coming up" titleId="dates-title" />
+          <KeyDatesTimeline entries={KEY_DATES} />
+        </div>
       </PageSection>
 
       {/* Events at a glance */}
       <PageSection labelledBy="glance-title" width="wide" className="mt-8 sm:mt-12">
         <SectionHead eyebrow="EVENTS AT A GLANCE" title="What's happening" titleId="glance-title" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* The programme is the main event; the three components run alongside it. */}
+          {/* The agenda is the main event; the three components run alongside it. */}
           <div className="glass-panel program-card glass-panel-strong p-6 sm:p-7 sm:col-span-2 lg:col-span-3">
             <div className="flex flex-wrap justify-between items-end gap-4">
               <div>
@@ -400,7 +367,7 @@ export default function Home() {
                   the data governance rationale, and the GATES Lakehouse.
                 </p>
               </div>
-              <TextLink to="/conference">See the programme &rarr;</TextLink>
+              <TextLink to="/conference">See the agenda &rarr;</TextLink>
             </div>
           </div>
 
@@ -537,7 +504,7 @@ export default function Home() {
           See you on {CONFERENCE.conferenceProperLabel.replace(/^\w+, /, "")}
         </h2>
         <div className="flex flex-col min-[420px]:flex-row gap-3">
-          <PrimaryButton to="/registration">Registration Info</PrimaryButton>
+          <PrimaryButton to="/registration">Register Now</PrimaryButton>
           <SecondaryButton to="/hackathon">Hackathon Info</SecondaryButton>
         </div>
       </section>

@@ -47,7 +47,7 @@ export function buildRegistrationConfirmation({ siteUrl, id, name }: Registratio
 <img src="${qrUrl}" width="220" height="220" alt="Your registration QR code" style="display:inline-block;width:220px;height:220px;border:0;">
 </p>
 <p style="margin:0 0 24px 0;font-size:12px;color:#666666;text-align:center;">Reference ID: ${escapeHtml(id)}</p>
-<p style="margin:0 0 16px 0;">Venue and travel details will be sent to this email address as soon as they are confirmed. In the meantime, you can find the programme and the latest updates on the conference website.</p>
+<p style="margin:0 0 16px 0;">Venue and travel details will be sent to this email address as soon as they are confirmed. In the meantime, you can find more details about the conference and the latest updates on the conference website.</p>
 ${buttonHtml(conferenceUrl, "View conference details")}
 <p style="margin:0 0 24px 0;">For questions, contact the secretariat at <a href="mailto:${EVENT.contact}" style="color:#1a1aea;">${EVENT.contact}</a>.</p>
 <p style="margin:0;">Regards,<br>${escapeHtml(EVENT.secretariat)}</p>`;
@@ -77,7 +77,7 @@ ${buttonHtml(conferenceUrl, "View conference details")}
     `Reference ID: ${id}`,
     "",
     "Venue and travel details will be sent to this email address as soon as they are confirmed. " +
-      "In the meantime, you can find the programme and the latest updates on the conference website:",
+      "In the meantime, you can find more details about the conference and the latest updates on the conference website:",
     conferenceUrl,
     "",
     `For questions, contact the secretariat at ${EVENT.contact}.`,

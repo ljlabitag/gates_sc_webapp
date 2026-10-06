@@ -827,7 +827,7 @@ export default function Hackathon() {
                   confirm by September 29.
                 </p>
                 <div className="mt-1.5">
-                  <TextLink to="/conference">See the conference programme &rarr;</TextLink>
+                  <TextLink to="/conference">See conference details &rarr;</TextLink>
                 </div>
               </div>
             ) : submissionsClosed ? (
@@ -839,7 +839,7 @@ export default function Hackathon() {
                   {nextMilestone.dateLabel}.
                 </p>
                 <div className="mt-1.5">
-                  <TextLink to="/conference">See the conference programme &rarr;</TextLink>
+                  <TextLink to="/conference">See conference details &rarr;</TextLink>
                 </div>
               </div>
             ) : (

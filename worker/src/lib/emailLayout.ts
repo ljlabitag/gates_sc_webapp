@@ -9,7 +9,7 @@
 // Event facts mirror client/src/data/conference.ts — the packages don't share
 // code, so update both if the date, time or venue change. The time and venue
 // are deliberately worded as provisional: the site itself still calls the
-// programme provisional and the venue "to be announced".
+// agenda provisional and the venue "to be announced".
 
 export const EVENT = {
   name: "2nd GATES Program Stakeholder Conference",
