@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import ConferencePoster from "../components/ConferencePoster";
 import gatesVerticalLogo from "../assets/logos/gates-lockup-vertical.webp";
 import recapOpenForum from "../assets/photos/2025-open-forum.jpg";
 import handLeft from "../assets/hero/hand-left.webp";
@@ -97,11 +98,16 @@ const HERO_SLIDE_LABELS = ["Conference", "Hackathon"] as const;
 const HERO_AUTOPLAY_MS = 5000;
 
 /**
- * Conference page's own hero content, reproduced here as one carousel slide
- * (see Home's hero below) — same copy/countdown/CTAs, just re-tagged so the
- * page still has exactly one <h1> regardless of which slide starts active.
- * "View the Programme" points at the Conference page's own #programme
- * anchor instead of a same-page one, since that section doesn't exist here.
+ * Conference hero as one carousel slide: the IEC poster (which carries the
+ * title, theme, date and venue) with the live countdown and CTAs beneath it.
+ * "View the Programme" points at the Conference page's own #programme anchor
+ * instead of a same-page one, since that section doesn't exist here.
+ *
+ * Unlike the Hackathon slide, this one is in normal flow rather than
+ * `absolute inset-0`: the poster has a fixed aspect ratio and must never be
+ * cropped, so it — not a hand-measured min-height — sets how tall the hero
+ * is at each width (the absolute Hackathon slide fills whatever that
+ * works out to). The page's <h1> is sr-only text in Home itself.
  */
 function ConferenceHeroSlide({
   active,
@@ -112,42 +118,19 @@ function ConferenceHeroSlide({
 }) {
   return (
     <div
-      className={`absolute inset-0 flex items-center justify-center transition-opacity duration-700 ease-in-out ${
+      className={`conference-poster-hero relative transition-opacity duration-700 ease-in-out ${
         active ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       aria-hidden={!active}
     >
-      <div className="hero-brand-gradient absolute inset-0" aria-hidden="true" />
-      <div className="conference-hero-road-bg absolute inset-0 z-0" aria-hidden="true" />
-      <div className="conference-hero-grid-bg absolute inset-0 z-0" aria-hidden="true" />
-      {/* w-full: this div's parent (the slide wrapper above) is itself a
-          flex row centering its content, so without an explicit width this
-          child would shrink-to-fit its content instead of filling out to
-          max-w-1150 — collapsing the @container query context to a few px
-          and, with it, the cqw-sized theme text below. */}
-      <div className="relative z-10 w-full max-w-[1150px] mx-auto px-5 sm:px-8 py-10 sm:py-14 text-center flex flex-col items-center @container">
-        <h2 className="conference-hero-badge inline-flex items-center m-0 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-white font-heading font-bold text-base sm:text-xl tracking-[0.01em]">
-          2<sup className="text-[0.65em] font-semibold">nd</sup>&nbsp;GATES Program Stakeholder Conference
-        </h2>
-        {/* Same cqw approach as Conference.tsx's own hero (see that file for
-            the full reasoning) — vw-based sizing outgrew this slide's own
-            column before the viewport did, same bug, same fix. */}
-        <p className="font-display text-[clamp(19px,6.3cqw,60px)] font-extrabold m-0 mt-6 sm:mt-7 tracking-[0.01em] uppercase text-glow leading-[1.05] whitespace-nowrap">
-          {CONFERENCE.theme}
-        </p>
-        <div className="mt-5 sm:mt-6 font-mono text-xs sm:text-sm leading-relaxed tracking-[0.1em] sm:tracking-[0.12em] text-white/65">
-          {CONFERENCE.dateLabel} &middot; {CONFERENCE.venueLabel}
-        </div>
-        <p className="text-[16px] sm:text-lg leading-[1.6] text-white/70 m-0 mt-3 sm:mt-4 max-w-[640px]">
-          The {CONFERENCE.edition} brings together stakeholders from DOST attached agencies and regional offices,
-          national government agencies, and development partners to learn about the latest developments of the
-          GATES Program and engage stakeholders in charting its next phase.
-        </p>
-
+      <ConferencePoster priority />
+      {/* pb-20 leaves room for the carousel dots/arrows, which are pinned to
+          the bottom of the hero over this slide. */}
+      <div className="relative z-10 w-full max-w-[1150px] mx-auto px-5 sm:px-8 pt-2 pb-20 sm:pb-24 text-center flex flex-col items-center">
         <div
           role="group"
           aria-label="Countdown to the conference"
-          className="grid grid-cols-4 gap-2 sm:gap-3 mt-7 sm:mt-8 w-full max-w-[420px]"
+          className="grid grid-cols-4 gap-2 sm:gap-3 w-full max-w-[420px]"
         >
           {countdownItems.map((item) => (
             <div key={item.label} className="glass-panel rounded-2xl px-2 sm:px-4 py-3.5 text-center">
@@ -330,7 +313,7 @@ export default function Home() {
         onFocus={() => setPaused(true)}
         onBlur={() => setPaused(false)}
       >
-        <div className="home-hero-slides relative w-full">
+        <div className="home-hero-slides relative w-full flex flex-col justify-center">
           <ConferenceHeroSlide active={activeSlide === 0} countdownItems={countdownItems} />
           <HackathonHeroSlide active={activeSlide === 1} />
 

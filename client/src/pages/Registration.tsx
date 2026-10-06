@@ -25,10 +25,11 @@ const EMPTY_FORM = {
   firstName: "",
   middleInitial: "",
   lastName: "",
+  nickname: "",
   email: "",
   mobile: "",
   agency: "",
-  organization: "",
+  division: "",
   designation: "",
   foodAllergies: "",
   assistanceNeeded: "",
@@ -146,11 +147,11 @@ export default function Registration() {
       return;
     }
     if (!form.agency.trim()) {
-      setError("Please enter your agency or office.");
+      setError("Please enter your agency or organization.");
       return;
     }
     if (!form.designation.trim()) {
-      setError("Please enter your designation or position.");
+      setError("Please enter your position or designation.");
       return;
     }
     if (!consent) {
@@ -269,6 +270,18 @@ export default function Registration() {
                     />
                   </Field>
                 </div>
+                <Field id="nickname" label="Nickname" hint="Optional. How you'd like to be called — printed on your name tag.">
+                  <input
+                    id="nickname"
+                    className={inputClass}
+                    type="text"
+                    value={form.nickname}
+                    onChange={setField("nickname")}
+                    maxLength={REGISTRATION_LIMITS.nickname}
+                    autoComplete="nickname"
+                    placeholder="e.g. Jun"
+                  />
+                </Field>
                 <Field
                   id="email"
                   label="Email address"
@@ -306,7 +319,7 @@ export default function Registration() {
                 <legend className={legendClass}>
                   <span className="text-gates-link mr-2">02</span>Agency &amp; position
                 </legend>
-                <Field id="agency" label="Agency / Office" required>
+                <Field id="agency" label="Agency / Organization" required>
                   <input
                     id="agency"
                     className={inputClass}
@@ -319,7 +332,18 @@ export default function Registration() {
                     required
                   />
                 </Field>
-                <Field id="designation" label="Designation / Position" required>
+                <Field id="division" label="Division / Section" hint="Optional. Leave blank if not applicable.">
+                  <input
+                    id="division"
+                    className={inputClass}
+                    type="text"
+                    value={form.division}
+                    onChange={setField("division")}
+                    maxLength={REGISTRATION_LIMITS.division}
+                    placeholder="e.g. Remote Sensing and Data Science Division"
+                  />
+                </Field>
+                <Field id="designation" label="Position / Designation" required>
                   <input
                     id="designation"
                     className={inputClass}
@@ -330,21 +354,6 @@ export default function Registration() {
                     autoComplete="organization-title"
                     placeholder="e.g. Science Research Specialist II"
                     required
-                  />
-                </Field>
-                <Field
-                  id="organization"
-                  label="Organization"
-                  hint="Optional. Your parent organization, if it differs from your agency or office."
-                >
-                  <input
-                    id="organization"
-                    className={inputClass}
-                    type="text"
-                    value={form.organization}
-                    onChange={setField("organization")}
-                    maxLength={REGISTRATION_LIMITS.organization}
-                    placeholder="e.g. Department of Science and Technology"
                   />
                 </Field>
               </fieldset>

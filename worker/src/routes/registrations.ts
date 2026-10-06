@@ -15,9 +15,10 @@ const DIETARY_OPTIONS = ["Vegetarian", "Halal", "No pork"];
 const ASSISTANCE_OPTIONS = ["Senior citizen", "Person with disability (PWD)", "Pregnant"];
 const LIMITS = {
   name: 60,
+  nickname: 30,
   mobile: 25,
   agency: 160,
-  organization: 160,
+  division: 120,
   designation: 120,
   foodAllergies: 200,
   assistanceNeeded: 200,
@@ -86,7 +87,8 @@ registrationsRoute.post("/", async (c) => {
   const email = text(body.email);
   const mobile = text(body.mobile);
   const agency = text(body.agency);
-  const organization = text(body.organization);
+  const nickname = text(body.nickname);
+  const division = text(body.division);
   const designation = text(body.designation);
   const foodAllergies = text(body.foodAllergies);
   const assistanceNeeded = text(body.assistanceNeeded);
@@ -114,16 +116,17 @@ registrationsRoute.post("/", async (c) => {
     return c.json({ error: "Please enter a valid mobile number." }, 400);
   }
   if (!agency) {
-    return c.json({ error: "Please enter your agency or office." }, 400);
+    return c.json({ error: "Please enter your agency or organization." }, 400);
   }
   if (!designation) {
-    return c.json({ error: "Please enter your designation or position." }, 400);
+    return c.json({ error: "Please enter your position or designation." }, 400);
   }
   if (
     firstName.length > LIMITS.name ||
     lastName.length > LIMITS.name ||
     agency.length > LIMITS.agency ||
-    (organization?.length ?? 0) > LIMITS.organization ||
+    (nickname?.length ?? 0) > LIMITS.nickname ||
+    (division?.length ?? 0) > LIMITS.division ||
     designation.length > LIMITS.designation
   ) {
     return c.json({ error: "One of the fields you entered is too long." }, 400);
@@ -174,10 +177,11 @@ registrationsRoute.post("/", async (c) => {
       firstName,
       middleInitial,
       lastName,
+      nickname,
       email,
       mobile,
       agency,
-      organization,
+      division,
       designation,
       dietaryPreferences: dietary.value,
       foodAllergies,

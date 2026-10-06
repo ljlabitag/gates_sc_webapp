@@ -18,9 +18,10 @@ export const ASSISTANCE_OPTIONS = ["Senior citizen", "Person with disability (PW
 
 export const REGISTRATION_LIMITS = {
   name: 60,
+  nickname: 30,
   mobile: 25,
   agency: 160,
-  organization: 160,
+  division: 120,
   designation: 120,
   /** Food allergies / specific diet note. */
   foodAllergies: 200,

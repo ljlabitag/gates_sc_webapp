@@ -19,10 +19,13 @@ export interface RegistrationInput {
   firstName: string;
   middleInitial: string;
   lastName: string;
+  nickname: string;
   email: string;
   mobile: string;
+  /** "Agency / Organization" — a DOST agency or office, or a partner institution. */
   agency: string;
-  organization: string;
+  /** Optional division or section within the agency. */
+  division: string;
   designation: string;
   /** Checked options from DIETARY_OPTIONS (data/registration.ts). */
   dietaryPreferences: string[];

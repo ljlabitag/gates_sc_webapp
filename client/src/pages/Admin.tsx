@@ -4,10 +4,11 @@ import { Link } from "react-router-dom";
 interface Registration {
   id: string;
   name: string;
+  nickname: string | null;
   email: string;
   mobile: string | null;
   agency: string | null;
-  organization: string | null;
+  division: string | null;
   designation: string | null;
   dietaryPreferences: string | null;
   foodAllergies: string | null;
@@ -190,9 +191,9 @@ export default function Admin() {
               <tr className="border-b border-white/10 text-white/50">
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Contact</th>
-                <th className="px-4 py-3 font-medium">Agency / Office</th>
-                <th className="px-4 py-3 font-medium">Designation</th>
-                <th className="px-4 py-3 font-medium">Organization</th>
+                <th className="px-4 py-3 font-medium">Agency / Organization</th>
+                <th className="px-4 py-3 font-medium">Division / Section</th>
+                <th className="px-4 py-3 font-medium">Position / Designation</th>
                 <th className="px-4 py-3 font-medium">Dietary</th>
                 <th className="px-4 py-3 font-medium">Special assistance</th>
                 <th className="px-4 py-3 font-medium">Submitted</th>
@@ -208,14 +209,17 @@ export default function Admin() {
               )}
               {registrations?.map((r) => (
                 <tr key={r.id} className="border-b border-white/5 align-top">
-                  <td className="px-4 py-3">{r.name}</td>
+                  <td className="px-4 py-3">
+                    {r.name}
+                    {r.nickname && <div className="text-white/50">&ldquo;{r.nickname}&rdquo;</div>}
+                  </td>
                   <td className="px-4 py-3">
                     {r.email}
                     {r.mobile && <div className="text-white/50">{r.mobile}</div>}
                   </td>
                   <td className="px-4 py-3">{r.agency || "—"}</td>
+                  <td className="px-4 py-3">{r.division || "—"}</td>
                   <td className="px-4 py-3">{r.designation || "—"}</td>
-                  <td className="px-4 py-3">{r.organization || "—"}</td>
                   <td className="px-4 py-3">{joinDetails(r.dietaryPreferences, r.foodAllergies)}</td>
                   <td className="px-4 py-3">{joinDetails(r.specialAssistance, r.assistanceNeeded)}</td>
                   <td className="px-4 py-3 text-white/60">{formatDate(r.createdAt)}</td>

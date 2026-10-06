@@ -251,6 +251,27 @@
      big, bold visual headline instead — same brand-gradient treatment as
      nav-register-gradient, just its own class since a hero badge and a nav
      button warrant independent sizing/padding tuning over time. */
+  /* The IEC poster (components/ConferencePoster.tsx). Capped at its native
+     1600px width; on wider screens it sits centred on the page's near-black
+     hero background, and a soft edge fade stops it reading as a hard
+     box. The fade is confined to the outer 6% (sides) and 4% (top/bottom),
+     where the artwork is only dark texture — no text or logos live there. */
+  .conference-poster {
+    max-width: 1600px;
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
+      linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+    mask-composite: intersect;
+  }
+
+  .conference-poster-hero {
+    background: #050506;
+  }
+
   .conference-hero-badge {
     background:
       linear-gradient(rgba(8, 9, 11, 0.3), rgba(8, 9, 11, 0.3)),

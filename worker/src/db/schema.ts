@@ -20,14 +20,19 @@ export const registrations = sqliteTable("registrations", {
   firstName: text("first_name"),
   middleInitial: text("middle_initial"),
   lastName: text("last_name"),
+  // Optional preferred name, for the name tag.
+  nickname: text("nickname"),
   email: text("email").notNull(),
   mobile: text("mobile"),
-  // The attendee's office or agency (e.g. "DOST-ASTI") — distinct from
-  // `organization`, the optional parent body (e.g. "Department of Science
-  // and Technology", or a development partner's institution).
+  // The attendee's agency or organization (e.g. "DOST-ASTI", or a development
+  // partner's institution) and, where applicable, their division or section
+  // within it. `designation` is their position.
   agency: text("agency"),
-  organization: text("organization"),
+  division: text("division"),
   designation: text("designation"),
+  // Superseded by `agency` ("Agency / Organization") — new registrations
+  // never write it. Left in place so the migration stays additive.
+  organization: text("organization"),
   // Dietary and assistance details are sensitive personal information under
   // RA 10173 (health-adjacent), hence structured checklists plus short,
   // length-capped notes rather than open text (brief §6). Checklists are

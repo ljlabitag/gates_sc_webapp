@@ -1,5 +1,6 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
+import ConferencePoster from "../components/ConferencePoster";
 import {
   componentIcons,
   Eyebrow,
@@ -84,36 +85,14 @@ export default function Conference() {
     <div className="conference-page min-h-screen">
       <Nav />
 
-      {/* Hero */}
-      <header className="conference-hero hero-brand-gradient relative overflow-hidden border-b border-white/8 px-5 sm:px-8">
-        <div className="conference-hero-road-bg absolute inset-0 z-0" aria-hidden="true" />
-        <div className="conference-hero-grid-bg absolute inset-0 z-0" aria-hidden="true" />
-        <div className="relative z-10 max-w-[1150px] mx-auto py-14 sm:py-20 text-center flex flex-col items-center @container">
-          <h1 className="conference-hero-badge inline-flex items-center m-0 px-5 py-2 sm:px-6 sm:py-2.5 rounded-full text-white font-heading font-bold text-base sm:text-xl tracking-[0.01em]">
-            2<sup className="text-[0.65em] font-semibold">nd</sup>&nbsp;GATES Program Stakeholder Conference
-          </h1>
-          {/* cqw (% of this div's own width via @container above), not vw —
-              vw scales with the viewport, but this container's own width
-              caps out at max-w-1150 well before the viewport does, so a
-              vw-based size (the original 6.4vw) kept growing past the
-              container and forced this onto two lines / off the edge at
-              exactly the widths where that gap is largest. Widened the
-              container itself (900 -> 1150) and bumped 5.9cqw -> 6.3cqw on
-              top of that, since 95%-of-900 alone read too small — this
-              keeps "Charting Spatial Futures" at ~95% of the now-wider
-              column, one line, reaching the original 72px cap on large
-              screens instead of stalling well under it. */}
-          <p className="font-display text-[clamp(19px,6.3cqw,72px)] font-extrabold m-0 mt-6 sm:mt-7 tracking-[0.01em] uppercase text-glow leading-[1.05] whitespace-nowrap">
-            {CONFERENCE.theme}
-          </p>
-          {/* Larger than the shared Eyebrow (which stays at its default
-              size everywhere else) — this is standing in as real event
-              detail copy underneath the theme, not a small section label,
-              so it reads at more than font-mono text-xs. */}
-          <div className="mt-5 sm:mt-6 font-mono text-xs sm:text-sm leading-relaxed tracking-[0.1em] sm:tracking-[0.12em] text-white/65">
-            {CONFERENCE.dateLabel} &middot; {CONFERENCE.venueLabel}
-          </div>
-          <p className="text-[17px] sm:text-lg leading-[1.6] text-white/70 m-0 mt-3 sm:mt-4 max-w-[700px]">
+      {/* Hero — the IEC poster carries the title, theme, date and venue, so
+          the <h1> is screen-reader-only and the live countdown/CTAs sit
+          directly beneath it. */}
+      <header className="conference-hero conference-poster-hero relative overflow-hidden border-b border-white/8">
+        <h1 className="sr-only">{CONFERENCE.edition}</h1>
+        <ConferencePoster priority />
+        <div className="relative z-10 max-w-[1150px] mx-auto px-5 sm:px-8 pt-2 pb-12 sm:pb-16 text-center flex flex-col items-center">
+          <p className="text-[17px] sm:text-lg leading-[1.6] text-white/70 m-0 max-w-[700px]">
             The {CONFERENCE.edition} brings together stakeholders from DOST attached agencies and regional offices,
             national government agencies, and development partners to learn about the latest developments of the
             GATES Program and engage stakeholders in charting its next phase.
@@ -122,7 +101,7 @@ export default function Conference() {
           <div
             role="group"
             aria-label="Countdown to the conference"
-            className="grid grid-cols-4 gap-2 sm:gap-3 mt-9 sm:mt-10 w-full max-w-[420px]"
+            className="grid grid-cols-4 gap-2 sm:gap-3 mt-8 sm:mt-9 w-full max-w-[420px]"
           >
             {countdown.map((item) => (
               <div key={item.label} className="glass-panel rounded-2xl px-2 sm:px-4 py-3.5 text-center">
@@ -143,7 +122,6 @@ export default function Conference() {
               View the Programme
             </a>
           </div>
-
         </div>
       </header>
 

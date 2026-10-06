@@ -56,8 +56,8 @@ export default function Privacy() {
             <a href="/registration" className="text-gates-link no-underline font-semibold">
               registration page
             </a>
-            . It collects your name, email address, mobile number, agency or office, designation, and (optionally)
-            your organization, used to manage attendance and to send you your confirmation and venue details. It
+            . It collects your name (and, optionally, a nickname for your name tag), email address, mobile number,
+            agency or organization, division or section (where applicable), and position or designation, used to manage attendance and to send you your confirmation and venue details. It
             also lets you share dietary preferences, food allergies, and special-assistance needs (such as senior
             citizen or PWD status). That information can reveal health conditions, so it is optional, limited to a
             short checklist and a short note, and used only to arrange catering, access, and seating at the
