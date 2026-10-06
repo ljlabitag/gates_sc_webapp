@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `registrations_email_unique` ON `registrations` (lower("email")) WHERE "registrations"."deleted_at" is null;

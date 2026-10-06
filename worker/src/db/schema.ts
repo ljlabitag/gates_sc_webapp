@@ -1,4 +1,5 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
+import { sqliteTable, text, integer, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 // SQLite has no native enum or boolean type: statuses are validated in app
 // code against a TS union, and 0/1 integers stand in for booleans (Drizzle's
@@ -12,11 +13,38 @@ export const registrations = sqliteTable("registrations", {
   // FK to the future voucher module's `events` table — nullable until that
   // migration lands, included now so it's additive rather than a schema break.
   eventId: text("event_id"),
+  // `name` is the display name, composed server-side from the three parts
+  // below ("First M. Last") — kept as its own column so the admin list and
+  // exports that predate the split keep working. The parts are nullable only
+  // because adding them to an existing table has to be additive.
   name: text("name").notNull(),
+  firstName: text("first_name"),
+  middleInitial: text("middle_initial"),
+  lastName: text("last_name"),
+  // Optional preferred name, for the name tag.
+  nickname: text("nickname"),
   email: text("email").notNull(),
+  mobile: text("mobile"),
+  // The attendee's agency or organization (e.g. "DOST-ASTI", or a development
+  // partner's institution) and, where applicable, their division or section
+  // within it. `designation` is their position.
+  agency: text("agency"),
+  division: text("division"),
+  designation: text("designation"),
+  // Superseded by `agency` ("Agency / Organization") — new registrations
+  // never write it. Left in place so the migration stays additive.
   organization: text("organization"),
-  // Freeform for now — see the implementation brief §6 on replacing this with
-  // structured checkbox options to avoid inviting disclosure of health data.
+  // Dietary and assistance details are sensitive personal information under
+  // RA 10173 (health-adjacent), hence structured checklists plus short,
+  // length-capped notes rather than open text (brief §6). Checklists are
+  // stored "; "-joined.
+  dietaryPreferences: text("dietary_preferences"),
+  foodAllergies: text("food_allergies"),
+  specialAssistance: text("special_assistance"),
+  assistanceNeeded: text("assistance_needed"),
+  // Superseded by the four columns above — new registrations never write it.
+  // Left in place so the migration stays additive rather than dropping a
+  // column from databases that already have the table.
   dietaryAccessibility: text("dietary_accessibility"),
   consentedAt: integer("consented_at").notNull(),
   privacyNoticeVersion: text("privacy_notice_version").notNull(),
@@ -24,7 +52,12 @@ export const registrations = sqliteTable("registrations", {
   retentionUntil: integer("retention_until").notNull(),
   deletedAt: integer("deleted_at"),
   createdAt: integer("created_at").notNull(),
-});
+}, (t) => [
+  // One live registration per email address, case-insensitively. The route
+  // checks first so repeats get a friendly answer; this is what makes that
+  // airtight when two submissions arrive at the same moment.
+  uniqueIndex("registrations_email_unique").on(sql`lower(${t.email})`).where(sql`${t.deletedAt} is null`),
+]);
 
 // Mirrors Annex A of the GATES GeoHack 2026 mechanics.
 export const hackathonSubmissions = sqliteTable("hackathon_submissions", {
@@ -65,7 +98,7 @@ export const hackathonSubmissions = sqliteTable("hackathon_submissions", {
 export const auditLog = sqliteTable("audit_log", {
   id: text("id").primaryKey(),
   actor: text("actor").notNull(),
-  action: text("action", { enum: ["view", "export", "download"] }).notNull(),
+  action: text("action", { enum: ["view", "export", "download", "update", "resend", "delete"] }).notNull(),
   resource: text("resource", { enum: ["registrations", "hackathon_submissions"] }).notNull(),
   resourceId: text("resource_id"),
   createdAt: integer("created_at").notNull(),

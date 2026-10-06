@@ -1,12 +1,14 @@
 import { Hono } from "hono";
 import { setSignedCookie, deleteCookie } from "hono/cookie";
-import { desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
 import type { AppEnv } from "../index";
 import { getDb } from "../db/client";
 import { registrations, hackathonSubmissions } from "../db/schema";
 import { timingSafeEqual } from "../lib/auth";
 import { toCsv } from "../lib/csv";
 import { logAudit } from "../lib/auditLog";
+import { parseRegistrationFields } from "../lib/registrationFields";
+import { sendRegistrationConfirmation } from "../lib/mailer";
 import { presignDownload } from "../storage/s3";
 import { adminAuth, SESSION_COOKIE } from "../middleware/adminAuth";
 import { checkRateLimit } from "../lib/rateLimit";
@@ -80,13 +82,118 @@ adminRoute.get("/registrations", adminAuth, async (c) => {
   return c.json(rows);
 });
 
+// Admin corrections to a registration — the access/correction/erasure rights
+// the privacy notice promises have to be actionable by someone, and this is
+// that someone. Each action is audit-logged (who, what, when) like reads are.
+// Only the registrant's own details are editable; consent records and
+// retention dates are a statement they made and are left untouched.
+adminRoute.patch("/registrations/:id", adminAuth, async (c) => {
+  const id = c.req.param("id");
+  if (!id) return c.notFound();
+  const body = await c.req.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return c.json({ error: "Invalid request body." }, 400);
+  }
+  const parsed = parseRegistrationFields(body);
+  if (!parsed.ok) {
+    return c.json({ error: parsed.error }, 400);
+  }
+  const fields = parsed.value;
+
+  const db = getDb(c.env.DB);
+  const [existing] = await db
+    .select({ id: registrations.id })
+    .from(registrations)
+    .where(and(eq(registrations.id, id), isNull(registrations.deletedAt)))
+    .limit(1);
+  if (!existing) {
+    return c.json({ error: "Registration not found." }, 404);
+  }
+
+  const emailTaken = await db
+    .select({ id: registrations.id })
+    .from(registrations)
+    .where(
+      and(sql`lower(${registrations.email}) = ${fields.email}`, isNull(registrations.deletedAt), ne(registrations.id, id)),
+    )
+    .limit(1);
+  if (emailTaken.length > 0) {
+    return c.json({ error: "Another registration already uses that email address." }, 409);
+  }
+
+  try {
+    await db.update(registrations).set(fields).where(eq(registrations.id, id));
+  } catch (err) {
+    if (String(err).includes("UNIQUE")) {
+      return c.json({ error: "Another registration already uses that email address." }, 409);
+    }
+    console.error("Failed to update registration:", err);
+    return c.json({ error: "Could not save the changes." }, 500);
+  }
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "update", resource: "registrations", resourceId: id });
+
+  const [row] = await db.select().from(registrations).where(eq(registrations.id, id)).limit(1);
+  return c.json(row);
+});
+
+// Re-sends the original confirmation (same registration id, so same QR) to
+// the address on file. Awaited, unlike the public form's fire-and-forget: an
+// admin pressing the button should find out if the mail provider refused it.
+adminRoute.post("/registrations/:id/resend", adminAuth, async (c) => {
+  const id = c.req.param("id");
+  if (!id) return c.notFound();
+  const db = getDb(c.env.DB);
+  const [row] = await db
+    .select({ id: registrations.id, name: registrations.name, email: registrations.email })
+    .from(registrations)
+    .where(and(eq(registrations.id, id), isNull(registrations.deletedAt)))
+    .limit(1);
+  if (!row) {
+    return c.json({ error: "Registration not found." }, 404);
+  }
+  try {
+    await sendRegistrationConfirmation(c.env, row.email, { id: row.id, name: row.name });
+  } catch (err) {
+    console.error("Admin re-send of registration confirmation failed:", err);
+    return c.json({ error: "The email provider rejected the message. Check the logs and try again." }, 502);
+  }
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "resend", resource: "registrations", resourceId: id });
+  return c.json({ ok: true, email: row.email });
+});
+
+// Permanent erasure, not a soft delete: a soft-deleted row would keep every
+// piece of personal data, which is the opposite of an erasure request. What
+// survives is the audit entry — the registration id, who deleted it and when,
+// with no personal data in it.
+adminRoute.delete("/registrations/:id", adminAuth, async (c) => {
+  const id = c.req.param("id");
+  if (!id) return c.notFound();
+  const db = getDb(c.env.DB);
+  const deleted = await db.delete(registrations).where(eq(registrations.id, id)).returning({ id: registrations.id });
+  if (deleted.length === 0) {
+    return c.json({ error: "Registration not found." }, 404);
+  }
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "delete", resource: "registrations", resourceId: id });
+  return c.json({ ok: true });
+});
+
 const REGISTRATION_COLUMNS = [
   "id",
   "eventId",
   "name",
+  "lastName",
+  "firstName",
+  "middleInitial",
+  "nickname",
   "email",
-  "organization",
-  "dietaryAccessibility",
+  "mobile",
+  "agency",
+  "division",
+  "designation",
+  "dietaryPreferences",
+  "foodAllergies",
+  "specialAssistance",
+  "assistanceNeeded",
   "consentedAt",
   "privacyNoticeVersion",
   "documentationConsent",

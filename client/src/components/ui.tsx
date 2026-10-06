@@ -71,6 +71,195 @@ export function IconPin({ color }: { color: DotColor }) {
   );
 }
 
+/** Solid-color rounded-square badge wrapping a 22px glyph — shared frame for the Icon* components below, so swapping which glyph a card uses is just swapping the child markup. Background is the full brand color (not a tint), so every glyph below is drawn in white with the brand color itself used only for the occasional accent/contrast line on top — the inverse of an earlier version (tinted background, colored glyph). */
+function IconBadge({ color, children }: { color: DotColor; children: ReactNode }) {
+  const c = dotColorVars[color];
+  return (
+    <span
+      aria-hidden="true"
+      className="inline-flex items-center justify-center w-11 h-11 rounded-[12px] mb-[14px]"
+      style={{ background: c }}
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24">{children}</svg>
+    </span>
+  );
+}
+
+/** Solid folded-map glyph — for the Geospatial Gallery component (maps built from DOST datasets). */
+export function IconMap({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <path d="M3 6.5 9 4l6 2.5 6-2.5v15l-6 2.5-6-2.5-6 2.5z" fill="white" />
+      <path d="M9 4v15M15 6.5V21" stroke={c} strokeWidth="1.4" strokeLinecap="round" opacity="0.75" />
+    </IconBadge>
+  );
+}
+
+/** Solid screen-with-a-chart glyph — for the Use Case Development Showcase component (partner agencies presenting to the room). */
+export function IconPresentation({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="3" y="4" width="18" height="12" rx="2" fill="white" />
+      <path d="M8 20h8M12 16v4" stroke="white" strokeWidth="1.75" strokeLinecap="round" fill="none" />
+      <path
+        d="M7 12.5 10 9l3 2.5 4-4.5"
+        stroke={c}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </IconBadge>
+  );
+}
+
+/** Solid code-brackets glyph — for the GATES GeoHack 2026 component (the hackathon build). */
+export function IconCode({ color }: { color: DotColor }) {
+  return (
+    <IconBadge color={color}>
+      <path d="M9.5 5.5 3.5 12l6 6.5 2-1.8L7.3 12l4.2-4.7z" fill="white" />
+      <path d="M14.5 5.5l6 6.5-6 6.5-2-1.8 4.2-4.7-4.2-4.7z" fill="white" />
+    </IconBadge>
+  );
+}
+
+/** Solid clipboard-check glyph — for the Hackathon pre-event card (final coaching and technical judging). */
+export function IconClipboardCheck({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="5" y="4" width="14" height="17" rx="2" fill="white" />
+      <rect x="9" y="2.5" width="6" height="3" rx="1" fill="white" />
+      <path d="M8.5 12.7 11 15.2l4.5-5" stroke={c} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </IconBadge>
+  );
+}
+
+/** Solid calendar glyph — for the Hackathon pre-event card's Main event slot (the conference day itself). */
+export function IconCalendar({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="3" y="5" width="18" height="16" rx="2" fill="white" />
+      <rect x="3" y="5" width="18" height="4.5" rx="2" fill={c} opacity="0.18" />
+      <path d="M7.5 3v4M16.5 3v4" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="14.5" r="2.2" fill={c} />
+    </IconBadge>
+  );
+}
+
+/**
+ * Icon per COMPONENTS entry (data/conference.ts), keyed by title rather than
+ * baked into the data file itself — icon choice is a UI concern, and keeping
+ * it here means data/conference.ts stays free of JSX/component imports.
+ * Shared by every page that renders the component-projects list (Conference,
+ * Home), so the same badge always represents the same component.
+ */
+export const componentIcons: Record<string, typeof IconMap> = {
+  "Geospatial Gallery": IconMap,
+  "Use Case Development Showcase": IconPresentation,
+  "GATES GeoHack 2026": IconCode,
+};
+
+/** Solid heart glyph with a pulse-line accent — for the Human Well-being strategic goal. */
+export function IconHeart({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <path
+        d="M12 19.5c-.3 0-.6-.1-.8-.3C8.2 16.6 4.5 13.4 4.5 9.8 4.5 7.1 6.6 5 9.2 5c1.3 0 2.5.6 3.3 1.5C13.3 5.6 14.5 5 15.8 5 18.4 5 20.5 7.1 20.5 9.8c0 3.6-3.7 6.8-6.7 9.4-.2.2-.5.3-.8.3z"
+        fill="white"
+      />
+      <path
+        d="M8.2 10.6h1.9l1.2 2.3 1.6-4.3 1 2h2.1"
+        stroke={c}
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </IconBadge>
+  );
+}
+
+/** Solid ascending-bars glyph with an uptrend line — for the Wealth Creation strategic goal. */
+export function IconGrowth({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="4" y="14" width="3.5" height="6" rx="0.6" fill="white" />
+      <rect x="10.25" y="10" width="3.5" height="10" rx="0.6" fill="white" />
+      <rect x="16.5" y="5.5" width="3.5" height="14.5" rx="0.6" fill="white" />
+      <path d="M4 9.5 8.5 5.5 12 8.5 19.5 3" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </IconBadge>
+  );
+}
+
+/** Solid shield-with-check glyph — for the Wealth Protection strategic goal. */
+export function IconShield({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <path d="M12 3.5 19 6v5.5c0 5-3.2 8-7 9.5-3.8-1.5-7-4.5-7-9.5V6z" fill="white" />
+      <path d="M9 12l2.2 2.2L15.5 9.5" stroke={c} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </IconBadge>
+  );
+}
+
+/** Solid leaf glyph with a vein accent — for the Sustainability strategic goal. */
+export function IconLeaf({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <path d="M19.5 4.5c-8 0-14.5 4.8-14.5 12 0 2 1.3 3.2 3.3 3.2 7.5 0 13.2-6.5 13.2-14 0-.4 0-.8 0-1.2z" fill="white" />
+      <path d="M7.5 19c2.5-4.5 6-8.5 11-11.5" stroke={c} strokeWidth="1.4" strokeLinecap="round" opacity="0.8" fill="none" />
+    </IconBadge>
+  );
+}
+
+/** Solid stacked-layers glyph — for the Data pillar (also reads as geospatial data layering). */
+export function IconLayers({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <path d="M12 3.5 21 8l-9 4.5L3 8z" fill="white" />
+      <path d="M3 12l9 4.5 9-4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.85" />
+      <path d="M3 16l9 4.5 9-4.5" stroke={c} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.55" />
+    </IconBadge>
+  );
+}
+
+/** Solid chip glyph with radiating pins — for the Technology pillar. */
+export function IconChip({ color }: { color: DotColor }) {
+  const c = dotColorVars[color];
+  return (
+    <IconBadge color={color}>
+      <rect x="7" y="7" width="10" height="10" rx="1.5" fill="white" />
+      <rect x="10" y="10" width="4" height="4" fill={c} />
+      <path
+        d="M9 3v3M12 3v3M15 3v3M9 18v3M12 18v3M15 18v3M3 9h3M3 12h3M3 15h3M18 9h3M18 12h3M18 15h3"
+        stroke="white"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </IconBadge>
+  );
+}
+
+/** Solid two-person glyph — for the People pillar. */
+export function IconPeople({ color }: { color: DotColor }) {
+  return (
+    <IconBadge color={color}>
+      <circle cx="9" cy="8" r="3" fill="white" />
+      <path d="M3.5 19c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5" fill="white" />
+      <circle cx="16.5" cy="9" r="2.3" fill="white" opacity="0.85" />
+      <path d="M14.8 13.2c2.6.3 4.7 2.2 4.9 5.3" stroke="white" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.85" />
+    </IconBadge>
+  );
+}
+
 export function GlassCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <div className={`glass-panel p-6 sm:p-7 ${className}`}>{children}</div>;
 }
@@ -80,6 +269,15 @@ export function PhotoPlaceholder({ label }: { label: string }) {
     <div className="photo-placeholder aspect-[4/3] rounded-2xl border border-white/12 flex items-center justify-center font-mono text-[11px] text-white/40 text-center p-1.5">
       {label}
       {/* TODO: replace with a real photo from client/src/assets/photos/ (see ASSETS.md) */}
+    </div>
+  );
+}
+
+/** Real recap photo — same frame as PhotoPlaceholder, once the actual image exists. Defaults to its aspect ratio; pass `aspect` when a source image was cropped to a different one (e.g. a wide banner crop) so object-cover doesn't crop it a second time to fit. */
+export function Photo({ src, alt, aspect = "aspect-[4/3]" }: { src: string; alt: string; aspect?: string }) {
+  return (
+    <div className={`${aspect} rounded-2xl border border-white/12 overflow-hidden`}>
+      <img src={src} alt={alt} className="w-full h-full object-cover" />
     </div>
   );
 }
@@ -172,6 +370,16 @@ export type PageSectionBackground = "grid-mono" | "grid-color" | "horizon" | "sw
  * for the plain page background, same as before this existed; only some
  * sections on a page should carry one, alternating with plain ones, or a
  * page reads as visually noisy rather than varied.
+ *
+ * `bloom` layers in a dimmer version of the same colorful radial-gradient
+ * wash used on every page's hero (`.section-bloom-bg`, painted in front of
+ * `background`'s own texture, which sits furthest back) — for sections that
+ * should read as a fuller
+ * extension of the hero rather than the plain page background. Unlike the
+ * hero's own `.hero-brand-gradient` (painted directly as an element's CSS
+ * background), this is its own masked layer so it can fade in and out at
+ * the section's top/bottom edge instead of hard-cutting against the plain
+ * section next to it.
  */
 export function PageSection({
   id,
@@ -179,6 +387,7 @@ export function PageSection({
   width = "default",
   className = "",
   background,
+  bloom = false,
   children,
 }: {
   id?: string;
@@ -186,6 +395,7 @@ export function PageSection({
   width?: "default" | "wide" | "narrow";
   className?: string;
   background?: PageSectionBackground;
+  bloom?: boolean;
   children: ReactNode;
 }) {
   const maxW = width === "wide" ? "max-w-[1120px]" : width === "narrow" ? "max-w-[820px]" : "max-w-[1000px]";
@@ -194,12 +404,13 @@ export function PageSection({
       id={id}
       aria-labelledby={labelledBy}
       style={{ scrollMarginTop: `${STICKY_OFFSET}px` }}
-      className={`relative ${background ? "overflow-hidden" : ""}`}
+      className={`relative ${background || bloom ? "overflow-hidden" : ""}`}
     >
       {background && (
         <div className={`page-section-bg page-section-bg-${background} absolute inset-0 z-0`} aria-hidden="true" />
       )}
-      <div className={`relative z-10 py-10 sm:py-14 lg:py-16 px-5 sm:px-8 ${maxW} mx-auto ${className}`}>
+      {bloom && <div className="section-bloom-bg absolute inset-0 z-0" aria-hidden="true" />}
+      <div className={`relative z-10 py-12 sm:py-16 lg:py-20 px-5 sm:px-8 ${maxW} mx-auto ${className}`}>
         {children}
       </div>
     </section>

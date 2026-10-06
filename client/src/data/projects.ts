@@ -68,7 +68,7 @@ export const PROJECTS: Project[] = [
   },
   {
     number: 2,
-    color: "teal",
+    color: "orange",
     glow: "#ffa726",
     quadrant: "NW",
     sailMotif: "Geodetic network — a triangulated mesh of survey nodes and baselines",
@@ -88,7 +88,7 @@ export const PROJECTS: Project[] = [
   },
   {
     number: 3,
-    color: "orange",
+    color: "teal",
     glow: "#f0c060",
     quadrant: "NE",
     sailMotif: "Terrain contours — topographic lines wrapping elevation and hazard",

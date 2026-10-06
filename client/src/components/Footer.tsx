@@ -137,12 +137,19 @@ export default function Footer() {
               Privacy Notice
             </Link>
           </span>
-          <a
-            href="#top"
-            className="text-white/55 no-underline hover:text-white/90 transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+          {/* A real click handler, not href="#top" — the old version's
+              target was the sticky nav (position: sticky; top: 0), which is
+              always within the viewport by definition, so the browser's
+              native "scroll target into view" for that fragment jump was a
+              no-op: the URL gained a #top hash but the page never actually
+              scrolled. */}
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="bg-transparent border-none p-0 cursor-pointer text-white/55 no-underline hover:text-white/90 transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
           >
             Back to top &#8593;
-          </a>
+          </button>
         </div>
       </div>
     </footer>

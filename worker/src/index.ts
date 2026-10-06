@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { presignUpload } from "./storage/s3";
 import { hackathonSubmissionsRoute } from "./routes/hackathonSubmissions";
+import { registrationsRoute } from "./routes/registrations";
 import { adminRoute } from "./routes/admin";
 import { checkRateLimit } from "./lib/rateLimit";
 
@@ -15,6 +16,14 @@ export type Env = {
   PRIVACY_NOTICE_VERSION: string;
   BREVO_API_KEY: string;
   MAIL_FROM: string;
+  // Public origin of this deployment, no trailing slash. Emails can't use
+  // relative URLs, so images in them (banner, QR code) are built from this.
+  SITE_URL: string;
+  // Cloudflare Turnstile bot check on the registration form. Both optional:
+  // the check is off until the secret is set (see lib/turnstile.ts). The site
+  // key is public and served to the form by GET /api/registrations/config.
+  TURNSTILE_SITE_KEY?: string;
+  TURNSTILE_SECRET_KEY?: string;
   // Optional: sendSecretariatNotification skips (and logs) rather than
   // throwing when this isn't set.
   SECRETARIAT_EMAIL?: string;
@@ -113,6 +122,7 @@ app.post("/api/uploads/presign", async (c) => {
 });
 
 app.route("/api/hackathon-submissions", hackathonSubmissionsRoute);
+app.route("/api/registrations", registrationsRoute);
 app.route("/api/admin", adminRoute);
 
 // Everything that isn't an API route falls through to static assets.

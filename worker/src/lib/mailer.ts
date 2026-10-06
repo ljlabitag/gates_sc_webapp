@@ -1,4 +1,5 @@
 import type { Env } from "../index";
+import { buildRegistrationConfirmation } from "./registrationEmail";
 
 export interface MailAttachment {
   name: string;
@@ -9,6 +10,8 @@ interface MailInput {
   to: string;
   subject: string;
   text: string;
+  /** Optional HTML body; `text` is still sent as the plain-text alternative. */
+  html?: string;
   attachment?: MailAttachment;
 }
 
@@ -36,7 +39,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
 // unlike the brief's "keep signatures unchanged" for the nodemailer→Brevo
 // swap itself, this one platform difference does thread `env` through the
 // public functions below; every other call shape is untouched.
-async function sendMail(env: Env, { to, subject, text, attachment }: MailInput): Promise<void> {
+async function sendMail(env: Env, { to, subject, text, html, attachment }: MailInput): Promise<void> {
   const res = await fetch(BREVO_SEND_URL, {
     method: "POST",
     headers: {
@@ -49,6 +52,7 @@ async function sendMail(env: Env, { to, subject, text, attachment }: MailInput):
       to: [{ email: to }],
       subject,
       textContent: text,
+      ...(html ? { htmlContent: html } : {}),
       ...(attachment
         ? { attachment: [{ name: attachment.name, content: arrayBufferToBase64(attachment.content) }] }
         : {}),
@@ -127,6 +131,30 @@ export function sendHackathonConfirmation(
       "Department of Science and Technology",
     ].join("\n"),
   });
+}
+
+export interface RegistrationConfirmationDetails {
+  id: string;
+  /** Full display name, e.g. "Ana D. Reyes". */
+  name: string;
+}
+
+// The content lives in registrationEmail.ts (pure, so it can be previewed
+// without sending). The time and venue it states are provisional, matching the
+// site. No secretariat notification accompanies this: unlike a proposal, a
+// registration doesn't need a human to look at it, and one email per
+// registrant would bury the shared inbox — the admin panel lists them all.
+export function sendRegistrationConfirmation(
+  env: Env,
+  to: string,
+  details: RegistrationConfirmationDetails,
+): Promise<void> {
+  const { subject, html, text } = buildRegistrationConfirmation({
+    siteUrl: env.SITE_URL,
+    id: details.id,
+    name: details.name,
+  });
+  return sendMail(env, { to, subject, html, text });
 }
 
 export interface SecretariatSubmissionMetadata {

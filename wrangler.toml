@@ -32,6 +32,15 @@ R2_BUCKET_NAME = "gates-sc-webapp"
 # consent record stores the version it was given under so what a person
 # agreed to stays provable later.
 PRIVACY_NOTICE_VERSION = "2026-08-13"
+# Origin that email images (banner, QR code) are loaded from. Update this when
+# a custom domain replaces workers.dev, or those images will break in
+# already-sent emails the day the old hostname stops resolving.
+SITE_URL = "https://gates-sc-webapp.dost-gates.workers.dev"
+# Registration-form bot check (Cloudflare Turnstile, free). Off until BOTH are
+# set: TURNSTILE_SITE_KEY here (public) and the TURNSTILE_SECRET_KEY secret
+# (`wrangler secret put TURNSTILE_SECRET_KEY`). Create the widget in the
+# Cloudflare dashboard (Turnstile > Add widget) for this hostname.
+# TURNSTILE_SITE_KEY = ""
 # INTERIM sender — dost.gov.ph's DNS is managed solely by DOST IT (no self-
 # service access), so authenticating dostgates@notify.dost.gov.ph in Brevo is
 # blocked on that request going through them. This Gmail address is verified
@@ -90,6 +99,8 @@ bucket_name = "gates-sc-webapp-staging"
 R2_ENDPOINT = "https://c5f38af076958ae8289a040392373bec.r2.cloudflarestorage.com"
 R2_BUCKET_NAME = "gates-sc-webapp-staging"
 PRIVACY_NOTICE_VERSION = "2026-08-13"
+SITE_URL = "https://gates-sc-webapp-staging.dost-gates.workers.dev"
+# TURNSTILE_SITE_KEY = ""   # see the note under [vars]; the secret is set per environment
 # Same interim Gmail sender as production — fine to share for staging since
 # it's just proving the integration works, not sending anything real.
 MAIL_FROM = "ljlabitag.dostgates@gmail.com"
