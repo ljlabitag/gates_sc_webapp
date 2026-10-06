@@ -18,6 +18,7 @@ const REPEAT_GAP_MS = 2500;
 const DECODE_WIDTH = 640;
 const DECODE_INTERVAL_MS = 120;
 const STATS_REFRESH_MS = 20_000;
+const RECENT_REFRESH_MS = 45_000;
 
 interface Attendee {
   id: string;
@@ -66,6 +67,8 @@ export default function AdminCheckin() {
   const [sound, setSound] = useState(true);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [stats, setStats] = useState<{ registered: number; checkedIn: number } | null>(null);
+  const [recent, setRecent] = useState<Attendee[] | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
   const [authLost, setAuthLost] = useState(false);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[] | null>(null);
@@ -88,13 +91,42 @@ export default function AdminCheckin() {
     }
   }, []);
 
-  // Other stations check people in too, so the count is read from the server
-  // — after every scan below, and on this timer — rather than tallied locally.
+  const loadRecent = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/checkin/recent", { credentials: "include" });
+      if (res.status === 401) return setAuthLost(true);
+      if (res.ok) setRecent(await res.json());
+    } catch {
+      // keep the last known list
+    }
+  }, []);
+
+  // Other stations check people in too, so the count and the recent-arrivals
+  // feed are read from the server — after every scan below, and on a timer —
+  // rather than tallied locally.
   useEffect(() => {
     loadStats();
-    const timer = setInterval(loadStats, STATS_REFRESH_MS);
-    return () => clearInterval(timer);
-  }, [loadStats]);
+    loadRecent();
+    const statsTimer = setInterval(loadStats, STATS_REFRESH_MS);
+    const recentTimer = setInterval(loadRecent, RECENT_REFRESH_MS);
+    return () => {
+      clearInterval(statsTimer);
+      clearInterval(recentTimer);
+    };
+  }, [loadStats, loadRecent]);
+
+  // "/" jumps to the search box (unless you're already typing somewhere).
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? "")) {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   const beep = useCallback((tone: "ok" | "warn" | "bad") => {
     const ctx = audioRef.current;
@@ -129,6 +161,7 @@ export default function AdminCheckin() {
         if (data.status === "checked_in") {
           setOutcome({ kind: "checked_in", attendee: data.attendee, kit: data.kit });
           loadStats();
+          loadRecent();
           beep("ok");
         } else if (data.status === "already_checked_in") {
           setOutcome({ kind: "already", attendee: data.attendee });
@@ -142,7 +175,7 @@ export default function AdminCheckin() {
         beep("bad");
       }
     },
-    [beep, loadStats],
+    [beep, loadStats, loadRecent],
   );
 
   const handleCode = useCallback(
@@ -290,6 +323,7 @@ export default function AdminCheckin() {
       setOutcome(null);
       lastCodeRef.current = { code: "", at: 0 };
       loadStats();
+      loadRecent();
     }
   };
 
@@ -313,37 +347,70 @@ export default function AdminCheckin() {
     );
   }
 
-  const tone =
-    outcome?.kind === "checked_in"
-      ? "border-emerald-400/50 bg-emerald-400/10"
-      : outcome?.kind === "already"
-        ? "border-amber-400/50 bg-amber-400/10"
-        : "border-gates-error/50 bg-gates-error/10";
+  const percent = stats && stats.registered ? Math.round((stats.checkedIn / stats.registered) * 100) : 0;
 
   return (
-    <div className="min-h-screen px-5 sm:px-8 py-6 sm:py-8 max-w-[1100px] mx-auto flex flex-col gap-5">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-[0.01em] m-0">Check-in</h1>
-        <div className="flex items-center gap-5 text-sm">
-          {stats && (
-            <span className="font-mono tabular-nums text-white/80" aria-live="polite">
-              <strong className="text-white">{stats.checkedIn}</strong> / {stats.registered} arrived
-            </span>
-          )}
-          <Link to="/admin" className="text-gates-link no-underline font-semibold">
+    <div className="min-h-screen px-5 sm:px-8 py-6 sm:py-8 max-w-[1180px] mx-auto flex flex-col gap-5">
+      <header className="flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold uppercase tracking-[0.01em] m-0">Check-in</h1>
+          <Link to="/admin" className="text-gates-link no-underline font-semibold text-sm">
             &larr; Admin
           </Link>
         </div>
-      </div>
+        {stats && (
+          <div className="glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-5 sm:gap-7" aria-live="polite">
+            <div className="shrink-0">
+              <div className="font-display text-[34px] sm:text-[40px] font-extrabold leading-none tabular-nums">
+                {stats.checkedIn}
+                <span className="ml-1.5 text-[18px] font-semibold text-white/40">/ {stats.registered}</span>
+              </div>
+              <div className="mt-1 font-heading text-[11px] font-semibold uppercase tracking-[0.12em] text-white/50">
+                Arrived
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="h-2.5 rounded-full bg-white/10 overflow-hidden" aria-hidden="true">
+                <div
+                  className="h-full rounded-full bg-emerald-400 transition-[width] duration-500"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+              <div className="mt-2 text-[13px] text-white/55">
+                {percent}% checked in &middot; {Math.max(0, stats.registered - stats.checkedIn)} still to arrive
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] gap-5 items-start">
-        <section className="glass-panel p-4 flex flex-col gap-3" aria-label="QR scanner">
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-5 items-start">
+        {/* Result first on small screens, so the answer is visible without scrolling past the camera. */}
+        <section aria-live="polite" aria-label="Last scan" className="order-1 lg:col-start-2 lg:row-start-1">
+          <ResultCard outcome={outcome} onUndo={undo} />
+        </section>
+
+        <section
+          className="order-2 glass-panel p-4 flex flex-col gap-3 lg:col-start-1 lg:row-start-1 lg:row-span-2"
+          aria-label="QR scanner"
+        >
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-black">
             <video ref={videoRef} playsInline muted className="absolute inset-0 w-full h-full object-cover" />
             <canvas ref={canvasRef} className="hidden" />
             {camera === "running" && (
               <div className="absolute inset-0 grid place-items-center pointer-events-none" aria-hidden="true">
-                <div className="w-[58%] aspect-square rounded-2xl border-2 border-white/70 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]" />
+                <div className="relative w-[58%] aspect-square shadow-[0_0_0_9999px_rgba(0,0,0,0.45)] rounded-2xl">
+                  <span className="absolute -top-0.5 -left-0.5 w-9 h-9 rounded-tl-2xl border-t-4 border-l-4 border-white" />
+                  <span className="absolute -top-0.5 -right-0.5 w-9 h-9 rounded-tr-2xl border-t-4 border-r-4 border-white" />
+                  <span className="absolute -bottom-0.5 -left-0.5 w-9 h-9 rounded-bl-2xl border-b-4 border-l-4 border-white" />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-9 h-9 rounded-br-2xl border-b-4 border-r-4 border-white" />
+                </div>
+              </div>
+            )}
+            {camera === "running" && (
+              <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-[11px] font-semibold text-white/90">
+                <span aria-hidden="true" className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                Scanning
               </div>
             )}
             {camera !== "running" && (
@@ -364,6 +431,9 @@ export default function AdminCheckin() {
                     >
                       {camera === "error" ? "Try again" : "Start camera"}
                     </button>
+                    {camera === "idle" && (
+                      <p className="text-white/45 text-[13px] m-0">Your browser will ask to use the camera.</p>
+                    )}
                   </div>
                 )}
               </div>
@@ -378,7 +448,7 @@ export default function AdminCheckin() {
                 maxLength={40}
                 onChange={(e) => onStationChange(e.target.value)}
                 placeholder="e.g. Main door, Laptop 2"
-                className="w-full px-3 py-2.5 rounded-lg border border-white/16 bg-white/5 text-white/94 text-[14px] focus:outline-none focus:ring-2 focus:ring-gates-blue"
+                className="w-full px-3 py-2.5 rounded-lg border border-white/16 bg-white/5 text-white/94 text-[14px] placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-gates-blue"
               />
             </label>
             <label className="flex flex-col gap-1.5">
@@ -426,72 +496,26 @@ export default function AdminCheckin() {
           </div>
           <p className="text-[12px] leading-[1.5] text-white/45 m-0">
             Hold the code about 20&ndash;30&nbsp;cm from the camera with the screen brightness up. If a phone is hard
-            to read, tilt it slightly to avoid glare.
+            to read, tilt it slightly to avoid glare. Keep this tab in front &mdash; scanning pauses in the background.
           </p>
         </section>
 
-        <div className="flex flex-col gap-5">
-          <section aria-live="polite" aria-label="Last scan">
-            {outcome ? (
-              <div className={`rounded-2xl border p-5 flex flex-col gap-1.5 ${tone}`}>
-                {outcome.kind === "error" ? (
-                  <>
-                    <div className="text-[12px] font-semibold uppercase tracking-[0.1em] text-red-300">Not checked in</div>
-                    <p className="text-lg m-0">{outcome.message}</p>
-                  </>
-                ) : (
-                  <>
-                    <div
-                      className={`text-[12px] font-semibold uppercase tracking-[0.1em] ${
-                        outcome.kind === "checked_in" ? "text-emerald-300" : "text-amber-300"
-                      }`}
-                    >
-                      {outcome.kind === "checked_in"
-                        ? "Checked in"
-                        : `Already checked in${
-                            outcome.attendee.checkedInAt ? ` at ${clock(outcome.attendee.checkedInAt)}` : ""
-                          }${outcome.attendee.checkedInBy ? ` · ${outcome.attendee.checkedInBy}` : ""}`}
-                    </div>
-                    <div className="font-display text-2xl sm:text-3xl font-extrabold leading-tight">
-                      {outcome.attendee.name}
-                      {outcome.attendee.nickname && (
-                        <span className="text-white/60 font-semibold"> &ldquo;{outcome.attendee.nickname}&rdquo;</span>
-                      )}
-                    </div>
-                    <div className="text-white/70 text-[15px]">
-                      {[outcome.attendee.agency, outcome.attendee.division, outcome.attendee.designation]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </div>
-                    {outcome.kind === "checked_in" && outcome.kit === "sending" && (
-                      <div className="text-[13px] text-emerald-200/80 mt-1">Virtual kit email is on its way.</div>
-                    )}
-                    {outcome.kind === "checked_in" && (
-                      <button
-                        type="button"
-                        onClick={() => undo(outcome.attendee)}
-                        className="self-start mt-2 text-white/55 hover:text-white bg-transparent border-none cursor-pointer p-0 text-[13px] underline"
-                      >
-                        Wrong person? Undo check-in
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="glass-panel p-5 text-white/55 text-[15px]">Scan a QR code to check someone in.</div>
-            )}
-          </section>
-
+        <div className="order-3 flex flex-col gap-5 lg:col-start-2 lg:row-start-2">
           <section className="glass-panel p-4 flex flex-col gap-3" aria-label="Find a registrant">
-            <h2 className="text-[15px] font-semibold m-0">No QR code? Find them by name</h2>
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 className="text-[15px] font-semibold m-0">No QR code? Find them by name</h2>
+              <span className="hidden sm:inline text-[11px] text-white/35">
+                Press <kbd className="rounded border border-white/20 px-1.5 py-0.5 font-mono text-[10px]">/</kbd> to search
+              </span>
+            </div>
             <form onSubmit={onSubmitQuery}>
               <input
+                ref={searchRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Name, nickname, email or agency — or paste / scan an ID"
                 autoComplete="off"
-                className="w-full px-3 py-2.5 rounded-lg border border-white/16 bg-white/5 text-white/94 text-[14px] focus:outline-none focus:ring-2 focus:ring-gates-blue"
+                className="w-full px-3 py-2.5 rounded-lg border border-white/16 bg-white/5 text-white/94 text-[14px] placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-gates-blue"
               />
             </form>
             {hits && hits.length === 0 && <p className="text-white/50 text-sm m-0">No matches.</p>}
@@ -524,7 +548,124 @@ export default function AdminCheckin() {
               </ul>
             )}
           </section>
+
+          <section className="glass-panel p-4 flex flex-col gap-2" aria-label="Recent check-ins">
+            <h2 className="text-[15px] font-semibold m-0">Recent check-ins</h2>
+            {recent === null ? (
+              <p className="text-white/45 text-sm m-0">Loading&hellip;</p>
+            ) : recent.length === 0 ? (
+              <p className="text-white/45 text-sm m-0">No one has arrived yet.</p>
+            ) : (
+              <ul className="list-none m-0 p-0 flex flex-col divide-y divide-white/8">
+                {recent.map((person) => (
+                  <li key={person.id} className="py-2 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-[14px] font-semibold truncate">
+                        {person.name}
+                        {person.nickname && (
+                          <span className="text-white/50 font-normal"> &ldquo;{person.nickname}&rdquo;</span>
+                        )}
+                      </div>
+                      <div className="text-[12px] text-white/45 truncate">{person.agency}</div>
+                    </div>
+                    <div className="shrink-0 text-right text-[12px] text-white/55">
+                      <div className="font-mono tabular-nums text-emerald-300">
+                        {person.checkedInAt ? clock(person.checkedInAt) : ""}
+                      </div>
+                      {person.checkedInBy && <div className="text-white/40">{person.checkedInBy}</div>}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
         </div>
+      </div>
+    </div>
+  );
+}
+
+const ICON_PATHS = {
+  ok: "M5 12.5l4.5 4.5L19 7.5",
+  already: "M12 7v6m0 3.5v.01",
+  error: "M7 7l10 10M17 7L7 17",
+} as const;
+
+function ResultCard({ outcome, onUndo }: { outcome: Outcome | null; onUndo: (attendee: Attendee) => void }) {
+  if (!outcome) {
+    return (
+      <div className="glass-panel rounded-2xl p-5 sm:p-6 flex items-center gap-4 text-white/55">
+        <div aria-hidden="true" className="w-12 h-12 shrink-0 rounded-full border-2 border-dashed border-white/20" />
+        <div>
+          <div className="text-[16px] font-semibold text-white/75">Ready to scan</div>
+          <div className="text-[13px]">Hold a registration QR code up to the camera.</div>
+        </div>
+      </div>
+    );
+  }
+
+  const kind = outcome.kind === "checked_in" ? "ok" : outcome.kind === "already" ? "already" : "error";
+  const theme = {
+    ok: { box: "border-emerald-400/50 bg-emerald-400/10", icon: "bg-emerald-400 text-emerald-950", label: "text-emerald-300" },
+    already: { box: "border-amber-400/50 bg-amber-400/10", icon: "bg-amber-400 text-amber-950", label: "text-amber-300" },
+    error: { box: "border-gates-error/50 bg-gates-error/10", icon: "bg-red-400 text-red-950", label: "text-red-300" },
+  }[kind];
+
+  return (
+    <div className={`rounded-2xl border p-5 sm:p-6 flex items-start gap-4 ${theme.box}`}>
+      <div className={`w-12 h-12 shrink-0 rounded-full grid place-items-center ${theme.icon}`} aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          className="w-7 h-7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d={ICON_PATHS[kind]} />
+        </svg>
+      </div>
+      <div className="min-w-0 flex flex-col gap-1">
+        {outcome.kind === "error" ? (
+          <>
+            <div className={`text-[12px] font-semibold uppercase tracking-[0.1em] ${theme.label}`}>Not checked in</div>
+            <p className="text-lg m-0">{outcome.message}</p>
+          </>
+        ) : (
+          <>
+            <div className={`text-[12px] font-semibold uppercase tracking-[0.1em] ${theme.label}`}>
+              {outcome.kind === "checked_in"
+                ? "Checked in"
+                : `Already checked in${outcome.attendee.checkedInAt ? ` at ${clock(outcome.attendee.checkedInAt)}` : ""}${
+                    outcome.attendee.checkedInBy ? ` · ${outcome.attendee.checkedInBy}` : ""
+                  }`}
+            </div>
+            <div className="font-display text-2xl sm:text-3xl font-extrabold leading-tight">
+              {outcome.attendee.name}
+              {outcome.attendee.nickname && (
+                <span className="text-white/60 font-semibold"> &ldquo;{outcome.attendee.nickname}&rdquo;</span>
+              )}
+            </div>
+            <div className="text-white/70 text-[15px]">
+              {[outcome.attendee.agency, outcome.attendee.division, outcome.attendee.designation]
+                .filter(Boolean)
+                .join(" · ")}
+            </div>
+            {outcome.kind === "checked_in" && outcome.kit === "sending" && (
+              <div className="text-[13px] text-emerald-200/80 mt-1">Virtual kit email is on its way.</div>
+            )}
+            {outcome.kind === "checked_in" && (
+              <button
+                type="button"
+                onClick={() => onUndo(outcome.attendee)}
+                className="self-start mt-2 text-white/55 hover:text-white bg-transparent border-none cursor-pointer p-0 text-[13px] underline"
+              >
+                Wrong person? Undo check-in
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

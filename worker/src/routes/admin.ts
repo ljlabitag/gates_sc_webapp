@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { setSignedCookie, deleteCookie } from "hono/cookie";
-import { and, desc, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import type { AppEnv } from "../index";
 import { getDb } from "../db/client";
 import { registrations, hackathonSubmissions } from "../db/schema";
@@ -317,6 +317,21 @@ adminRoute.get("/checkin/search", adminAuth, async (c) => {
     )
     .orderBy(registrations.name)
     .limit(8);
+  await logAudit(c.env.DB, { actor: c.get("actor"), action: "view", resource: "registrations" });
+  return c.json(rows);
+});
+
+// The latest arrivals across every station, for the scanner page's feed — so
+// staff on one laptop can see who the others just checked in. Names are
+// personal data, so reads are audit-logged like the other lookups.
+adminRoute.get("/checkin/recent", adminAuth, async (c) => {
+  const db = getDb(c.env.DB);
+  const rows = await db
+    .select(attendeeColumns)
+    .from(registrations)
+    .where(and(isNull(registrations.deletedAt), isNotNull(registrations.checkedInAt)))
+    .orderBy(desc(registrations.checkedInAt))
+    .limit(10);
   await logAudit(c.env.DB, { actor: c.get("actor"), action: "view", resource: "registrations" });
   return c.json(rows);
 });
