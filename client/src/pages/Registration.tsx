@@ -6,7 +6,7 @@ import Turnstile from "../components/Turnstile";
 import { Eyebrow, IconPin, TextLink } from "../components/ui";
 import { GATES } from "../data/org";
 import { CONFERENCE } from "../data/conference";
-import { ASSISTANCE_OPTIONS, DIETARY_OPTIONS, REGISTRATION_LIMITS } from "../data/registration";
+import { AGE_BRACKETS, ASSISTANCE_OPTIONS, DIETARY_OPTIONS, REGISTRATION_LIMITS, SEX_OPTIONS } from "../data/registration";
 import { fetchRegistrationConfig, submitRegistration, type RegistrationResult } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
 
@@ -18,7 +18,12 @@ const labelClass = "font-heading text-[12px] font-semibold text-white/62";
 const legendClass =
   "font-heading text-[11px] font-semibold uppercase tracking-[0.12em] text-white/48 mb-1";
 
-const hintClass = "text-[12px] leading-[1.5] text-white/45 m-0";
+// Native selects need their own caret once `appearance-none` strips the
+// browser's, which would otherwise render dark-on-dark here.
+const SELECT_CARET =
+  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23ffffffb3' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M5 8l5 5 5-5'/></svg>\")";
+
+const hintClass ="text-[12px] leading-[1.5] text-white/45 m-0";
 
 const checkboxClass = "mt-0.5 w-4 h-4 shrink-0 rounded border-white/25 bg-white/5 accent-gates-link";
 
@@ -32,6 +37,8 @@ const EMPTY_FORM = {
   agency: "",
   division: "",
   designation: "",
+  ageBracket: "",
+  sexAtBirth: "",
   foodAllergies: "",
   assistanceNeeded: "",
 };
@@ -124,7 +131,7 @@ export default function Registration() {
   }, []);
 
   const setField =
-    (key: keyof typeof form) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    (key: keyof typeof form) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setForm((state) => ({ ...state, [key]: event.target.value }));
       if (error) setError("");
     };
@@ -154,6 +161,14 @@ export default function Registration() {
     }
     if (mobileDigits < 10 || mobileDigits > 15) {
       setError("Please enter a valid mobile number.");
+      return;
+    }
+    if (!form.ageBracket) {
+      setError("Please select your age bracket.");
+      return;
+    }
+    if (!form.sexAtBirth) {
+      setError("Please select your sex assigned at birth.");
       return;
     }
     if (!form.agency.trim()) {
@@ -241,7 +256,7 @@ export default function Registration() {
                 .
               </p>
               <div className="mt-1.5">
-                <TextLink to="/conference">See the conference programme &rarr;</TextLink>
+                <TextLink to="/conference">See conference details &rarr;</TextLink>
               </div>
             </div>
           ) : (
@@ -344,6 +359,54 @@ export default function Registration() {
                     required
                   />
                 </Field>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field id="ageBracket" label="Age bracket" required>
+                    <select
+                      id="ageBracket"
+                      className={`${inputClass} appearance-none bg-[length:16px] bg-[right_0.9rem_center] bg-no-repeat pr-10`}
+                      style={{ backgroundImage: SELECT_CARET }}
+                      value={form.ageBracket}
+                      onChange={setField("ageBracket")}
+                      required
+                    >
+                      <option value="" className="bg-[#0e0f13]">
+                        Select…
+                      </option>
+                      {AGE_BRACKETS.map((bracket) => (
+                        <option key={bracket} value={bracket} className="bg-[#0e0f13]">
+                          {bracket}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <fieldset className="border-0 m-0 p-0 flex flex-col gap-2 min-w-0">
+                    <legend className={`${labelClass} mb-2 p-0`}>
+                      Sex assigned at birth <span className="text-gates-orange">*</span>
+                    </legend>
+                    <div className="flex flex-wrap gap-x-5 gap-y-2.5 py-2.5">
+                      {SEX_OPTIONS.map((option) => (
+                        <label key={option} className="flex items-center gap-2.5 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="sexAtBirth"
+                            value={option}
+                            checked={form.sexAtBirth === option}
+                            onChange={() => {
+                              setForm((state) => ({ ...state, sexAtBirth: option }));
+                              if (error) setError("");
+                            }}
+                            className={`${checkboxClass} mt-0 rounded-full`}
+                          />
+                          <span className="text-[13px] leading-[1.4] text-white/70">{option}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                </div>
+                <p className={hintClass}>
+                  Used only for aggregate attendance reporting. You may choose &ldquo;Prefer not to say&rdquo; for
+                  sex assigned at birth.
+                </p>
               </fieldset>
 
               <fieldset className="border-0 m-0 p-0 flex flex-col gap-4 border-t border-white/8 pt-5">
@@ -513,7 +576,7 @@ export default function Registration() {
             </div>
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4 text-sm text-white/80">
               <span className="text-white/50">Venue</span>
-              <span className="text-right">TBD</span>
+              <span className="text-right">Metro Manila</span>
             </div>
             <div className="h-px bg-white/10 my-1.5" />
             <Eyebrow>INCLUDES</Eyebrow>

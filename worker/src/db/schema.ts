@@ -31,6 +31,11 @@ export const registrations = sqliteTable("registrations", {
   agency: text("agency"),
   division: text("division"),
   designation: text("designation"),
+  // Demographics for attendance reporting: one of a fixed list of age brackets
+  // (never a birth date) and sex assigned at birth, which may be "Prefer not
+  // to say". Null on registrations made before these were collected.
+  ageBracket: text("age_bracket"),
+  sexAtBirth: text("sex_at_birth"),
   // Superseded by `agency` ("Agency / Organization") — new registrations
   // never write it. Left in place so the migration stays additive.
   organization: text("organization"),
@@ -51,6 +56,16 @@ export const registrations = sqliteTable("registrations", {
   documentationConsent: integer("documentation_consent", { mode: "boolean" }).notNull(),
   retentionUntil: integer("retention_until").notNull(),
   deletedAt: integer("deleted_at"),
+  // Arrival at the venue: set when the registrant's QR code is scanned (or
+  // they're checked in by name). `checkedInBy` is the scanning station's
+  // label, or the admin login when no station name was given. Null until
+  // they arrive.
+  checkedInAt: integer("checked_in_at"),
+  checkedInBy: text("checked_in_by"),
+  // When the virtual-kit email went out after check-in. Null until it has
+  // been sent successfully, so a failed send is visible (and retryable) and
+  // undoing then repeating a check-in can't email the kit twice.
+  kitSentAt: integer("kit_sent_at"),
   createdAt: integer("created_at").notNull(),
 }, (t) => [
   // One live registration per email address, case-insensitively. The route
@@ -98,7 +113,7 @@ export const hackathonSubmissions = sqliteTable("hackathon_submissions", {
 export const auditLog = sqliteTable("audit_log", {
   id: text("id").primaryKey(),
   actor: text("actor").notNull(),
-  action: text("action", { enum: ["view", "export", "download", "update", "resend", "delete"] }).notNull(),
+  action: text("action", { enum: ["view", "export", "download", "update", "resend", "delete", "checkin", "checkin_undo"] }).notNull(),
   resource: text("resource", { enum: ["registrations", "hackathon_submissions"] }).notNull(),
   resourceId: text("resource_id"),
   createdAt: integer("created_at").notNull(),

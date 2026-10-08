@@ -1,6 +1,7 @@
 import Nav from "../components/Nav";
 import Footer from "../components/Footer";
 import ConferencePoster from "../components/ConferencePoster";
+import { ConferenceActions } from "../components/ConferenceHeroInfo";
 import {
   componentIcons,
   Eyebrow,
@@ -25,18 +26,16 @@ import {
   AGENDA,
   COMPONENTS,
   CONFERENCE,
-  CONFERENCE_DATE,
   PARTICIPANTS,
   RECAP_2025,
 } from "../data/conference";
 import { usePageMeta } from "../hooks/usePageMeta";
-import { useCountdown } from "../hooks/useCountdown";
 
 const SECTIONS = [
   { id: "about", label: "About" },
   { id: "schedule", label: "Important dates" },
   { id: "attending", label: "Who attends" },
-  { id: "programme", label: "Programme" },
+  { id: "programme", label: "Agenda" },
   { id: "components", label: "Components" },
   { id: "recap", label: "2025 recap" },
 ];
@@ -48,19 +47,19 @@ const dotByColor = {
   plum: "bg-gates-plum",
 } as const;
 
-/* Split at the lunch break (AGENDA[13]) — the last morning-programme row —
+/* Split at the lunch break (AGENDA[13]) — the last morning-session row —
    so the boundary moves with the data instead of a hardcoded index if the
-   programme changes again. */
+   agenda changes again. */
 const AGENDA_LUNCH_INDEX = AGENDA.findIndex((item) => item.title === "Lunch Break + Geospatial Gallery Walk");
 const AGENDA_GROUPS = [
   {
-    label: "Morning programme",
+    label: "Morning sessions",
     range: "8:00 AM–1:00 PM",
     color: "blue",
     items: AGENDA.slice(0, AGENDA_LUNCH_INDEX + 1),
   },
   {
-    label: "Afternoon programme",
+    label: "Afternoon sessions",
     range: "1:00 PM–4:00 PM",
     color: "orange",
     items: AGENDA.slice(AGENDA_LUNCH_INDEX + 1),
@@ -73,57 +72,26 @@ export default function Conference() {
     `The 2nd GATES Program Stakeholder Conference, ${CONFERENCE.dateLabel} in Metro Manila. Program updates, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.`,
   );
 
-  const { d, h, m, s } = useCountdown(CONFERENCE_DATE);
-  const countdown = [
-    { value: d, label: "DAYS" },
-    { value: h, label: "HRS" },
-    { value: m, label: "MIN" },
-    { value: s, label: "SEC" },
-  ];
-
   return (
     <div className="conference-page min-h-screen">
       <Nav />
 
       {/* Hero — the IEC poster carries the title, theme, date and venue, so
-          the <h1> is screen-reader-only and the live countdown/CTAs sit
-          directly beneath it. */}
-      <header className="conference-hero conference-poster-hero relative overflow-hidden border-b border-white/8">
+          the <h1> is screen-reader-only and the hero is the poster alone. The
+          calls to action sit directly beneath it. */}
+      <header className="conference-hero hero-poster-bg relative overflow-hidden">
         <h1 className="sr-only">{CONFERENCE.edition}</h1>
         <ConferencePoster priority />
-        <div className="relative z-10 max-w-[1150px] mx-auto px-5 sm:px-8 pt-2 pb-12 sm:pb-16 text-center flex flex-col items-center">
-          <p className="text-[17px] sm:text-lg leading-[1.6] text-white/70 m-0 max-w-[700px]">
-            The {CONFERENCE.edition} brings together stakeholders from DOST attached agencies and regional offices,
-            national government agencies, and development partners to learn about the latest developments of the
-            GATES Program and engage stakeholders in charting its next phase.
-          </p>
-
-          <div
-            role="group"
-            aria-label="Countdown to the conference"
-            className="grid grid-cols-4 gap-2 sm:gap-3 mt-8 sm:mt-9 w-full max-w-[420px]"
-          >
-            {countdown.map((item) => (
-              <div key={item.label} className="glass-panel rounded-2xl px-2 sm:px-4 py-3.5 text-center">
-                <div className="font-mono tabular-nums text-[22px] sm:text-[26px] font-semibold">{item.value}</div>
-                <div className="font-heading text-[9px] sm:text-[10px] text-white/50 mt-1 tracking-[0.08em]">
-                  {item.label}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col min-[420px]:flex-row gap-3 mt-5 sm:mt-6 w-full min-[420px]:w-auto">
-            <PrimaryButton to="/registration">Registration Info</PrimaryButton>
-            <a
-              href="#programme"
-              className="glass-panel px-[26px] py-3.5 rounded-full text-white/90 font-semibold text-[15px] no-underline text-center"
-            >
-              View the Programme
-            </a>
-          </div>
-        </div>
       </header>
+
+      <section
+        aria-label="Registration and conference details"
+        className="hero-poster-bg border-b border-white/8 px-5 sm:px-8 pt-2 pb-10 sm:pb-12"
+      >
+        <div className="max-w-[1150px] mx-auto flex flex-col items-center">
+          <ConferenceActions detailsHref="#programme" detailsLabel="View Agenda" />
+        </div>
+      </section>
 
       <SectionNav items={SECTIONS} />
 
@@ -238,7 +206,7 @@ export default function Conference() {
         </div>
       </PageSection>
 
-      {/* Programme */}
+      {/* Agenda (the section keeps its #programme id so existing links still work) */}
       <PageSection id="programme" labelledBy="programme-title" background="grid-color">
         <SectionHead
           eyebrow="PROVISIONAL PROGRAM"
@@ -416,7 +384,7 @@ export default function Conference() {
         <Eyebrow>BE PART OF WHAT COMES NEXT</Eyebrow>
         <h2 className="text-[clamp(24px,3vw,34px)] font-bold m-0 tracking-tight">Join us on November 10</h2>
         <div className="flex flex-col min-[420px]:flex-row gap-3 mt-1 w-full min-[420px]:w-auto">
-          <PrimaryButton to="/registration">Registration Info</PrimaryButton>
+          <PrimaryButton to="/registration">Register Now</PrimaryButton>
           <SecondaryButton to="/hackathon">Explore the Hackathon</SecondaryButton>
         </div>
       </section>

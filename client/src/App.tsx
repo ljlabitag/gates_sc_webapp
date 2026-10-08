@@ -10,6 +10,8 @@ import Privacy from "./pages/Privacy";
 // Code-split: ~300 lines used by two people, no reason to ship it in every
 // public page's bundle (brief §10 performance pass).
 const Admin = lazy(() => import("./pages/Admin"));
+// Same reasoning, and it also carries the QR-decoding library.
+const AdminCheckin = lazy(() => import("./pages/AdminCheckin"));
 
 // Early-access gate: Home/Program/Conference aren't signed off for
 // production yet, so every path except /registration, /hackathon, /privacy,
@@ -57,6 +59,14 @@ function App() {
           element={
             <Suspense fallback={null}>
               <Admin />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/admin/checkin"
+          element={
+            <Suspense fallback={null}>
+              <AdminCheckin />
             </Suspense>
           }
         />

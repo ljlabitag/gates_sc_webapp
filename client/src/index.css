@@ -240,7 +240,7 @@
   .nav-register-gradient {
     background:
       linear-gradient(rgba(8, 9, 11, 0.3), rgba(8, 9, 11, 0.3)),
-      linear-gradient(110deg, #1a1aea 0%, #984077 34%, #118e8e 67%, #fd9404 100%);
+      linear-gradient(110deg, #1a1aea 0%, #118e8e 34%, #fd9404 67%, #984077 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.28),
       0 3px 14px rgba(26, 26, 234, 0.16);
@@ -251,25 +251,60 @@
      big, bold visual headline instead — same brand-gradient treatment as
      nav-register-gradient, just its own class since a hero badge and a nav
      button warrant independent sizing/padding tuning over time. */
-  /* The IEC poster (components/ConferencePoster.tsx). Capped at its native
-     1600px width; on wider screens it sits centred on the page's near-black
-     hero background, and a soft edge fade stops it reading as a hard
-     box. The fade is confined to the outer 6% (sides) and 4% (top/bottom),
-     where the artwork is only dark texture — no text or logos live there. */
-  .conference-poster {
+  /* The IEC hero posters (components/HeroPoster.tsx — Conference, Home, About).
+     Capped at 1600px wide. Up to that width the artwork runs edge to edge, so
+     only its top and bottom edges are softened into the page. Past 1600px the
+     poster sits centred on the page's near-black hero background, and a soft
+     side fade (outer 6%) stops it reading as a hard box — applied only then,
+     because below that it would just dim the artwork's own edge colours.
+     Phones get the portrait design, which also runs edge to edge, so they only
+     fade the bottom. (768px = Tailwind's md, matching the <picture> breakpoint.) */
+  .hero-poster {
     max-width: 1600px;
-    -webkit-mask-image:
-      linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
-    -webkit-mask-composite: source-in;
-    mask-image:
-      linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
-      linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
-    mask-composite: intersect;
+    -webkit-mask-image: linear-gradient(to bottom, black 96%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 96%, transparent 100%);
   }
 
-  .conference-poster-hero {
+  @media (min-width: 768px) {
+    .hero-poster {
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+    }
+  }
+
+  @media (min-width: 1601px) {
+    .hero-poster {
+      -webkit-mask-image:
+        linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+      -webkit-mask-composite: source-in;
+      mask-image:
+        linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%),
+        linear-gradient(to bottom, transparent 0%, black 4%, black 96%, transparent 100%);
+      mask-composite: intersect;
+    }
+  }
+
+  .hero-poster-bg {
     background: #050506;
+  }
+
+  /* Staff pages (admin, check-in) wear the site's look. The check-in screen is
+     seen by arriving participants, so it gets the full brand backdrop: the
+     hero gradient plus the net-grid artwork rising from the bottom edge. The
+     admin only gets a faint bloom along the top, so dense tables stay calm. */
+  .checkin-grid-bg {
+    background-image: url("./assets/hero/grid-color-bg.webp");
+    background-size: cover;
+    background-position: center bottom;
+    opacity: 0.42;
+    -webkit-mask-image: linear-gradient(to top, black 0%, black 35%, transparent 80%);
+    mask-image: linear-gradient(to top, black 0%, black 35%, transparent 80%);
+  }
+
+  .admin-bloom {
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
   }
 
   .conference-hero-badge {

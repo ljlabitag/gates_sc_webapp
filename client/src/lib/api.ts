@@ -27,6 +27,10 @@ export interface RegistrationInput {
   /** Optional division or section within the agency. */
   division: string;
   designation: string;
+  /** One of AGE_BRACKETS (data/registration.ts). */
+  ageBracket: string;
+  /** One of SEX_OPTIONS (data/registration.ts). */
+  sexAtBirth: string;
   /** Checked options from DIETARY_OPTIONS (data/registration.ts). */
   dietaryPreferences: string[];
   foodAllergies: string;

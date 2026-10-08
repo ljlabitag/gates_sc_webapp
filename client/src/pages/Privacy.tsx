@@ -58,10 +58,17 @@ export default function Privacy() {
             </a>
             . It collects your name (and, optionally, a nickname for your name tag), email address, mobile number,
             agency or organization, division or section (where applicable), and position or designation, used to manage attendance and to send you your confirmation and venue details. It
+            also asks for your age bracket (not your birth date) and your sex assigned at birth — you may answer
+            &ldquo;Prefer not to say&rdquo; — which are used only for aggregate attendance reporting. It
             also lets you share dietary preferences, food allergies, and special-assistance needs (such as senior
             citizen or PWD status). That information can reveal health conditions, so it is optional, limited to a
             short checklist and a short note, and used only to arrange catering, access, and seating at the
             conference.
+          </p>
+          <p className="m-0">
+            <strong className="text-white/85 font-semibold">Attendance.</strong> At the venue, staff scan the QR code
+            in your confirmation email (or look you up by name) to record that you arrived, along with the time. This
+            is used to confirm attendance and to send you follow-up materials for the conference.
           </p>
           <p className="m-0">
             <strong className="text-white/85 font-semibold">Spam protection.</strong> The registration form may use

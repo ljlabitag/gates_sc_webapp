@@ -1,0 +1,1 @@
+ALTER TABLE `registrations` ADD `kit_sent_at` integer;
