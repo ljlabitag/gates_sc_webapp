@@ -9,6 +9,8 @@
 // so keep these in sync by hand if the options or limits ever change.
 export const DIETARY_OPTIONS = ["Vegetarian", "Halal", "No pork"];
 export const ASSISTANCE_OPTIONS = ["Senior citizen", "Person with disability (PWD)", "Pregnant"];
+export const AGE_BRACKETS = ["Below 18", "18-24", "25-34", "35-44", "45-54", "55-64", "65 and above"];
+export const SEX_OPTIONS = ["Female", "Male", "Prefer not to say"];
 export const LIMITS = {
   name: 60,
   nickname: 30,
@@ -42,6 +44,8 @@ export interface RegistrationFields {
   agency: string;
   division: string | null;
   designation: string;
+  ageBracket: string | null;
+  sexAtBirth: string | null;
   dietaryPreferences: string | null;
   foodAllergies: string | null;
   specialAssistance: string | null;
@@ -67,7 +71,23 @@ function checklist(value: unknown, allowed: string[]): { ok: true; value: string
   return { ok: true, value: chosen.join("; ") || null };
 }
 
-export function parseRegistrationFields(body: Record<string, unknown>): ParsedRegistration {
+// Required single choice from a fixed list. With `required` off (the admin
+// editor, which has to be able to save rows from before these fields existed)
+// a blank is accepted and stored as null; a value outside the list never is.
+function choice(
+  value: unknown,
+  allowed: string[],
+  required: boolean,
+): { ok: true; value: string | null } | { ok: false; missing: boolean } {
+  const picked = text(value);
+  if (!picked) return required ? { ok: false, missing: true } : { ok: true, value: null };
+  return allowed.includes(picked) ? { ok: true, value: picked } : { ok: false, missing: false };
+}
+
+export function parseRegistrationFields(
+  body: Record<string, unknown>,
+  { requireDemographics = true }: { requireDemographics?: boolean } = {},
+): ParsedRegistration {
   const firstName = text(body.firstName);
   const lastName = text(body.lastName);
   // Accept "D" or "D." — stored as the bare uppercase letter.
@@ -97,6 +117,14 @@ export function parseRegistrationFields(body: Record<string, unknown>): ParsedRe
   }
   if (!agency) return { ok: false, error: "Please enter your agency or organization." };
   if (!designation) return { ok: false, error: "Please enter your position or designation." };
+  const age = choice(body.ageBracket, AGE_BRACKETS, requireDemographics);
+  if (!age.ok) {
+    return { ok: false, error: age.missing ? "Please select your age bracket." : "Please choose an age bracket from the list provided." };
+  }
+  const sex = choice(body.sexAtBirth, SEX_OPTIONS, requireDemographics);
+  if (!sex.ok) {
+    return { ok: false, error: sex.missing ? "Please select your sex assigned at birth." : "Please choose an option from the list provided for sex assigned at birth." };
+  }
   if (
     firstName.length > LIMITS.name ||
     lastName.length > LIMITS.name ||
@@ -137,6 +165,8 @@ export function parseRegistrationFields(body: Record<string, unknown>): ParsedRe
       agency,
       division,
       designation,
+      ageBracket: age.value,
+      sexAtBirth: sex.value,
       dietaryPreferences: dietary.value,
       foodAllergies,
       specialAssistance: assistance.value,

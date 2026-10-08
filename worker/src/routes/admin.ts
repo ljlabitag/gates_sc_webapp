@@ -95,7 +95,9 @@ adminRoute.patch("/registrations/:id", adminAuth, async (c) => {
   if (!body || typeof body !== "object") {
     return c.json({ error: "Invalid request body." }, 400);
   }
-  const parsed = parseRegistrationFields(body);
+  // Rows from before age bracket / sex were collected have neither, so an
+  // admin correcting some other field mustn't be forced to invent them.
+  const parsed = parseRegistrationFields(body, { requireDemographics: false });
   if (!parsed.ok) {
     return c.json({ error: parsed.error }, 400);
   }
@@ -362,6 +364,8 @@ const REGISTRATION_COLUMNS = [
   "agency",
   "division",
   "designation",
+  "ageBracket",
+  "sexAtBirth",
   "dietaryPreferences",
   "foodAllergies",
   "specialAssistance",

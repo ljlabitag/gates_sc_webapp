@@ -69,6 +69,8 @@ function Details({ r }: { r: Registration }) {
     ["Mobile", r.mobile],
     ["Position", r.designation],
     ["Division / section", r.division],
+    ["Age bracket", r.ageBracket],
+    ["Sex assigned at birth", r.sexAtBirth],
     ["Dietary", [r.dietaryPreferences, r.foodAllergies].filter(Boolean).join(" · ") || null],
     ["Special assistance", [r.specialAssistance, r.assistanceNeeded].filter(Boolean).join(" · ") || null],
     ["Photo / video consent", r.documentationConsent ? "Yes" : "No"],

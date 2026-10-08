@@ -31,6 +31,11 @@ export const registrations = sqliteTable("registrations", {
   agency: text("agency"),
   division: text("division"),
   designation: text("designation"),
+  // Demographics for attendance reporting: one of a fixed list of age brackets
+  // (never a birth date) and sex assigned at birth, which may be "Prefer not
+  // to say". Null on registrations made before these were collected.
+  ageBracket: text("age_bracket"),
+  sexAtBirth: text("sex_at_birth"),
   // Superseded by `agency` ("Agency / Organization") — new registrations
   // never write it. Left in place so the migration stays additive.
   organization: text("organization"),

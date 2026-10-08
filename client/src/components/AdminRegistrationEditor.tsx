@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { ASSISTANCE_OPTIONS, DIETARY_OPTIONS, REGISTRATION_LIMITS } from "../data/registration";
+import { AGE_BRACKETS, ASSISTANCE_OPTIONS, DIETARY_OPTIONS, REGISTRATION_LIMITS, SEX_OPTIONS } from "../data/registration";
 
 /** The editable subset of a registration row, as the admin API returns it. */
 export interface EditableRegistration {
@@ -14,6 +14,8 @@ export interface EditableRegistration {
   agency: string | null;
   division: string | null;
   designation: string | null;
+  ageBracket: string | null;
+  sexAtBirth: string | null;
   dietaryPreferences: string | null;
   foodAllergies: string | null;
   specialAssistance: string | null;
@@ -81,6 +83,8 @@ export default function AdminRegistrationEditor({
     agency: registration.agency ?? "",
     division: registration.division ?? "",
     designation: registration.designation ?? "",
+    ageBracket: registration.ageBracket ?? "",
+    sexAtBirth: registration.sexAtBirth ?? "",
     foodAllergies: registration.foodAllergies ?? "",
     assistanceNeeded: registration.assistanceNeeded ?? "",
   });
@@ -113,6 +117,18 @@ export default function AdminRegistrationEditor({
       required={required}
       onChange={(e) => set(key)(e.target.value)}
     />
+  );
+
+  // Blank is allowed here: rows from before these were collected have neither.
+  const select = (key: "ageBracket" | "sexAtBirth", options: readonly string[]) => (
+    <select className={inputClass} value={form[key]} onChange={(e) => set(key)(e.target.value)}>
+      <option value="">Not provided</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
   );
 
   const handleSubmit = async (event: FormEvent) => {
@@ -189,6 +205,10 @@ export default function AdminRegistrationEditor({
             onChange={(e) => set("email")(e.target.value)}
           />
         </Labeled>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Labeled label="Age bracket">{select("ageBracket", AGE_BRACKETS)}</Labeled>
+          <Labeled label="Sex assigned at birth">{select("sexAtBirth", SEX_OPTIONS)}</Labeled>
+        </div>
         <Labeled label="Agency / Organization *">{text("agency", REGISTRATION_LIMITS.agency, true)}</Labeled>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Labeled label="Division / Section">{text("division", REGISTRATION_LIMITS.division)}</Labeled>

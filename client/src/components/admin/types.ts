@@ -11,6 +11,8 @@ export interface Registration {
   agency: string | null;
   division: string | null;
   designation: string | null;
+  ageBracket: string | null;
+  sexAtBirth: string | null;
   dietaryPreferences: string | null;
   foodAllergies: string | null;
   specialAssistance: string | null;
