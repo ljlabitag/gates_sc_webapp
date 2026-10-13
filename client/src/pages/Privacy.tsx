@@ -56,7 +56,7 @@ export default function Privacy() {
             <a href="/registration" className="text-gates-link no-underline font-semibold">
               registration page
             </a>
-            . It collects your name (and, optionally, a nickname for your name tag), email address, mobile number,
+            . It collects your name (and a nickname for your name tag), email address, mobile number,
             agency or organization, division or section (where applicable), and position or designation, used to manage attendance and to send you your confirmation and venue details. It
             also asks for your age bracket (not your birth date) and your sex assigned at birth — you may answer
             &ldquo;Prefer not to say&rdquo; — which are used only for aggregate attendance reporting. It

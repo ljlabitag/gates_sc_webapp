@@ -155,6 +155,10 @@ export default function Registration() {
       setError("Please enter your last name.");
       return;
     }
+    if (!form.nickname.trim()) {
+      setError("Please enter your nickname.");
+      return;
+    }
     if (!form.email.trim() || !EMAIL_RE.test(form.email.trim())) {
       setError("Please enter a valid email address.");
       return;
@@ -316,7 +320,7 @@ export default function Registration() {
                     />
                   </Field>
                 </div>
-                <Field id="nickname" label="Nickname" hint="Optional. How you'd like to be called — printed on your name tag.">
+                <Field id="nickname" label="Nickname" required hint="How you'd like to be called — printed on your name tag.">
                   <input
                     id="nickname"
                     className={inputClass}
@@ -326,6 +330,7 @@ export default function Registration() {
                     maxLength={REGISTRATION_LIMITS.nickname}
                     autoComplete="nickname"
                     placeholder="e.g. Jun"
+                    required
                   />
                 </Field>
                 <Field

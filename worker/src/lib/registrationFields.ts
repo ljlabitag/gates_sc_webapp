@@ -86,7 +86,7 @@ function choice(
 
 export function parseRegistrationFields(
   body: Record<string, unknown>,
-  { requireDemographics = true }: { requireDemographics?: boolean } = {},
+  { requireNewFields = true }: { requireNewFields?: boolean } = {},
 ): ParsedRegistration {
   const firstName = text(body.firstName);
   const lastName = text(body.lastName);
@@ -106,6 +106,11 @@ export function parseRegistrationFields(
   if (rawInitial && !/^\p{L}$/u.test(rawInitial)) {
     return { ok: false, error: "Middle initial should be a single letter." };
   }
+  // Nickname, age bracket and sex were added after the first registrations,
+  // so they're required of new registrations only (requireNewFields): rows
+  // from before have none of them, and an admin fixing another field on one
+  // mustn't be forced to invent them.
+  if (requireNewFields && !nickname) return { ok: false, error: "Please enter your nickname." };
   if (!email) return { ok: false, error: "Please enter your email address." };
   if (!EMAIL_RE.test(email) || email.length > EMAIL_MAX_LENGTH) {
     return { ok: false, error: "Please enter a valid email address." };
@@ -117,11 +122,11 @@ export function parseRegistrationFields(
   }
   if (!agency) return { ok: false, error: "Please enter your agency or organization." };
   if (!designation) return { ok: false, error: "Please enter your position or designation." };
-  const age = choice(body.ageBracket, AGE_BRACKETS, requireDemographics);
+  const age = choice(body.ageBracket, AGE_BRACKETS, requireNewFields);
   if (!age.ok) {
     return { ok: false, error: age.missing ? "Please select your age bracket." : "Please choose an age bracket from the list provided." };
   }
-  const sex = choice(body.sexAtBirth, SEX_OPTIONS, requireDemographics);
+  const sex = choice(body.sexAtBirth, SEX_OPTIONS, requireNewFields);
   if (!sex.ok) {
     return { ok: false, error: sex.missing ? "Please select your sex assigned at birth." : "Please choose an option from the list provided for sex assigned at birth." };
   }

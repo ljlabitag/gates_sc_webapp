@@ -95,9 +95,9 @@ adminRoute.patch("/registrations/:id", adminAuth, async (c) => {
   if (!body || typeof body !== "object") {
     return c.json({ error: "Invalid request body." }, 400);
   }
-  // Rows from before age bracket / sex were collected have neither, so an
-  // admin correcting some other field mustn't be forced to invent them.
-  const parsed = parseRegistrationFields(body, { requireDemographics: false });
+  // Rows from before nickname / age bracket / sex were required lack them, so
+  // an admin correcting some other field mustn't be forced to invent them.
+  const parsed = parseRegistrationFields(body, { requireNewFields: false });
   if (!parsed.ok) {
     return c.json({ error: parsed.error }, 400);
   }
