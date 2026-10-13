@@ -13,11 +13,11 @@ const Admin = lazy(() => import("./pages/Admin"));
 // Same reasoning, and it also carries the QR-decoding library.
 const AdminCheckin = lazy(() => import("./pages/AdminCheckin"));
 
-// Early-access gate: Home/Program/Conference aren't signed off for
-// production yet, so every path except /registration, /hackathon, /privacy,
-// and /admin redirects to /hackathon there (nav links included, since they
-// route through here too). /registration is open on production because
-// invitations link straight to it. Same build runs on every environment — no separate
+// Early-access gate: when active on a host, every path except /registration,
+// /hackathon, /privacy, and /admin redirects to /hackathon (nav links
+// included, since they route through here too). It is currently off on every
+// known host, production included; it stays as the fail-closed default for any
+// unlisted host. Same build runs on every environment — no separate
 // staging build exists (worker:deploy and worker:deploy:staging both just
 // run `npm run build -w client`) — so this is a runtime hostname check, not
 // a build-time flag. Defaults to GATE ACTIVE for any host not explicitly
@@ -28,6 +28,9 @@ const EARLY_ACCESS_GATE_DISABLED_HOSTS = new Set([
   "localhost",
   "127.0.0.1",
   "gates-sc-webapp-staging.dost-gates.workers.dev",
+  // Production, opened up once the content was signed off. To close the gate
+  // again, remove this line — nothing else needs to change.
+  "gates-sc-webapp.dost-gates.workers.dev",
 ]);
 
 function isEarlyAccessGateActive(): boolean {
