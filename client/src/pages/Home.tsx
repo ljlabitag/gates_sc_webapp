@@ -227,7 +227,7 @@ function HackathonHeroSlide({ active }: { active: boolean }) {
 export default function Home() {
   usePageMeta(
     `${CONFERENCE.edition} — November 10, 2026`,
-    "The 2nd GATES Program Stakeholder Conference, November 10, 2026 in Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.",
+    "The 2nd GATES Program Stakeholder Conference, November 10, 2026 at Acacia Hotel Manila, Muntinlupa, Metro Manila. Keynotes, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.",
   );
 
   const { d, h, m, s } = useCountdown(CONFERENCE_DATE);

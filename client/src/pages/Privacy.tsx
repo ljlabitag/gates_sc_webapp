@@ -57,7 +57,7 @@ export default function Privacy() {
               registration page
             </a>
             . It collects your name (and a nickname for your name tag), email address, mobile number,
-            agency or organization, division or section (where applicable), and position or designation, used to manage attendance and to send you your confirmation and venue details. It
+            agency or organization, division or section (where applicable), and position or designation, used to manage attendance and to send you your confirmation and event details. It
             also asks for your age bracket (not your birth date) and your sex assigned at birth — you may answer
             &ldquo;Prefer not to say&rdquo; — which are used only for aggregate attendance reporting. It
             also lets you share dietary preferences, food allergies, and special-assistance needs (such as senior

@@ -127,8 +127,8 @@ export const PHASES = [
       "Orientation and capacity building (online, October 7) — onboarding to the GATES Lakehouse sandbox, datasets, and tools; briefing on rules, deliverables, scoring, and data governance; matching with assigned GATES mentors.",
       "Development period (October 8 – November 8) — teams build at their own offices with mentor support.",
       "Virtual check-ins — two mandatory online checkpoints with GATES specialists on October 20 and November 3, plus on-demand consultations with mentors.",
-      "Final coaching and technical judging (face-to-face, November 9) — a walkthrough of pitching rules and a coaching session, then each team presents to the technical panel: 10 minutes to pitch, 5 minutes Q&A, 5 minutes of feedback. Worth 70% of the final score.",
-      "Final pitch and executive judging (November 10) — teams deliver an improved 5-minute pitch to the executive panel and the conference audience. Worth 30% of the final score.",
+      "Final coaching and technical judging (face-to-face at Acacia Hotel Manila, Muntinlupa, Metro Manila, November 9) — a walkthrough of pitching rules and a coaching session, then each team presents to the technical panel: 10 minutes to pitch, 5 minutes Q&A, 5 minutes of feedback. Worth 70% of the final score.",
+      "Final pitch and executive judging (November 10, Acacia Hotel Manila) — teams deliver an improved 5-minute pitch to the executive panel and the conference audience. Worth 30% of the final score.",
       "Awarding — winners announced during the conference.",
     ],
   },
@@ -204,11 +204,11 @@ export const RUBRICS: Rubric[] = [
 // Orientation is online now (see PHASES), so there's no separate covered
 // hotel night for it — only Finals gets one, per the mechanics' §X.
 export const COVERED_COSTS = [
-  "Finals (November 9–10) — one night of hotel accommodation, with meals during the activity.",
+  "Finals (November 9–10, Acacia Hotel Manila, Muntinlupa) — one night of hotel accommodation, with meals during the activity.",
 ];
 
 export const PARTICIPANT_COSTS = [
-  "Airfare and land travel to and from Metro Manila for face-to-face activities.",
+  "Airfare and land travel to and from Acacia Hotel Manila (Muntinlupa, Metro Manila) for face-to-face activities.",
   "Accommodation and meals beyond the covered night and activity meals.",
 ];
 

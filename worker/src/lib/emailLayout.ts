@@ -7,15 +7,15 @@
 // sending anything.
 //
 // Event facts mirror client/src/data/conference.ts — the packages don't share
-// code, so update both if the date, time or venue change. The time and venue
-// are deliberately worded as provisional: the site itself still calls the
-// agenda provisional and the venue "to be announced".
+// code, so update both if the date, time or venue change. The time is
+// deliberately worded as tentative: the site still calls the agenda
+// provisional.
 
 export const EVENT = {
   name: "2nd GATES Program Stakeholder Conference",
   date: "Tuesday, November 10, 2026",
   time: "8:00 AM – 4:00 PM (tentative)",
-  venue: "Metro Manila — exact venue to be announced",
+  venue: "Acacia Hotel Manila, Muntinlupa, Metro Manila",
   contact: "dostgates@dost.gov.ph",
   secretariat: "GATES Program Secretariat",
 };

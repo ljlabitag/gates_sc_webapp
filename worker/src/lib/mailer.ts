@@ -141,8 +141,7 @@ export interface RegistrationConfirmationDetails {
 }
 
 // The content lives in registrationEmail.ts (pure, so it can be previewed
-// without sending). The time and venue it states are provisional, matching the
-// site. No secretariat notification accompanies this: unlike a proposal, a
+// without sending). The time it states is tentative, matching the site. No secretariat notification accompanies this: unlike a proposal, a
 // registration doesn't need a human to look at it, and one email per
 // registrant would bury the shared inbox — the admin panel lists them all.
 export function sendRegistrationConfirmation(

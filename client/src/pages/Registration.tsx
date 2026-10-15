@@ -248,8 +248,8 @@ export default function Registration() {
                 </p>
               ) : (
                 <p className="text-sm leading-[1.6] text-white/62 m-0">
-                  We&apos;ve sent a confirmation to {form.email.trim()}. Venue and travel details will be sent to
-                  that address as soon as they&apos;re confirmed.
+                  We&apos;ve sent a confirmation to {form.email.trim()}. Further event details will be sent to that
+                  address as they&apos;re confirmed.
                 </p>
               )}
               <p className="text-[13px] leading-[1.6] text-white/50 m-0 mt-1">
@@ -337,7 +337,7 @@ export default function Registration() {
                   id="email"
                   label="Email address"
                   required
-                  hint="Your confirmation, and later the venue details, are sent here."
+                  hint="Your confirmation, and later event updates, are sent here."
                 >
                   <input
                     id="email"
@@ -581,7 +581,7 @@ export default function Registration() {
             </div>
             <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4 text-sm text-white/80">
               <span className="text-white/50">Venue</span>
-              <span className="text-right">Metro Manila</span>
+              <span className="text-right">{CONFERENCE.venueLabel}</span>
             </div>
             <div className="h-px bg-white/10 my-1.5" />
             <Eyebrow>INCLUDES</Eyebrow>

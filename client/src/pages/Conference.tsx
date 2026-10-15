@@ -69,7 +69,7 @@ const AGENDA_GROUPS = [
 export default function Conference() {
   usePageMeta(
     `${CONFERENCE.edition} — ${CONFERENCE.dateLabel}`,
-    `The 2nd GATES Program Stakeholder Conference, ${CONFERENCE.dateLabel} in Metro Manila. Program updates, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.`,
+    `The 2nd GATES Program Stakeholder Conference, ${CONFERENCE.dateLabel} at ${CONFERENCE.venueLabel}. Program updates, the Use Case Development Showcase, the Geospatial Gallery, and the first GATES GeoHack 2026.`,
   );
 
   return (
@@ -194,15 +194,12 @@ export default function Conference() {
           </div>
           <div>
             <Eyebrow>VENUE</Eyebrow>
-            <h3 className="text-[19px] font-semibold mt-2 mb-1.5">Metro Manila</h3>
+            <h3 className="text-[19px] font-semibold mt-2 mb-1.5">{CONFERENCE.venueName}</h3>
             <p className="text-sm leading-[1.6] text-white/60 m-0">
-              The venue is being finalized. Exact location and travel details will be posted here and sent to registered
-              participants as soon as they are confirmed.
+              {CONFERENCE.venueArea}. The conference and the GeoHack 2026 finals are held here; arrival details will
+              be sent to registered participants.
             </p>
           </div>
-          <span className="sm:ml-auto shrink-0 self-start sm:self-center px-3 py-1.5 rounded-full border border-white/12 bg-white/6 font-heading text-[10px] font-semibold uppercase tracking-[0.08em] text-white/62">
-            To be announced
-          </span>
         </div>
       </PageSection>
 

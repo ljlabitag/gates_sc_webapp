@@ -614,7 +614,7 @@ export default function Hackathon() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 sm:p-5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-teal">November 9</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-teal">November 9 · Acacia Hotel Manila</span>
                 <h4 className="text-[15px] font-semibold mt-2 mb-1.5">Technical judging</h4>
                 <p className="text-[13px] leading-[1.6] text-white/58 m-0">
                   Teams demonstrate their working solution, explain its technical implementation, and respond to the
@@ -622,7 +622,7 @@ export default function Hackathon() {
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 sm:p-5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-plum">November 10</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-gates-plum">November 10 · Acacia Hotel Manila</span>
                 <h4 className="text-[15px] font-semibold mt-2 mb-1.5">Final conference pitch</h4>
                 <p className="text-[13px] leading-[1.6] text-white/58 m-0">
                   Teams present an improved pitch to the executive panel and stakeholder conference audience before

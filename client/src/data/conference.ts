@@ -41,7 +41,9 @@ export const CONFERENCE = {
   dateLabel: "November 10, 2026",
   conferenceProperLabel: "Tuesday, November 10, 2026",
   hackathonDayLabel: "Monday, November 9, 2026",
-  venueLabel: "Metro Manila — venue to be announced",
+  venueName: "Acacia Hotel Manila",
+  venueArea: "Muntinlupa, Metro Manila",
+  venueLabel: "Acacia Hotel Manila, Muntinlupa, Metro Manila",
   /** Confirmed — matches the hackathon mechanics document's own title. */
   theme: "Charting Spatial Futures",
   previousTheme: "#SpatialTogether",
